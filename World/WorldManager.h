@@ -34,6 +34,7 @@
 #include "Asteroid.h"
 #include "Planet.h"
 #include "SpaceStation.h"
+#include "Ship.h"
 
 namespace OpenSR
 {
@@ -96,6 +97,7 @@ public:
     Q_INVOKABLE bool saveWorld(const QString& path);
     Q_INVOKABLE bool loadWorld(const QString& path);
 
+    Q_INVOKABLE OpenSR::World::ShipStyle            ShipStyle();
     Q_INVOKABLE OpenSR::World::RaceStyle            RaceStyle();
     Q_INVOKABLE OpenSR::World::PlanetarySystemStyle PlanetarySystemStyle();
     Q_INVOKABLE OpenSR::World::AsteroidStyle        AsteroidStyle();
