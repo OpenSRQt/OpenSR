@@ -96,11 +96,11 @@ public:
     Q_INVOKABLE bool saveWorld(const QString& path);
     Q_INVOKABLE bool loadWorld(const QString& path);
 
-    Q_INVOKABLE OpenSR::World::RaceStyle            *RaceStyle();
-    Q_INVOKABLE OpenSR::World::PlanetarySystemStyle *PlanetarySystemStyle();
-    Q_INVOKABLE OpenSR::World::AsteroidStyle        *AsteroidStyle();
-    Q_INVOKABLE OpenSR::World::PlanetStyle          *PlanetStyle();
-    Q_INVOKABLE OpenSR::World::StationStyle         *StationStyle();
+    Q_INVOKABLE OpenSR::World::RaceStyle            RaceStyle();
+    Q_INVOKABLE OpenSR::World::PlanetarySystemStyle PlanetarySystemStyle();
+    Q_INVOKABLE OpenSR::World::AsteroidStyle        AsteroidStyle();
+    Q_INVOKABLE OpenSR::World::PlanetStyle          PlanetStyle();
+    Q_INVOKABLE OpenSR::World::StationStyle         StationStyle();
 
     Q_INVOKABLE OpenSR::World::Race*                Race(OpenSR::World::WorldObject *parent = 0);
     Q_INVOKABLE OpenSR::World::Item*                Item(OpenSR::World::WorldObject *parent = 0);
