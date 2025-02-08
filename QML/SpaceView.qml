@@ -21,9 +21,12 @@ Item {
         color: "black"
     }
 
-    Item {
+    Rectangle {
+        // it's in center of the view
+        // topleft corner is a center of the star
         x: parent.width / 2
         y: parent.height / 2
+//        anchors.fill: parent
 
         Image {
             id: bg
@@ -33,35 +36,36 @@ Item {
             cache: false
         }
 
-        Item {
+        Rectangle {
             id: spaceNode
             //transform: Scale {xScale: 0.25; yScale: 0.25}
+
         }
     }
 
-    Item {
-        id: radarView
-        anchors.right: parent.right
-        anchors.top: parent.top
+//    Item {
+//        id: radarView
+//        anchors.right: parent.right
+//        anchors.top: parent.top
 
-        width: radarViewWidth
-        height: width
+//        width: radarViewWidth
+//        height: width
 
-        Image {
-            source: "res:/DATA/PanelSpace2/1RadarA.gi";
-            anchors.fill: parent
-            cache: true
-        }
-        Button {
-            id: radarCenterButton
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            normalImage:  "res:/DATA/PanelSpace2/1CenterN.gi"
-            hoveredImage: "res:/DATA/PanelSpace2/1CenterA.gi"
-            downImage:    "res:/DATA/PanelSpace2/1CenterD.gi"
-            onClicked: console.log("Centering not implemented")
-        }
-    }
+//        Image {
+//            source: "res:/DATA/PanelSpace2/1RadarA.gi";
+//            anchors.fill: parent
+//            cache: true
+//        }
+//        Button {
+//            id: radarCenterButton
+//            anchors.bottom: parent.bottom
+//            anchors.right: parent.right
+//            normalImage:  "res:/DATA/PanelSpace2/1CenterN.gi"
+//            hoveredImage: "res:/DATA/PanelSpace2/1CenterA.gi"
+//            downImage:    "res:/DATA/PanelSpace2/1CenterD.gi"
+//            onClicked: console.log("Centering not implemented")
+//        }
+//    }
 
     onSystemChanged: {
         for(var i in spaceNode.children) {
@@ -326,6 +330,21 @@ Item {
         text: "Turn"
         onClicked: WorldManager.startTurn()
     }
+    Button {
+        id: shipViewButton
+        anchors.bottom: parent.bottom
+        anchors.right:  turnButton.left
+        text: "Ship"
+        onClicked: {
+            console.log("clicked");
+            shipView.visible = !shipView.visible
+        }
+    }
+
+    ShipWindow {
+        id: shipView
+        anchors.centerIn: parent
+    }
 
     TrajectoryItem {
         id: playerTrajectoryView
@@ -351,6 +370,8 @@ Item {
         anchors.fill: parent
         propagateComposedEvents: true
         onClicked: {
+            mouse.accepted = false;
+//            return;
             if (mouse.button !== Qt.LeftButton)
                 return;
 

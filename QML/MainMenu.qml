@@ -13,7 +13,7 @@ Item {
     }
 
     Connections {
-        onHeightChanged: {
+        function onHeightChanged() {
             background.height = menu.height
             updateBackgroundAnim()
         }
@@ -39,6 +39,7 @@ Item {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
     }
+
     GAIAnimatedImage {
         id: grid
         
@@ -167,9 +168,11 @@ Item {
     
     Music {
         id: music
-        source: "res:/Music/SPECIAL/SpaceIsCalling.dat"
+//        source: "res:/Music/SPECIAL/SpaceIsCalling.dat"
+//        source: "/media/oldhome/kakadu/prog/OpenSR/data/SPECIAL/SpaceIsCalling.dat"
+        source: Engine.dataDir + "/SPECIAL/SpaceIsCalling.dat"
         Component.onCompleted: {
-            play();
+            //play();
         }
     }
     
@@ -178,6 +181,7 @@ Item {
     }
 
     function newGame() {
+        console.log(JSON.stringify(World))
         World.generateWorld("res:/World/DefaultWorldGen.js");
         changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
@@ -195,4 +199,6 @@ Item {
             object.questSelected.connect(startQuest)
         }
     }
+
+    //Component.onCompleted: newGame()
 }

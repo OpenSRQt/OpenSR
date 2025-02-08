@@ -318,9 +318,18 @@ QIODevice *ResourceManager::getIODevice(const QString& path, QObject *parent)
 
 QIODevice *ResourceManager::getIODevice(const QUrl& path, QObject *parent)
 {
+    if (QFile::exists( path.path() )) {
+        auto r = new QFile(path.path());
+        r->open(QFile::ReadOnly);
+        return r;
+    }
+
     if (path.scheme().compare("res", Qt::CaseInsensitive) &&
         path.scheme().compare("dat", Qt::CaseInsensitive))
+    {
+        qDebug() << __FILE__ << __LINE__;
         return 0;
+    }
 
     QString p = path.path();
     if (!path.scheme().compare("dat", Qt::CaseInsensitive))

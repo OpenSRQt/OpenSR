@@ -32,7 +32,7 @@ Item {
                 !((p.x < visibleRect.x) || (p.y < visibleRect.y) ||
                  (p.x > (visibleRect.x + visibleRect.width)) ||
                  (p.y > (visibleRect.y + visibleRect.height)));
-        console.log("checking point " + p + "in rect " + visibleRect + "says " + ans)
+        //console.log("checking point " + p + "in rect " + visibleRect + "says " + ans)
         return ans;
     }
 

@@ -96,10 +96,12 @@ createAsteroidStyles();
 sector = genSector("Sector.Caragon", "Constellations.Name.3")
 var system = genSystem("System.Solar", sector, "Star.02", 10000, "dat:/Bm.Star.00a", "#FFFFFF", "dat:/Bm.BGO.bg00")
 
-var styleCount = Object.keys(asteroidStyles).length
+var styleCount = Object.keys(asteroidStyles).length / 2
 var i = 0
 for(var k in asteroidStyles)
 {
+    if (i>= styleCount)
+        break;
     var asteroid = World.newAsteroid(system);
     asteroid.objectName = "Asteroid." + k;
     asteroid.style = asteroidStyles[k];

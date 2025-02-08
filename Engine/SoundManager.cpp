@@ -238,15 +238,19 @@ MusicDecoder *SoundManager::getMusicDecoder(const QUrl& url, QObject *parent)
             !QFileInfo(path).suffix().compare("dat", Qt::CaseInsensitive))
     {
         QIODevice *dev = ((Engine *)qApp)->resources()->getIODevice(url);
-        if (!dev)
+        if (!dev) {
+            qDebug() << "Bad IO device";
             return 0;
+        }
         return new MPG123MusicDecoder(dev, parent);
     }
     else if (!QFileInfo(path).suffix().compare("ogg", Qt::CaseInsensitive))
     {
         QIODevice *dev = ((Engine *)qApp)->resources()->getIODevice(url);
-        if (!dev)
+        if (!dev) {
+            qDebug() << "Bad IO device";
             return 0;
+        }
         return new VorbisMusicDecoder(dev, parent);
     }
     qWarning() << "Unsupported music format: " << QFileInfo(path).suffix();

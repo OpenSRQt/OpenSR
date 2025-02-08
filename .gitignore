@@ -5,4 +5,5 @@ Makefile
 CMakeFiles
 *.user
 CMakeCache.txt
-
+/data/*.pkg
+/data/*.dat

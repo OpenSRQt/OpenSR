@@ -59,6 +59,7 @@ static QObject* managerSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEn
 void bindWorldTypes(QJSEngine *script, QQmlEngine *qml)
 {
     script->globalObject().setProperty("World", script->newQObject(WorldManager::instance()));
+    qDebug() << "World is binded: " << WorldManager::instance();
 
     qmlRegisterSingletonType<WorldManager>("OpenSR.World", 1, 0, "WorldManager", managerSingletonProvider);
     WorldObject::registerType<WorldObject>(qml, script);
