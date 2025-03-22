@@ -227,8 +227,8 @@ void Ship::evalTrajectoryTo(const QPointF &dest)
 
     qDebug() << "from" << startPos << "to" << dest;
 
-    auto dx = qAbs(dest.x() - startPos.x());
-    auto dy = qAbs(dest.y() - startPos.y());
+    auto dx = dest.x() - startPos.x();
+    auto dy = dest.y() - startPos.y();
     qDebug() << startPos << dest;
     qDebug() << QString("dx = %1, dy = %2").arg(dx).arg(dy);
 
