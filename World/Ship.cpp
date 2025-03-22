@@ -22,6 +22,8 @@
 #include <QtQml/QQmlEngine>
 #include <QtMath>
 
+#define CONST_SPEED 0.05f
+
 namespace OpenSR
 {
 namespace World
@@ -116,6 +118,26 @@ Ship::ShipRank Ship::rank() const
     return m_rank;
 }
 
+float Ship::period() const
+{
+    return m_period;
+}
+
+float Ship::time() const
+{
+    return m_time;
+}
+
+float Ship::speed() const
+{
+    return m_speed;
+}
+
+QPointF Ship::destination() const
+{
+    return m_destination;
+}
+
 void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
 {
     if (m_affiliation == affiliation)
@@ -132,6 +154,70 @@ void Ship::setRank(Ship::ShipRank rank)
 
     m_rank = rank;
     emit rankChanged(m_rank);
+}
+
+void Ship::setPeriod(float period)
+{
+    if (period != m_period)
+    {
+        m_period = period;
+        emit(periodChanged());
+        calcPosition();
+        calcSpeed();
+    }
+}
+
+void Ship::setTime(float time)
+{
+    if (time != m_time)
+    {
+        m_time = time;
+        emit(timeChanged());
+        calcPosition();
+        calcSpeed();
+    }
+}
+
+void Ship::setDestination(QPointF destination)
+{
+    if (destination != m_destination)
+    {
+        m_destination = destination;
+        emit(destinationChanged());
+        calcPosition();
+        calcSpeed();
+    }
+}
+
+void Ship::startTurn()
+{
+    SpaceObject::startTurn();
+}
+
+void Ship::processTurn(float time)
+{
+    calcPosition(time);
+    SpaceObject::processTurn(time);
+}
+
+void Ship::finishTurn()
+{
+    setTime(m_time + 1.0f);
+    SpaceObject::finishTurn();
+}
+
+void Ship::calcPosition(float dt)
+{
+    QPointF next;
+    next.setX((1.0f - dt) * position().x() + dt * m_destination.x());
+    next.setY((1.0f - dt) * position().y() + dt * m_destination.y());
+    setPosition(next);
+}
+
+void Ship::calcSpeed()
+{
+    m_speed = CONST_SPEED;
+    emit(speedChanged());
 }
 
 void Ship::evalTrajectoryTo(const QPointF &dest)

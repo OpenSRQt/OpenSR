@@ -60,6 +60,10 @@ class OPENSR_WORLD_API Ship: public MannedObject
 
     Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation NOTIFY affiliationChanged)
     Q_PROPERTY(ShipRank        rank        READ rank        WRITE setRank        NOTIFY rankChanged)
+    Q_PROPERTY(float period READ period WRITE setPeriod NOTIFY periodChanged)
+    Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
+    Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
+    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
 
 public:
     enum class ShipAffiliation {
@@ -79,25 +83,49 @@ public:
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
 
+    float period() const;
+    float time() const;
+    float speed() const;
+    QPointF destination() const;
+
+
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
     ShipAffiliation affiliation() const;
 
     ShipRank rank() const;
 
+    virtual void startTurn();
+    virtual void processTurn(float time);
+    virtual void finishTurn();
+
     Q_INVOKABLE void evalTrajectoryTo(const QPointF &dest);
 
 public slots:
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
+    void setPeriod(float period);
+    void setTime(float time);
+    void setDestination(QPointF destination);
 
 signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
+    void periodChanged();
+    void timeChanged();
+    void speedChanged();
+    void destinationChanged();
 
 private:
+    void calcPosition(float dt = 0.0f);
+    void calcSpeed();
+
     ShipAffiliation m_affiliation;
     ShipRank m_rank;
+    float m_period;
+    float m_time;
+    float m_speed;
+    QPointF m_destination;
 };
 }
 }
