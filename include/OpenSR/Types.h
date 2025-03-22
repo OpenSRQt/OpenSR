@@ -20,10 +20,10 @@
 #define OPENSR_TYPES_H
 
 #include <OpenSR/OpenSR.h>
-#include <QtCore/QPointF>
-#include <QtCore/QMetaType>
-#include <QtCore/QList>
-#include <QtCore/QObject>
+#include <QPointF>
+#include <QMetaType>
+#include <QList>
+#include <QObject>
 
 namespace OpenSR
 {
@@ -41,9 +41,6 @@ public:
 
     QList<QPointF> calcPolyline(int minStep = 1);
 };
-
-QDataStream& operator<<(QDataStream & stream, const BezierCurve& );
-QDataStream& operator>>(QDataStream & stream, const BezierCurve& );
 }
 
 Q_DECLARE_METATYPE(OpenSR::BezierCurve)
