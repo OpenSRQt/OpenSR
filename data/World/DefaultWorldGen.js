@@ -124,15 +124,12 @@ function initStation(obj, kind) {
     case "rc":
         obj.style = World.StationStyle();
         obj.style.texture = "res:/DATA/Ruins/RC.gai";
-        console.log(World.SpaceStation.RangerCenter)
-        obj.stationKind = 1;//World.SpaceStation.RangerCenter;
-        // TODO: understand why registration of Enums from C++ doesn't work
+        obj.stationKind = World.SpaceStationObject.RangerCenter;
     }
 }
 
 var rangerCenter1 = World.SpaceStation(system);
 initStation(rangerCenter1, "ranger")
-//console.log("rangerCenter1.style = " + rangerCenter1.style);
 rangerCenter1.position = Qt.point(-400, -100);
 
 context.currentSystem = system;
