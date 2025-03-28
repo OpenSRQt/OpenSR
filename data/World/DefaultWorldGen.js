@@ -132,41 +132,39 @@ var rangerCenter1 = World.SpaceStation(system);
 initStation(rangerCenter1, "ranger")
 rangerCenter1.position = Qt.point(-400, -100);
 
-// function shipStyleByAffiliation(ship) {
-//     var raceStr = "";
-//     switch (ship.affiliation) {
-//     case World.Ship.Gaal:   raceStr = "People"; break;
-//     case World.Ship.Fei:    raceStr = "Fei";    break;
-//     case World.Ship.People: raceStr = "People"; break;
-//     case World.Ship.Peleng: raceStr = "Peleng"; break;
-//     case World.Ship.Maloc:  raceStr = "Maloc";  break;
-//     default: return null;
-//     }
-//     var rankStr = "";
-//     switch (ship.rank) {
-//     case World.Ship.Diplomat:  rankStr = "Diplomat";  break;
-//     case World.Ship.Liner:     rankStr = "Liner";     break;
-//     case World.Ship.Ranger:    rankStr = "Ranger";    break;
-//     case World.Ship.Pirate:    rankStr = "Pirate";    break;
-//     case World.Ship.Warrior:   rankStr = "Warrior";   break;
-//     case World.Ship.Transport: rankStr = "Transport"; break;
-//     default: return null;
-//     }
+function shipStyleByAffiliation(ship) {
+    var raceStr = "";
+    switch (ship.affiliation) {
+        case World.ShipObject.Gaal: raceStr = "People"; break;
+        case World.ShipObject.Fei: raceStr = "Fei"; break;
+        case World.ShipObject.People: raceStr = "People"; break;
+        case World.ShipObject.Peleng: raceStr = "Peleng"; break;
+        case World.ShipObject.Maloc: raceStr = "Maloc"; break;
+        default: return null;
+    }
+    var rankStr = "";
+    switch (ship.rank) {
+        case World.ShipObject.Diplomat: rankStr = "Diplomat"; break;
+        case World.ShipObject.Liner: rankStr = "Liner"; break;
+        case World.ShipObject.Ranger: rankStr = "Ranger"; break;
+        case World.ShipObject.Pirate: rankStr = "Pirate"; break;
+        case World.ShipObject.Warrior: rankStr = "Warrior"; break;
+        case World.ShipObject.Transport: rankStr = "Transport"; break;
+        default: return null;
+    }
 
-//     var info = Engine.datValue("Data.SE.Ship." + raceStr + "." + rankStr);
-//     var style = World.newShipStyle();
-//     style.texture = "dat:/" + info.Image; // animated
-//     return style;
-// }
+    var info = Engine.datValue("Data.SE.Ship." + raceStr + "." + rankStr);
+    var style = World.ShipStyle();
+    style.texture = "dat:/" + info.Image; // animated
+    return style;
+}
 
 var ship1 = World.Ship(system);
-ship1.position    = Qt.point(-300, -300);
-// ship1.affiliation = World.Ship.People;
-// ship1.rank        = World.Ship.Diplomat;
-// ship1.style       = shipStyleByAffiliation(ship1);
 
-ship1.style = World.ShipStyle();
-ship1.style.texture = "res:/DATA/Ship/HS0.hai";
+ship1.position    = Qt.point(-300, -300);
+ship1.affiliation = World.ShipObject.People;
+ship1.rank        = World.ShipObject.Diplomat;
+ship1.style       = shipStyleByAffiliation(ship1);
 
 ship1.style.width = 128;
 context.playerShip = ship1;

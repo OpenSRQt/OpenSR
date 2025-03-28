@@ -72,13 +72,13 @@ public:
         Keller, Terron, Blazer,
         UnknownRace
     };
-    Q_ENUM(ShipAffiliation);
+    Q_ENUM(ShipAffiliation)
 
     enum class ShipRank {
         Unspecified = 0,
         Diplomat, Liner, Ranger, Pirate, Warrior, Transport
     };
-    Q_ENUM(ShipRank);
+    Q_ENUM(ShipRank)
 
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
