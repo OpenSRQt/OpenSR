@@ -25,6 +25,8 @@
 #include <QMetaObject>
 #include <QQmlEngine>
 
+#include <QDebug>
+
 class QQmlEngine;
 
 #define WORLD_JS_DEFAULT_OBJECT_CONSTRUCTOR(Factory, Class)\
@@ -55,11 +57,16 @@ static void bindEnumsToJS(QJSEngine *script)
     
     const QMetaObject *obj = &T::staticMetaObject;
 
-    QString className = QString(obj->className()).replace("OpenSR::World::", QString()) + QString("Object");
+    for (int i = 0; i < obj->enumeratorCount(); ++i) {
+        QMetaEnum metaEnum = obj->enumerator(i);
+        QJSValue enumObj = script->newObject();
 
-    QJSValue metaObject = script->newQMetaObject(obj);
+        for (int j = 0; j < metaEnum.keyCount(); ++j) {
+            enumObj.setProperty(metaEnum.key(j), metaEnum.value(j));
+        }
 
-    world.setProperty(className, metaObject);
+        world.setProperty(metaEnum.name(), enumObj);
+    }
 }
 
 }

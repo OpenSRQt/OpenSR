@@ -124,7 +124,7 @@ function initStation(obj, kind) {
     case "rc":
         obj.style = World.StationStyle();
         obj.style.texture = "res:/DATA/Ruins/RC.gai";
-        obj.stationKind = World.SpaceStationObject.RangerCenter;
+        obj.stationKind = World.StationKind.RangerCenter;
     }
 }
 
