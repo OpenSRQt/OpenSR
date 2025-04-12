@@ -52,31 +52,18 @@ static void bindEnumsToJS(QJSEngine *script)
 
     if (world.isUndefined())
         return;
-
+    
     const QMetaObject *obj = &T::staticMetaObject;
-    int enumCount = obj->enumeratorCount();
 
-    if (!enumCount)
-        return;
+    for (int i = 0; i < obj->enumeratorCount(); ++i) {
+        QMetaEnum metaEnum = obj->enumerator(i);
+        QJSValue enumObj = script->newObject();
 
-    QString className = QString(obj->className()).replace("OpenSR::World::", QString());
+        for (int j = 0; j < metaEnum.keyCount(); ++j) {
+            enumObj.setProperty(metaEnum.key(j), metaEnum.value(j));
+        }
 
-    QJSValue p;
-    if (world.hasProperty(className))
-        p = world.property(className);
-    else
-    {
-        p = script->newObject();
-        world.setProperty(className, p);
-    }
-
-    for (int i = 0; i < enumCount; i++)
-    {
-        QMetaEnum e = obj->enumerator(i);
-
-        int ec = e.keyCount();
-        for (int j = 0; j < ec; j++)
-            p.setProperty(e.key(j), e.value(j));
+        world.setProperty(metaEnum.name(), enumObj);
     }
 }
 
