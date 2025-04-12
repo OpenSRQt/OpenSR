@@ -25,8 +25,6 @@
 #include <QMetaObject>
 #include <QQmlEngine>
 
-#include <QDebug>
-
 class QQmlEngine;
 
 #define WORLD_JS_DEFAULT_OBJECT_CONSTRUCTOR(Factory, Class)\
