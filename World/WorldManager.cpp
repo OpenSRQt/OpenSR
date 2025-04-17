@@ -28,6 +28,8 @@
 #include <QQmlEngine>
 
 #include <OpenSR/Engine.h>
+#include <qdebug.h>
+#include <qpoint.h>
 
 #include "WorldObject.h"
 #include "WorldContext.h"
@@ -164,6 +166,29 @@ void TurnAnimation::updateCurrentTime(int currentTime)
         ctx->currentSystem()->processTurn((float)currentTime / (float)duration());
 }
 
+ShipMovementAnimation::ShipMovementAnimation(QObject *parent): QAbstractAnimation(parent), previousTime(0)
+{
+}
+
+int	ShipMovementAnimation::duration() const
+{
+    return -1;
+}
+
+void ShipMovementAnimation::updateCurrentTime(int currentTime)
+{
+    if (state() != ShipMovementAnimation::Running)
+        return;
+
+    WorldContext *ctx = WorldManager::instance()->context();
+    if (ctx && ctx->currentSystem()) 
+    {
+        int deltaTime = currentTime - previousTime;
+        previousTime = currentTime;
+        qobject_cast<Ship*>(ctx->playerShip())->processMovement((float)deltaTime);
+    }
+}
+
 WorldManager* WorldManager::m_staticInstance = 0;
 quint32 WorldManager::m_idPool = 0;
 
@@ -206,6 +231,7 @@ WorldManager::WorldManager(QObject *parent): QObject(parent),
     metaMap.insert(WorldObject::staticTypeId<World::ResourceManager>(), WorldObject::staticTypeMeta<World::ResourceManager>());
 
     m_animation = new TurnAnimation(this);
+    m_ship_animation = new ShipMovementAnimation(this);
     connect(m_animation, SIGNAL(finished()), this, SLOT(finishTurn()));
 }
 
@@ -224,6 +250,7 @@ WorldManager::~WorldManager()
     if (m_context)
         delete m_context;
     delete m_animation;
+    delete m_ship_animation;
     WorldManager::m_staticInstance = 0;
 }
 
@@ -263,6 +290,41 @@ void WorldManager::finishTurn()
         m_animation->stop();
 
     m_context->finishTurn();
+}
+
+void WorldManager::startShipMovement(QPointF destination) 
+{
+    if (!m_context)
+        return;
+
+    if (m_ship_animation->state() == ShipMovementAnimation::Running)
+        return;
+
+    class Ship* playerShip = qobject_cast<class Ship*>(m_context->playerShip());
+
+    if (playerShip) 
+    {
+        connect(m_context, SIGNAL(playerShipArrived()), this, SLOT(finishShipMovement()));
+        connect(playerShip, SIGNAL(shipArrived()), m_context,SLOT(playerShipArrivalNotify())); // TODO: add disconnect
+
+        playerShip->startMovement(destination);
+
+        m_ship_animation->setLoopCount(1);
+        m_ship_animation->setCurrentTime(0);
+        m_ship_animation->start();
+    }
+}
+
+void WorldManager::finishShipMovement() 
+{
+    if (m_ship_animation->state() == ShipMovementAnimation::Running) 
+    {
+        class Ship* playerShip = qobject_cast<class Ship*>(m_context->playerShip());
+        disconnect(m_context, SIGNAL(playerShipArrived()), this, SLOT(finishShipMovement()));
+        disconnect(playerShip, SIGNAL(shipArrived()), m_context,SLOT(playerShipArrivalNotify()));
+        m_ship_animation->previousTime = 0;
+        m_ship_animation->stop();
+    }
 }
 
 bool WorldManager::loadWorld(const QString& path)

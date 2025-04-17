@@ -22,6 +22,7 @@
 #include <QDataStream>
 
 #include <QtQml>
+#include <qglobal.h>
 
 namespace OpenSR
 {
@@ -143,6 +144,11 @@ ResourceManager* WorldContext::resources() const
 QObject* WorldContext::findObject(const QString& name) const
 {
     return findChild<QObject*>(name);
+}
+
+void WorldContext::playerShipArrivalNotify()
+{
+    emit playerShipArrived();
 }
 }
 }

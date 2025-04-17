@@ -189,9 +189,8 @@ Item {
             
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
 
-            console.log("For parent: " + positionInSpaceNode )
-            World.context.playerShip.evalTrajectoryTo(positionInSpaceNode);
-            World.context.playerShip.destination = positionInSpaceNode;
+            console.log("For parent: " + positionInSpaceNode );
+            WorldManager.startShipMovement(positionInSpaceNode);
             
             //playerTrajectoryView.updateTraj();
         }

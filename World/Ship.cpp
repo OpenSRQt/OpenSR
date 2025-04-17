@@ -21,8 +21,11 @@
 
 #include <QtQml/QQmlEngine>
 #include <QtMath>
+#include <qdebug.h>
+#include <qmath.h>
+#include <qpoint.h>
 
-#define CONST_SPEED 0.05f
+#define CONST_SPEED 0.8f
 
 namespace OpenSR
 {
@@ -190,29 +193,33 @@ void Ship::setDestination(QPointF destination)
     }
 }
 
-void Ship::startTurn()
-{
-    SpaceObject::startTurn();
+void Ship::startMovement(QPointF destination) 
+{  
+    m_start_position = position();
+    setDestination(destination);
 }
 
-void Ship::processTurn(float time)
+void Ship::processMovement(float time)
 {
     calcPosition(time);
     SpaceObject::processTurn(time);
 }
 
-void Ship::finishTurn()
-{
-    setTime(m_time + 1.0f);
-    SpaceObject::finishTurn();
-}
-
 void Ship::calcPosition(float dt)
 {
-    QPointF next;
-    next.setX((1.0f - dt) * position().x() + dt * m_destination.x());
-    next.setY((1.0f - dt) * position().y() + dt * m_destination.y());
-    setPosition(next);
+    QPointF direction = m_destination - position(); // TODO: fix case where destination = initial position
+    float distance = static_cast<float>(qSqrt(direction.x() * direction.x() + direction.y() * direction.y()));
+
+    if (distance <= dt * m_speed || m_destination == m_start_position) 
+    {
+        setPosition(m_destination);
+        emit shipArrived();
+    } 
+    else 
+    {
+        QPointF next = position() + (direction / distance) * m_speed * dt;
+        setPosition(next);
+    }
 }
 
 void Ship::calcSpeed()

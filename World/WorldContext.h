@@ -58,11 +58,15 @@ public:
     WorldObject *playerShip() const;
     void setPlayerShip(WorldObject *);
 
+public slots:
+    void playerShipArrivalNotify();
+
 Q_SIGNALS:
     void currentSystemChanged();
     void resourcesChanged();
 
     void playerShipChanged(WorldObject* playerShip);
+    void playerShipArrived();
 
 private:
     PlanetarySystem *m_currentSystem;

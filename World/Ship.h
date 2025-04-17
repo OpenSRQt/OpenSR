@@ -22,6 +22,7 @@
 #include "World.h"
 #include "MannedObject.h"
 #include "Resource.h"
+#include <qpoint.h>
 
 namespace OpenSR
 {
@@ -94,11 +95,10 @@ public:
     ShipAffiliation affiliation() const;
 
     ShipRank rank() const;
-
-    virtual void startTurn();
-    virtual void processTurn(float time);
-    virtual void finishTurn();
-
+    
+    void startMovement(QPointF destination);
+    void processMovement(float time);
+  
     Q_INVOKABLE void evalTrajectoryTo(const QPointF &dest);
 
 public slots:
@@ -115,6 +115,7 @@ signals:
     void timeChanged();
     void speedChanged();
     void destinationChanged();
+    void shipArrived();
 
 private:
     void calcPosition(float dt = 0.0f);
@@ -126,6 +127,7 @@ private:
     float m_time;
     float m_speed;
     QPointF m_destination;
+    QPointF m_start_position;
 };
 }
 }

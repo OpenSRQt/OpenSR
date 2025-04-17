@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <QAbstractAnimation>
+#include <qpoint.h>
 
 #include "WorldContext.h"
 #include "WorldBindings.h"
@@ -49,6 +50,17 @@ public:
     virtual int	duration() const;
     virtual void updateCurrentTime(int currentTime);
 };
+
+class OPENSR_WORLD_API ShipMovementAnimation: public QAbstractAnimation
+{
+    Q_OBJECT
+public:
+    ShipMovementAnimation(QObject *parent = 0);
+
+    virtual int	duration() const;
+    virtual void updateCurrentTime(int currentTime);
+    int previousTime;
+}; 
 
 class Race;
 class Item;
@@ -139,10 +151,13 @@ Q_SIGNALS:
 public Q_SLOTS:
     void startTurn();
     void finishTurn();
+    void startShipMovement(QPointF destination);
+    void finishShipMovement();
 
 private:
     WorldContext* m_context;
     TurnAnimation *m_animation;
+    ShipMovementAnimation *m_ship_animation;
 
     static WorldManager* m_staticInstance;
     static quint32 m_idPool;
