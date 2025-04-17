@@ -135,21 +135,21 @@ rangerCenter1.position = Qt.point(-400, -100);
 function shipStyleByAffiliation(ship) {
     var raceStr = "";
     switch (ship.affiliation) {
-        case World.ShipObject.Gaal: raceStr = "People"; break;
-        case World.ShipObject.Fei: raceStr = "Fei"; break;
-        case World.ShipObject.People: raceStr = "People"; break;
-        case World.ShipObject.Peleng: raceStr = "Peleng"; break;
-        case World.ShipObject.Maloc: raceStr = "Maloc"; break;
+        case World.ShipAffiliation.Gaal: raceStr = "People"; break;
+        case World.ShipAffiliation.Fei: raceStr = "Fei"; break;
+        case World.ShipAffiliation.People: raceStr = "People"; break;
+        case World.ShipAffiliation.Peleng: raceStr = "Peleng"; break;
+        case World.ShipAffiliation.Maloc: raceStr = "Maloc"; break;
         default: return null;
     }
     var rankStr = "";
     switch (ship.rank) {
-        case World.ShipObject.Diplomat: rankStr = "Diplomat"; break;
-        case World.ShipObject.Liner: rankStr = "Liner"; break;
-        case World.ShipObject.Ranger: rankStr = "Ranger"; break;
-        case World.ShipObject.Pirate: rankStr = "Pirate"; break;
-        case World.ShipObject.Warrior: rankStr = "Warrior"; break;
-        case World.ShipObject.Transport: rankStr = "Transport"; break;
+        case World.ShipRank.Diplomat: rankStr = "Diplomat"; break;
+        case World.ShipRank.Liner: rankStr = "Liner"; break;
+        case World.ShipRank.Ranger: rankStr = "Ranger"; break;
+        case World.ShipRank.Pirate: rankStr = "Pirate"; break;
+        case World.ShipRank.Warrior: rankStr = "Warrior"; break;
+        case World.ShipRank.Transport: rankStr = "Transport"; break;
         default: return null;
     }
 
@@ -162,8 +162,8 @@ function shipStyleByAffiliation(ship) {
 var ship1 = World.Ship(system);
 
 ship1.position    = Qt.point(-300, -300);
-ship1.affiliation = World.ShipObject.People;
-ship1.rank        = World.ShipObject.Diplomat;
+ship1.affiliation = World.ShipAffiliation.People;
+ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
 
 ship1.style.width = 128;
