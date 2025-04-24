@@ -21,11 +21,11 @@
 
 #include <QtQml/QQmlEngine>
 #include <QtMath>
-#include <qdebug.h>
-#include <qmath.h>
+#include <cmath>
 #include <qpoint.h>
 
-#define CONST_SPEED 0.8f
+#define CONST_SPEED 0.3f
+#define NORMAL_ANGULAR_SPEED 0.003f
 
 namespace OpenSR
 {
@@ -94,7 +94,7 @@ bool operator==(const ShipStyle& one, const ShipStyle& another)
 }
 
 /*  Ship */
-Ship::Ship(WorldObject *parent, quint32 id): MannedObject(parent, id)
+Ship::Ship(WorldObject *parent, quint32 id): MannedObject(parent, id), m_speed(CONST_SPEED), m_angularSpeed(NORMAL_ANGULAR_SPEED)
 {
 }
 
@@ -122,14 +122,19 @@ Ship::ShipRank Ship::rank() const
     return m_rank;
 }
 
-float Ship::period() const
-{
-    return m_period;
-}
-
 float Ship::time() const
 {
     return m_time;
+}
+
+float Ship::angularSpeed() const
+{
+    return m_angularSpeed;
+}
+
+float Ship::angle() const
+{
+    return m_angle;
 }
 
 float Ship::speed() const
@@ -160,25 +165,21 @@ void Ship::setRank(Ship::ShipRank rank)
     emit rankChanged(m_rank);
 }
 
-void Ship::setPeriod(float period)
-{
-    if (period != m_period)
-    {
-        m_period = period;
-        emit(periodChanged());
-        calcPosition();
-        calcSpeed();
-    }
-}
-
 void Ship::setTime(float time)
 {
     if (time != m_time)
     {
         m_time = time;
         emit(timeChanged());
-        calcPosition();
-        calcSpeed();
+    }
+}
+
+void Ship::setAngle(float angle)
+{
+    if (angle != m_angle)
+    {
+        m_angle = angle;
+        emit(angleChanged());
     }
 }
 
@@ -188,44 +189,109 @@ void Ship::setDestination(QPointF destination)
     {
         m_destination = destination;
         emit(destinationChanged());
-        calcPosition();
-        calcSpeed();
     }
 }
 
-void Ship::startMovement(QPointF destination) 
+void Ship::normalizeAnlge(float& deltaAngle)
+{
+    while (deltaAngle > M_PI)
+        deltaAngle -= 2* M_PI;
+
+    while (deltaAngle < -M_PI) 
+        deltaAngle += 2 * M_PI; 
+}
+
+void Ship::initTargetAngle()
+{
+    QPointF directionalVector = m_destination - position();
+    float directionNorm = std::sqrt(directionalVector.x() * directionalVector.x() + directionalVector.y() * directionalVector.y());
+    directionalVector /= directionNorm;
+
+    m_targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
+}
+
+void Ship::correctLinearSpeed() 
+{
+    // const QPointF normal1(-std::sin(m_angle), std::cos(m_angle));
+    // const QPointF normal2(std::sin(m_angle), -std::cos(m_angle));
+    // const float turnRadius = m_speed / m_angularSpeed;
+
+    // const QPointF circleCenter1 = position() + normal1 * turnRadius;
+    // const QPointF circleCenter2 = position() + normal2 * turnRadius;
+
+    // const QPointF dist1 = destination() - circleCenter1;
+    // const QPointF dist2 = destination() - circleCenter2;
+
+    // const float distLength1 = std::sqrt(dist1.x() * dist1.x() + dist1.y() * dist1.y());
+    // const float distLength2 = std::sqrt(dist2.x() * dist2.x() + dist2.y() * dist2.y());
+
+    // if (distLength1 < turnRadius || distLength2 < turnRadius) 
+    // {
+    //     const float safetyFactor = 1.0f;
+    //     m_angularSpeed = (m_speed / turnRadius) * safetyFactor;
+    // }
+
+    const float deltaX = m_destination.x() - position().x();
+    const float deltaY = m_destination.y() - position().y();
+    const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
+    if (turnRadius < m_speed / m_angularSpeed) 
+    {
+        // m_angularSpeed = (m_speed / turnRadius);
+        m_speed = m_angularSpeed * turnRadius;
+    }
+}
+
+void Ship::startMovement(QPointF destination) // TODO: replace QPointF with QVector2d
 {  
     m_start_position = position();
     setDestination(destination);
+    correctLinearSpeed();
 }
 
 void Ship::processMovement(float time)
 {
+    qDebug() << "m_angularSpeed: " << m_angularSpeed; 
+    calcAngle(time);
     calcPosition(time);
-    SpaceObject::processTurn(time);
 }
+
+void Ship::calcAngle(float dt)
+{
+    initTargetAngle();
+    float deltaAngle = m_targetAngle - m_angle;
+    normalizeAnlge(deltaAngle);
+
+    if (std::abs(deltaAngle) <= dt * m_angularSpeed || m_angle == m_targetAngle)
+    {
+        setAngle(m_targetAngle);
+    } 
+    else 
+    {
+        const float rotateDirection = deltaAngle >= 0 ? 1.0f : -1.0f; 
+        const float newAngle = m_angle + dt * m_angularSpeed * rotateDirection;
+        setAngle(newAngle);
+    }
+}
+
 
 void Ship::calcPosition(float dt)
 {
-    QPointF direction = m_destination - position(); // TODO: fix case where destination = initial position
-    float distance = static_cast<float>(qSqrt(direction.x() * direction.x() + direction.y() * direction.y()));
-
+    QPointF direction = m_destination - position();
+    float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+    
     if (distance <= dt * m_speed || m_destination == m_start_position) 
     {
         setPosition(m_destination);
+        // m_angularSpeed = NORMAL_ANGULAR_SPEED;
+        m_speed = CONST_SPEED;
         emit shipArrived();
     } 
     else 
     {
-        QPointF next = position() + (direction / distance) * m_speed * dt;
+        QPointF directionalVector(std::cos(m_angle), std::sin(m_angle));
+        QPointF next = position() + directionalVector * m_speed * dt;
         setPosition(next);
     }
-}
-
-void Ship::calcSpeed()
-{
-    m_speed = CONST_SPEED;
-    emit(speedChanged());
 }
 
 void Ship::evalTrajectoryTo(const QPointF &dest)

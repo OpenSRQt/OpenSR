@@ -165,6 +165,7 @@ ship1.position    = Qt.point(-300, -300);
 ship1.affiliation = World.ShipAffiliation.People;
 ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
+ship1.angle       = 0;
 
 ship1.style.width = 128;
 context.playerShip = ship1;

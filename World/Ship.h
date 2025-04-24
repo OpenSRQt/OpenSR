@@ -61,7 +61,7 @@ class OPENSR_WORLD_API Ship: public MannedObject
 
     Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation NOTIFY affiliationChanged)
     Q_PROPERTY(ShipRank        rank        READ rank        WRITE setRank        NOTIFY rankChanged)
-    Q_PROPERTY(float period READ period WRITE setPeriod NOTIFY periodChanged)
+    Q_PROPERTY(float angle READ angle WRITE setAngle NOTIFY angleChanged)
     Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
     Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
@@ -84,9 +84,10 @@ public:
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
 
-    float period() const;
     float time() const;
     float speed() const;
+    float angularSpeed() const;
+    float angle() const;
     QPointF destination() const;
 
 
@@ -104,28 +105,34 @@ public:
 public slots:
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
-    void setPeriod(float period);
     void setTime(float time);
     void setDestination(QPointF destination);
+    void setAngle(float angle);
 
 signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
-    void periodChanged();
     void timeChanged();
     void speedChanged();
     void destinationChanged();
+    void angleChanged();
     void shipArrived();
 
 private:
     void calcPosition(float dt = 0.0f);
-    void calcSpeed();
+    void calcAngle(float dt = 0.0f);
+    void normalizeAnlge(float& deltaAngle);
+    void initTargetAngle();
+    void correctLinearSpeed();
 
     ShipAffiliation m_affiliation;
     ShipRank m_rank;
-    float m_period;
+
     float m_time;
+    float m_angle;
     float m_speed;
+    float m_angularSpeed;
+    float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
 };
