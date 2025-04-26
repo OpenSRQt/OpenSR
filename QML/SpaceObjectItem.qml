@@ -16,6 +16,7 @@ Item {
     x: positioning && object ? object.position.x : 0
     y: positioning && object ? object.position.y : 0
     rotation: positioning && object ? radToDeg(shipAngle) : 0
+    
 
     Loader {
         id: objectLoader
