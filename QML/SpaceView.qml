@@ -13,6 +13,10 @@ Item {
 
     property var trajectoryView
 
+    property SpaceObjectItem playerShipItem
+    property list<SpaceObjectItem> clickables
+    property var object 
+
     anchors.fill: parent
 
     Rectangle {

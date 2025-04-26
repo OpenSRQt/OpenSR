@@ -17,6 +17,8 @@
 */
 
 #include "InhabitedPlanet.h"
+#include "ResourceManager.h"
+#include "WorldContext.h"
 
 #include <QtQml>
 
@@ -24,11 +26,113 @@ namespace OpenSR
 {
 namespace World
 {
+
+QString InhabitedPlanetStyle::surface() const
+{
+    return getData<Data>().surface;
+}
+
+void InhabitedPlanetStyle::setSurface(const QString &texture)
+{
+    auto d = getData<Data>();
+    d.surface = texture;
+    setData(d);
+}
+
+QString InhabitedPlanetStyle::cloud0() const
+{
+    return getData<Data>().cloud0;
+}
+
+void InhabitedPlanetStyle::setCloud0(const QString &texture)
+{
+    auto d = getData<Data>();
+    d.cloud0 = texture;
+    setData(d);
+}
+
+QString InhabitedPlanetStyle::cloud1() const
+{
+    return getData<Data>().cloud1;
+}
+
+void InhabitedPlanetStyle::setCloud1(const QString &texture)
+{
+    auto d = getData<Data>();
+    d.cloud1 = texture;
+    setData(d);
+}
+
+int InhabitedPlanetStyle::radius() const
+{
+    return getData<Data>().radius;
+}
+
+void InhabitedPlanetStyle::setRadius(const int r)
+{
+    auto d = getData<Data>();
+    d.radius = r;
+    setData(d);
+}
+
+QColor InhabitedPlanetStyle::atmosphere() const
+{
+    return getData<Data>().atmosphere;
+}
+
+void InhabitedPlanetStyle::setAtmosphere(const QColor& c)
+{
+    auto d = getData<Data>();
+    d.atmosphere = c;
+    setData(d);
+}
+
+QString InhabitedPlanetStyle::background() const 
+{
+    return getData<Data>().background;
+}
+
+void InhabitedPlanetStyle::setBackground(const QString& texture)
+{
+    auto d = getData<Data>();
+    d.background = texture;
+    setData(d);
+}
+
+QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style)
+{
+    return stream << style.id();
+}
+
+QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style)
+{
+    quint32 id;
+    stream >> id;
+    ResourceManager *m = ResourceManager::instance();
+    Q_ASSERT(m != 0);
+    Resource::replaceData(style, m->getResource(id));
+    return stream;
+}
+
+QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle::Data& data)
+{
+    return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.background;
+}
+
+QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle::Data& data)
+{
+    return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius >> data.background;
+}
+
 const quint32 InhabitedPlanet::m_staticTypeId = typeIdFromClassName(InhabitedPlanet::staticMetaObject.className());
 
 template<>
 void WorldObject::registerType<InhabitedPlanet>(QQmlEngine *qml, QJSEngine *script)
 {
+    qRegisterMetaType<InhabitedPlanetStyle>();
+    qRegisterMetaTypeStreamOperators<InhabitedPlanetStyle>();
+    qRegisterMetaType<InhabitedPlanetStyle::Data>();
+    qRegisterMetaTypeStreamOperators<InhabitedPlanetStyle::Data>();
     qmlRegisterType<InhabitedPlanet>("OpenSR.World", 1, 0, "InhabitedPlanet");
 }
 
@@ -67,5 +171,35 @@ QString InhabitedPlanet::namePrefix() const
 {
     return tr("Inhabited planet");
 }
+
+InhabitedPlanetStyle InhabitedPlanet::style() const
+{
+    return m_style;
+}
+
+void InhabitedPlanet::setStyle(const InhabitedPlanetStyle& style)
+{
+    m_style = style;
+    emit(styleChanged());
+}
+
+void InhabitedPlanet::prepareSave()
+{
+    WorldObject::prepareSave();
+    m_style.registerResource();
+}
+
+// bool InhabitedPlanet::waitForArrival() const {
+//     return m_waitingForArrival;
+// }
+
+// void InhabitedPlanet::setWaitForArrival(bool wait) {
+//     if(m_waitingForArrival == wait) {
+//         return;
+//     }
+//     emit waitForArrivalChanged();
+// }
+
+
 }
 }

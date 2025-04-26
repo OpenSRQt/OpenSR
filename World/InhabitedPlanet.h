@@ -21,24 +21,90 @@
 
 #include "World.h"
 #include "Planet.h"
+#include <QGraphicsItem>
 
 namespace OpenSR
 {
 namespace World
 {
+
+class OPENSR_WORLD_API InhabitedPlanetStyle: public Resource
+{
+    Q_GADGET
+
+    Q_PROPERTY(QString surface READ surface WRITE setSurface)
+    Q_PROPERTY(QString cloud0  READ cloud0  WRITE setCloud0 )
+    Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
+    Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
+    Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString background READ background WRITE setBackground)
+
+public:
+    struct Data
+    {
+        QString surface, cloud0, cloud1, background;
+        int radius;
+        QColor atmosphere;
+    };
+
+    QString surface() const;
+    QString cloud0() const;
+    QString cloud1() const;
+    int radius() const;
+    QColor atmosphere() const;
+    QString background() const;
+
+    void setSurface(const QString&);
+    void setCloud0(const QString&);
+    void setCloud1(const QString&);
+    void setRadius(int);
+    void setAtmosphere(const QColor&);
+    void setBackground(const QString&);
+
+};
+
+QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style);
+QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style);
+QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle::Data& data);
+QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle::Data& data);
+
+
 class OPENSR_WORLD_API InhabitedPlanet: public Planet
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
+    Q_PROPERTY(OpenSR::World::InhabitedPlanetStyle style READ style WRITE setStyle NOTIFY styleChanged)
+    //Q_PROPERTY(bool waitingForArrival READ waitForArrival WRITE setWaitForArrival NOTIFY waitForArrivalChanged)
 public:
     Q_INVOKABLE InhabitedPlanet(WorldObject *parent = 0, quint32 id = 0);
     virtual ~InhabitedPlanet();
 
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
+
+    InhabitedPlanetStyle style() const;
+    void setStyle(const InhabitedPlanetStyle& style);
+
+    // bool waitForArrival() const;
+    // void setWaitForArrival(bool wait);
+
+    virtual void prepareSave();
+
+Q_SIGNALS:
+    void styleChanged();
+    void sizeChanged();
+
+    //bool waitForArrivalChanged() const;
+
+private:
+    InhabitedPlanetStyle m_style;
+    //bool m_waitingForArrival = false;
 };
 }
 }
+
+Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle::Data)
+Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle)
 
 #endif // OPENSR_WORLD_INHABITEDPLANET_H

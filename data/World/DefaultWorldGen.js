@@ -82,6 +82,38 @@ function getPlanetStyleFromDat(id) {
     return style
 }
 
+function getInhabitedPlanetStyleFromDat(id) {
+    var planet = Engine.datValue("Data.SE.Planet." + id)
+    var color;
+    if ("AtmColor" in planet) {
+        var rgb = planet["AtmColor"].split(',')
+        color = Qt.rgba(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 1.0).toString()
+    }
+    else
+        color = Qt.rgba(1.0, 1.0, 1.0, 1.0).toString()
+
+    var splitted, cloud0 = "", cloud1 = "", cloud0Speed = 1.0, cloud1Speed = 1.0
+    if ("Cloud0" in planet) {
+        splitted = planet["Cloud0"].split(',')
+        cloud0 = "dat:/" + splitted[1]
+        cloud0Speed = parseFloat(splitted[0])
+    }
+    if ("Cloud1" in planet) {
+        splitted = planet["Cloud1"].split(',')
+        cloud1 = "dat:/" + splitted[1]
+        cloud1Speed = parseFloat(splitted[0])
+    }
+    
+    var style = World.InhabitedPlanetStyle();
+    style.surface  = "dat:/" + planet["Image"];
+    style.cloud0 = cloud0;
+    style.cloud1 = cloud1;
+    style.atmosphere = color;
+    style.radius = planet["Radius"];
+    style.background = "res:/DATA/PlanetBG/2/" + planet["BG"] + ".gi";
+    return style
+}
+
 genRace("Race.People", "Race.Name.People", "dat:/Bm.Race.Emblem.2People", "#0030BD", "")
 genRace("Race.Feyan", "Race.Name.Fei", "dat:/Bm.Race.Emblem.2Fei", "#E03BFF", "")
 genRace("Race.Gaal", "Race.Name.Gaal", "dat:/Bm.Race.Emblem.2Gaal", "#FFDB0A", "")
@@ -112,10 +144,18 @@ for(var k in asteroidStyles)
 
 var planet = World.InhabitedPlanet(system);
 planet.name = "PlanetName.Solar.2"
-planet.style = getPlanetStyleFromDat("200")
+planet.style = getInhabitedPlanetStyleFromDat("198")
 planet.period = 15;
 planet.angle = 3.1415 / 4;
 planet.position = Qt.point(355, -222);
+
+var planet = World.InhabitedPlanet(system);
+planet.name = "PlanetName.Solar.1"
+planet.style = getInhabitedPlanetStyleFromDat("198")
+planet.period = 15;
+planet.angle = 3.1415 / 4;
+planet.position = Qt.point(355, 222);
+
 
 function initStation(obj, kind) {
     switch (kind) {
@@ -169,7 +209,7 @@ ship1.angle       = 0;
 
 ship1.style.width = 128;
 context.playerShip = ship1;
-
+context.planetToEnter = null;
 context.currentSystem = system;
 
 World.saveWorld("/tmp/test.osr");

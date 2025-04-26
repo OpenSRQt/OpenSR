@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick 2.5
 import OpenSR 1.0
 import OpenSR.World 1.0
 
@@ -16,6 +16,7 @@ Item {
     x: positioning && object ? object.position.x : 0
     y: positioning && object ? object.position.y : 0
     rotation: positioning && object ? radToDeg(shipAngle) : 0
+    
 
     Loader {
         id: objectLoader
@@ -51,10 +52,51 @@ Item {
             cache: false
         }
     }
-    Component {
-        id: planetComponent
-        PlanetItem {}
+
+Component {
+    id: planetComponent
+    PlanetItem {
+        id: planetItem
+
+        property bool isWaitingForShipArrival: false
+
+        MouseArea {
+            anchors.fill: parent
+            onDoubleClicked: {
+                if(context.planetToEnter == null){
+                    planetItem.isWaitingForShipArrival = true;
+                    context.planetToEnter = planetItem.planet;
+                }else{
+                    console.log("already has a planet");
+                }
+                
+            }
+            preventStealing: true
+
+            Rectangle {
+                anchors.fill: parent
+                color: "red"
+                opacity: 0.3
+            }
+        }
+
+        Connections {
+            target: context
+
+            function onPlayerShipArrived() {
+                if(planetItem.isWaitingForShipArrival){
+                    changeScreen(
+                        "qrc:/OpenSR/PlanetView.qml", 
+                        {"system": World.context.planet}
+                    );
+                    planetItem.isWaitingForShipArrival = false;
+                    context.planetToEnter = null;
+                }
+                
+            }
+        }
     }
+}
 
     onObjectChanged: {
         objectLoader.source = "";

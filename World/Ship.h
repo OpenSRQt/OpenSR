@@ -121,7 +121,7 @@ signals:
 private:
     void calcPosition(float dt = 0.0f);
     void calcAngle(float dt = 0.0f);
-    void normalizeAnlge(float& deltaAngle);
+    void normalizeAngle(float& deltaAngle);
     void initTargetAngle();
     void correctLinearSpeed();
 

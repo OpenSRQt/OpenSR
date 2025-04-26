@@ -192,7 +192,7 @@ void Ship::setDestination(QPointF destination)
     }
 }
 
-void Ship::normalizeAnlge(float& deltaAngle)
+void Ship::normalizeAngle(float& deltaAngle)
 {
     while (deltaAngle > M_PI)
         deltaAngle -= 2* M_PI;
@@ -250,7 +250,7 @@ void Ship::startMovement(QPointF destination) // TODO: replace QPointF with QVec
 
 void Ship::processMovement(float time)
 {
-    qDebug() << "m_angularSpeed: " << m_angularSpeed; 
+    //qDebug() << "m_angularSpeed: " << m_angularSpeed; 
     calcAngle(time);
     calcPosition(time);
 }
@@ -259,7 +259,7 @@ void Ship::calcAngle(float dt)
 {
     initTargetAngle();
     float deltaAngle = m_targetAngle - m_angle;
-    normalizeAnlge(deltaAngle);
+    normalizeAngle(deltaAngle);
 
     if (std::abs(deltaAngle) <= dt * m_angularSpeed || m_angle == m_targetAngle)
     {

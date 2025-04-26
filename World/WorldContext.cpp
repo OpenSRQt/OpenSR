@@ -150,5 +150,18 @@ void WorldContext::playerShipArrivalNotify()
 {
     emit playerShipArrived();
 }
+
+WorldObject* WorldContext::planetToEnter() const{
+    qDebug() << "Accessing planetToEnter:" << m_planetToEnter;
+    return m_planetToEnter;
+}
+
+void WorldContext::setPlanetToEnter(WorldObject * planet){
+    if(m_planetToEnter == planet) return;
+    m_planetToEnter = planet;
+    emit planetToEnterChanged(planet);
+}
+
+
 }
 }
