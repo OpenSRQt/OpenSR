@@ -160,8 +160,10 @@ void Ship::setIsMoving(bool isMoving)
     }
 }
 
-void Ship::normalizeAngle(float &deltaAngle) {
-    while (deltaAngle > M_PI) deltaAngle -= 2 * M_PI;
+void Ship::normalizeAgnle(float& deltaAngle)
+{
+    while (deltaAngle > M_PI)
+        deltaAngle -= 2* M_PI;
 
     while (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
 }
