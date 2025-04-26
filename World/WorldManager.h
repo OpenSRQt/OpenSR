@@ -35,6 +35,7 @@
 #include "Ship.h"
 #include "SpaceStation.h"
 #include "TurnAnimation.h"
+#include "InhabitedPlanet.h"
 
 namespace OpenSR
 {
@@ -95,6 +96,7 @@ public:
     Q_INVOKABLE OpenSR::World::AsteroidStyle AsteroidStyle();
     Q_INVOKABLE OpenSR::World::PlanetStyle PlanetStyle();
     Q_INVOKABLE OpenSR::World::StationStyle StationStyle();
+    Q_INVOKABLE OpenSR::World::InhabitedPlanetStyle InhabitedPlanetStyle();
 
     Q_INVOKABLE OpenSR::World::Race *Race(OpenSR::World::WorldObject *parent = 0);
     Q_INVOKABLE OpenSR::World::Item *Item(OpenSR::World::WorldObject *parent = 0);

@@ -23,7 +23,6 @@
 
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
-
 namespace OpenSR
 {
 namespace World
@@ -37,6 +36,8 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
                    STORED false)
     Q_PROPERTY(ResourceManager *resources READ resources NOTIFY resourcesChanged STORED false)
     Q_PROPERTY(WorldObject *playerShip READ playerShip NOTIFY playerShipChanged STORED false WRITE setPlayerShip)
+    Q_PROPERTY(WorldObject* planetToEnter READ planetToEnter  
+        NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
 
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = 0, quint32 id = 0);
@@ -60,6 +61,9 @@ public:
 
     bool checkPlannedActions() const;
 
+    WorldObject* planetToEnter() const;
+    void setPlanetToEnter(WorldObject *);
+
 public slots:
     void onShipArrived();
 
@@ -70,10 +74,13 @@ signals:
     void playerShipChanged(WorldObject *playerShip);
     void plannedActionsCompleted();
 
+    void planetToEnterChanged(WorldObject* playerShip);
+
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
     WorldObject *m_playerShip;
+    WorldObject* m_planetToEnter;
 };
 } // namespace World
 } // namespace OpenSR
