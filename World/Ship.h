@@ -20,6 +20,7 @@
 #define OPENSR_WORLD_SHIP_H
 
 #include <qpoint.h>
+#include "InhabitedPlanet.h"
 
 #include "InhabitedPlanet.h"
 #include "MannedObject.h"
@@ -100,6 +101,14 @@ class OPENSR_WORLD_API Ship : public MannedObject {
 
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
+    
+    void startMovement(QPointF destination);
+    void processMovement(float time);
+  
+    Q_INVOKABLE void evalTrajectoryTo(const QPointF &dest);
+
+    Q_INVOKABLE void exitThePlace();
+public slots:
     float angle() const;
     float speed() const;
     QPointF destination() const;
@@ -111,6 +120,11 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     void setTime(float time);
     void setDestination(QPointF destination);
     void setAngle(float angle);
+    void checkPlanetProximity(
+        WorldObject* planetToEnter, 
+        const QPointF &planetCenter, 
+        const QPointF &shipPosition
+    );
     void setIsMoving(bool isMoving);
 
     static const float normalLinearSpeed;
@@ -130,6 +144,9 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     void isMovingChanged();
     void shipArrived();
     void isMovingChanged();
+
+    void enterPlace();
+    void exitPlace();
 
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF& pos, const QPointF& dest);
@@ -151,6 +168,8 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+
+    bool m_isNearPlanet = false;
     bool m_isMoving = false;
 };
 }  // namespace World
