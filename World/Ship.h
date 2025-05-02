@@ -23,6 +23,7 @@
 #include "Resource.h"
 #include "World.h"
 #include <QPoint>
+#include "InhabitedPlanet.h"
 
 namespace OpenSR
 {
@@ -108,6 +109,7 @@ public:
     QPointF destination() const;
     bool isMoving() const;
 
+    Q_INVOKABLE void exitThePlace();
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
@@ -134,6 +136,9 @@ signals:
     void isMovingChanged();
     void shipArrived();
 
+    void enterPlace();
+    void exitPlace();
+
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
     float calcAngle(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
@@ -153,6 +158,8 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+
+    bool m_isNearPlanet = false;
     bool m_isMoving = false;
     bool m_actionsPlanned = false;
 };

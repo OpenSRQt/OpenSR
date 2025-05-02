@@ -17,6 +17,7 @@
 */
 
 #include "WorldContext.h"
+#include "InhabitedPlanet.h"
 
 #include "Ship.h"
 #include <QDataStream>
@@ -157,11 +158,11 @@ QObject *WorldContext::findObject(const QString &name) const
 
 void WorldContext::onShipArrived()
 {
+    m_shipIsMoving = false;
     emit plannedActionsCompleted();
 }
 
 WorldObject* WorldContext::planetToEnter() const{
-    qDebug() << "Accessing planetToEnter:" << m_planetToEnter;
     return m_planetToEnter;
 }
 
@@ -171,6 +172,15 @@ void WorldContext::setPlanetToEnter(WorldObject * planet){
     emit planetToEnterChanged(planet);
 }
 
+QPointF WorldContext::movementPosition() {
+    return m_planetPosition;
+}
+
+void WorldContext::setMovementPosition(const QPointF& pos) {
+    if(m_planetPosition == pos) return;
+    m_planetPosition = pos;
+    emit movementPositionChanged(pos);
+}
 
 }
 }

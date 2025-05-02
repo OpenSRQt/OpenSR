@@ -16,7 +16,6 @@ Item {
     x: positioning && object ? object.position.x : 0
     y: positioning && object ? object.position.y : 0
     rotation: positioning && object ? radToDeg(shipAngle) : 0
-    
 
     Loader {
         id: objectLoader
@@ -33,6 +32,7 @@ Item {
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
                 item.source = object.style.texture;
                 item.height = item.width = object.style.width;
+                item.ship = object;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::SpaceStation") {
                 item.source = object.style.texture;
             }
@@ -53,50 +53,87 @@ Item {
         }
     }
 
-Component {
-    id: planetComponent
-    PlanetItem {
-        id: planetItem
+    Component {
+        id: planetComponent
+        PlanetItem {
+            id: planetItem
+            property bool isWaitingForShipArrival: false
 
-        property bool isWaitingForShipArrival: false
-
-        MouseArea {
-            anchors.fill: parent
-            onDoubleClicked: {
-                if(context.planetToEnter == null){
-                    planetItem.isWaitingForShipArrival = true;
-                    context.planetToEnter = planetItem.planet;
-                }else{
-                    console.log("already has a planet");
-                }
-                
-            }
-            preventStealing: true
-
-            Rectangle {
+            MouseArea {
                 anchors.fill: parent
-                color: "red"
-                opacity: 0.3
-            }
-        }
-
-        Connections {
-            target: context
-
-            function onPlayerShipArrived() {
-                if(planetItem.isWaitingForShipArrival){
-                    changeScreen(
-                        "qrc:/OpenSR/PlanetView.qml", 
-                        {"system": World.context.planet}
-                    );
-                    planetItem.isWaitingForShipArrival = false;
-                    context.planetToEnter = null;
+                onDoubleClicked: {
+                    if (context.planetToEnter == null) {
+                        context.planetToEnter = planetItem.planet;
+                    }
                 }
-                
+                preventStealing: true
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: "red"
+                    opacity: planetItem.isWaitingForShipArrival ? 0.5 : 0.3
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 200
+                        }
+                    }
+                }
+            }
+
+            Connections {
+                target: context.playerShip
+
+                function onEnterPlace() {
+                    if(planetItem.planet == context.planetToEnter)
+                        planetItem.isWaitingForShipArrival = true;
+                }
+            }
+
+            Connections {
+                target: context
+
+                function onPlayerShipArrived() {
+                    if (planetItem.isWaitingForShipArrival) {
+                        changeScreen("qrc:/OpenSR/PlanetView.qml", {
+                            "system": World.context.planet
+                        });
+                        planetItem.isWaitingForShipArrival = false;
+                    }
+                }
             }
         }
     }
-}
+
+    Component {
+        id: shipComponent
+
+        AnimatedImage {
+            id: shipImage;
+            cache: false
+            property Ship ship
+            opacity: 1
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 500
+                    easing.type: Easing.InOutQuad
+                }
+            }
+            Connections {
+                target: ship
+
+                function onEnterPlace() {
+                    console.log("onEnterThePlace()");
+                    shipImage.opacity = 0;
+                }
+
+                function onExitPlace() {
+                    console.log("onExitThePlace()");
+                    shipImage.opacity = 1;
+                }
+            }
+        }
+
+    }
 
     onObjectChanged: {
         objectLoader.source = "";
@@ -121,7 +158,7 @@ Component {
             objectLoader.sourceComponent = defaultComponent;
             positioning = true;
         } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
-            objectLoader.sourceComponent = defaultComponent;
+            objectLoader.sourceComponent = shipComponent;
             positioning = true;
         }
     }
