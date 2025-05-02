@@ -247,6 +247,7 @@ float Ship::calcAngle(const float dt, const float angle, const QPointF &pos, con
     }
 }
 
+
 QPointF Ship::calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest)
 {
     const float distance = static_cast<float>(QLineF(dest, pos).length());
