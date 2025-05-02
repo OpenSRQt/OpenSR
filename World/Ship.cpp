@@ -167,13 +167,14 @@ void Ship::initTargetAngle() {
     m_targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
 }
 
+void Ship::correctLinearSpeed() 
+{
 void Ship::correctLinearSpeed() {
     const float deltaX = m_destination.x() - position().x();
     const float deltaY = m_destination.y() - position().y();
-    const float turnRadius =
-        (deltaX * deltaX + deltaY * deltaY) /
-        (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
-    if (turnRadius < m_speed / m_angularSpeed) {
+    const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
+    if (turnRadius < m_speed / m_angularSpeed) 
+    {
         m_speed = m_angularSpeed * turnRadius;
     }
 }
@@ -208,17 +209,21 @@ void Ship::calcAngle(float dt) {
     }
 }
 
-void Ship::calcPosition(float dt) {
-    const QPointF direction = m_destination - position();
-    const float distance = std::sqrt(direction.x() * direction.x() +
-                                     direction.y() * direction.y());
 
-    if (distance <= dt * m_speed || m_destination == m_start_position) {
+void Ship::calcPosition(float dt)
+{
+    const QPointF direction = m_destination - position();
+    const float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+    
+    if (distance <= dt * m_speed || m_destination == m_start_position) 
+    {
         setPosition(m_destination);
         m_speed = CONST_SPEED;
         setIsMoving(false);
         emit shipArrived();
-    } else {
+    } 
+    else 
+    {
         const QPointF directionalVector(std::cos(m_angle), std::sin(m_angle));
         const QPointF next = position() + directionalVector * m_speed * dt;
         setPosition(next);
