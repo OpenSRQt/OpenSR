@@ -122,13 +122,10 @@ Item {
             repeat: true
             running: false
             onTriggered: {
-                console.log("context.planetPosition ", context.movementPosition.x, context.movementPosition.y);
-                console.log("playerShipItem ", playerShipItem.x,  playerShipItem.y);
                 context.playerShip.checkPlanetProximity(
                     context.planetToEnter, 
                     Qt.point(context.movementPosition.x, context.movementPosition.y), 
                     Qt.point(playerShipItem.x, playerShipItem.y));
-                console.log("value");
             }
         }
 
@@ -147,7 +144,6 @@ Item {
             target: context
 
             function onPlayerShipArrived() {
-                console.log("onPlayerShipArrived()");
                 proximityTimer.stop();
                 context.planetToEnter = null;
             }
