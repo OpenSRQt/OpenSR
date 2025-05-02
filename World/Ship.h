@@ -133,6 +133,7 @@ public slots:
     void angleChanged();
     void isMovingChanged();
     void shipArrived();
+
     void enterPlace();
     void exitPlace();
 
