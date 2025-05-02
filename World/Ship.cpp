@@ -340,5 +340,27 @@ void Ship::evalTrajectoryTo(const QPointF &dest)
 }
 
 
+Q_INVOKABLE void Ship::exitThePlace() {
+    emit exitPlace();
+}
+
+void Ship::checkPlanetProximity(WorldObject* planetToEnter, const QPointF &planetCenter, const QPointF &shipPosition) {
+    if(!planetToEnter) {
+        return;
+    }
+    InhabitedPlanet* planet = qobject_cast<InhabitedPlanet*>(planetToEnter);
+    int planetRadius = planet->style().radius();
+
+    const qreal distance = QLineF(shipPosition, planetCenter).length();
+    
+    if (distance <= planetRadius && !m_isNearPlanet) {
+        m_isNearPlanet = true;
+        emit enterPlace();
+    } else if (distance > planetRadius && m_isNearPlanet) {
+        m_isNearPlanet = false;
+        emit exitPlace();
+    }
+}
+
 }
 }

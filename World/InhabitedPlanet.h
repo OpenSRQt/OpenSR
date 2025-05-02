@@ -86,20 +86,18 @@ public:
     InhabitedPlanetStyle style() const;
     void setStyle(const InhabitedPlanetStyle& style);
 
-    // bool waitForArrival() const;
-    // void setWaitForArrival(bool wait);
+    void waitForArrival();
 
     virtual void prepareSave();
 
 Q_SIGNALS:
     void styleChanged();
     void sizeChanged();
-
-    //bool waitForArrivalChanged() const;
+    void planetToEnter();
 
 private:
     InhabitedPlanetStyle m_style;
-    //bool m_waitingForArrival = false;
+    bool m_PlayerShipIsNearPlanet = false;
 };
 }
 }

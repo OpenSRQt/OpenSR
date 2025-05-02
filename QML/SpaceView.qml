@@ -86,6 +86,12 @@ Item {
             o = component.createObject(spaceNode, {
                 object: system.children[c]
             });
+
+            if(system.children[c] == WorldManager.context.playerShip){
+                playerShipItem = o;
+                console.log("Player ship item initialized:", playerShipItem);
+            }
+            
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
             o.entered.connect(showTrajectory);
@@ -102,6 +108,50 @@ Item {
     DebugTooltip {
         id: debug
         visible: false
+    }
+
+    MouseArea {
+        id: spaceMouseOverlay
+        z: 1
+        anchors.fill: parent
+        propagateComposedEvents: true
+
+        Timer {
+            id: proximityTimer
+            interval: 100
+            repeat: true
+            running: false
+            onTriggered: {
+                console.log("context.planetPosition ", context.movementPosition.x, context.movementPosition.y);
+                console.log("playerShipItem ", playerShipItem.x,  playerShipItem.y);
+                context.playerShip.checkPlanetProximity(
+                    context.planetToEnter, 
+                    Qt.point(context.movementPosition.x, context.movementPosition.y), 
+                    Qt.point(playerShipItem.x, playerShipItem.y));
+                console.log("value");
+            }
+        }
+
+        onClicked: {
+            if (mouse.button !== Qt.LeftButton)
+                return;
+
+            mouse.accepted = true;
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            proximityTimer.start();
+            WorldManager.startShipMovement(positionInSpaceNode);
+            context.movementPosition = positionInSpaceNode
+        }
+
+        Connections {
+            target: context
+
+            function onPlayerShipArrived() {
+                console.log("onPlayerShipArrived()");
+                proximityTimer.stop();
+                context.planetToEnter = null;
+            }
+        }
     }
 
     function showTrajectory(object) {
@@ -175,211 +225,6 @@ Item {
     //         object = WorldManager.context.playerShip
     //     }
     // }
-
-    MouseArea {
-        id: spaceMouseOverlay
-        anchors.fill: parent
-        
-        propagateComposedEvents: true
-
-        onClicked: {
-            if (mouse.button !== Qt.LeftButton)
-                return;
-
-            mouse.accepted = true;
-
-            console.log("left clicked in space")
-            //console.log(World.context.playerShip)
-            
-            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-
-            console.log("For parent: " + positionInSpaceNode );
-            WorldManager.startShipMovement(positionInSpaceNode);
-            
-            //playerTrajectoryView.updateTraj();
-        }
-    }
-
-    MouseArea {
-        id: leftHoverArea
-
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        anchors.topMargin: scrollSize
-        anchors.bottomMargin: scrollSize
-
-        width: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x + maxScrollTime * bgSpeed;
-            hFgAnim.to = spaceNode.x + maxScrollTime * speed;
-            hAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-        }
-    }
-    MouseArea {
-        id: rightHoverArea
-
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-
-        anchors.topMargin: scrollSize
-        anchors.bottomMargin: scrollSize
-
-        width: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x - maxScrollTime * bgSpeed;
-            hFgAnim.to = spaceNode.x - maxScrollTime * speed;
-            hAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-        }
-    }
-    MouseArea {
-        id: topHoverArea
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        anchors.leftMargin: scrollSize
-        anchors.rightMargin: scrollSize
-
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            vBgAnim.to = bg.y + maxScrollTime * bgSpeed;
-            vFgAnim.to = spaceNode.y + maxScrollTime * speed;
-            vAnim.start();
-        }
-        onExited: {
-            vAnim.stop();
-        }
-    }
-    MouseArea {
-        id: bottomHoverArea
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        anchors.leftMargin: scrollSize
-        anchors.rightMargin: scrollSize
-
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            vBgAnim.to = bg.y - maxScrollTime * bgSpeed;
-            vFgAnim.to = spaceNode.y - maxScrollTime * speed;
-            vAnim.start();
-        }
-        onExited: {
-            vAnim.stop();
-        }
-    }
-    MouseArea {
-        id: topleftHoverArea
-
-        anchors.left: parent.left
-        anchors.top: parent.top
-
-        width: scrollSize
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x + maxScrollTime * bgSpeed / Math.sqrt(2);
-            hFgAnim.to = spaceNode.x + maxScrollTime * speed / Math.sqrt(2);
-            vBgAnim.to = bg.y + maxScrollTime * bgSpeed / Math.sqrt(2);
-            vFgAnim.to = spaceNode.y + maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start();
-            vAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-            vAnim.stop();
-        }
-    }
-    MouseArea {
-        id: toprightHoverArea
-
-        anchors.right: parent.right
-        anchors.top: parent.top
-
-        width: scrollSize
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x - maxScrollTime * bgSpeed / Math.sqrt(2);
-            hFgAnim.to = spaceNode.x - maxScrollTime * speed / Math.sqrt(2);
-            vBgAnim.to = bg.y + maxScrollTime * bgSpeed / Math.sqrt(2);
-            vFgAnim.to = spaceNode.y + maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start();
-            vAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-            vAnim.stop();
-        }
-    }
-    MouseArea {
-        id: bottomleftHoverArea
-
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-
-        width: scrollSize
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x + maxScrollTime * bgSpeed / Math.sqrt(2);
-            hFgAnim.to = spaceNode.x + maxScrollTime * speed / Math.sqrt(2);
-            vBgAnim.to = bg.y - maxScrollTime * bgSpeed / Math.sqrt(2);
-            vFgAnim.to = spaceNode.y - maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start();
-            vAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-            vAnim.stop();
-        }
-    }
-    MouseArea {
-        id: bottomrightHoverArea
-
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-
-        width: scrollSize
-        height: scrollSize
-
-        hoverEnabled: true
-        onEntered: {
-            hBgAnim.to = bg.x - maxScrollTime * bgSpeed / Math.sqrt(2);
-            hFgAnim.to = spaceNode.x - maxScrollTime * speed / Math.sqrt(2);
-            vBgAnim.to = bg.y - maxScrollTime * bgSpeed / Math.sqrt(2);
-            vFgAnim.to = spaceNode.y - maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start();
-            vAnim.start();
-        }
-        onExited: {
-            hAnim.stop();
-            vAnim.stop();
-        }
-    }
 
     Button {
         id: turnButton

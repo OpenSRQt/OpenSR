@@ -189,17 +189,11 @@ void InhabitedPlanet::prepareSave()
     m_style.registerResource();
 }
 
-// bool InhabitedPlanet::waitForArrival() const {
-//     return m_waitingForArrival;
-// }
-
-// void InhabitedPlanet::setWaitForArrival(bool wait) {
-//     if(m_waitingForArrival == wait) {
-//         return;
-//     }
-//     emit waitForArrivalChanged();
-// }
-
+void InhabitedPlanet::waitForArrival()
+{
+    qDebug() << "InhabitedPlanet::waitForArrival()";
+    emit(planetToEnter());
+}
 
 }
 }
