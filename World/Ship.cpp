@@ -170,10 +170,9 @@ void Ship::correctLinearSpeed()
 {
     const float deltaX = m_destination.x() - position().x();
     const float deltaY = m_destination.y() - position().y();
-    const float turnRadius =
-        (deltaX * deltaX + deltaY * deltaY) /
-        (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
-    if (turnRadius < m_speed / m_angularSpeed) {
+    const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
+    if (turnRadius < m_speed / m_angularSpeed) 
+    {
         m_speed = m_angularSpeed * turnRadius;
     }
 }
