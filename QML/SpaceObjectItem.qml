@@ -73,11 +73,8 @@ Item {
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
                         isWaitingForShipArrival = true;
-                        console.log("isWaitingForShipArrival")
                     }
-                    // var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-                    // WorldManager.startShipMovement(positionInSpaceNode);
-                    // context.movementPosition = positionInSpaceNode;
+                    mouse.accepted = false;
                 }
             }
 
