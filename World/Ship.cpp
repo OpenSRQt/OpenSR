@@ -212,31 +212,11 @@ void Ship::initTargetAngle()
 
 void Ship::correctLinearSpeed() 
 {
-    // const QPointF normal1(-std::sin(m_angle), std::cos(m_angle));
-    // const QPointF normal2(std::sin(m_angle), -std::cos(m_angle));
-    // const float turnRadius = m_speed / m_angularSpeed;
-
-    // const QPointF circleCenter1 = position() + normal1 * turnRadius;
-    // const QPointF circleCenter2 = position() + normal2 * turnRadius;
-
-    // const QPointF dist1 = destination() - circleCenter1;
-    // const QPointF dist2 = destination() - circleCenter2;
-
-    // const float distLength1 = std::sqrt(dist1.x() * dist1.x() + dist1.y() * dist1.y());
-    // const float distLength2 = std::sqrt(dist2.x() * dist2.x() + dist2.y() * dist2.y());
-
-    // if (distLength1 < turnRadius || distLength2 < turnRadius) 
-    // {
-    //     const float safetyFactor = 1.0f;
-    //     m_angularSpeed = (m_speed / turnRadius) * safetyFactor;
-    // }
-
     const float deltaX = m_destination.x() - position().x();
     const float deltaY = m_destination.y() - position().y();
     const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
     if (turnRadius < m_speed / m_angularSpeed) 
     {
-        // m_angularSpeed = (m_speed / turnRadius);
         m_speed = m_angularSpeed * turnRadius;
     }
 }
@@ -276,20 +256,19 @@ void Ship::calcAngle(float dt)
 
 void Ship::calcPosition(float dt)
 {
-    QPointF direction = m_destination - position();
-    float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+    const QPointF direction = m_destination - position();
+    const float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
     
     if (distance <= dt * m_speed || m_destination == m_start_position) 
     {
         setPosition(m_destination);
-        // m_angularSpeed = NORMAL_ANGULAR_SPEED;
         m_speed = CONST_SPEED;
         emit shipArrived();
     } 
     else 
     {
-        QPointF directionalVector(std::cos(m_angle), std::sin(m_angle));
-        QPointF next = position() + directionalVector * m_speed * dt;
+        const QPointF directionalVector(std::cos(m_angle), std::sin(m_angle));
+        const QPointF next = position() + directionalVector * m_speed * dt;
         setPosition(next);
     }
 }
