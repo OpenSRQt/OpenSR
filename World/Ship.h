@@ -112,8 +112,8 @@ class OPENSR_WORLD_API Ship : public MannedObject {
 
     void startMovement(QPointF destination);
     void processMovement(float time);
-
-    Q_INVOKABLE void evalTrajectoryTo(const QPointF& dest);
+  
+    Q_INVOKABLE void calcTrajectory(const QPointF &destination);
 
     Q_INVOKABLE void exitThePlace();
    public slots:

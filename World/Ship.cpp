@@ -227,48 +227,58 @@ void Ship::calcPosition(float dt)
     }
 }
 
-void Ship::evalTrajectoryTo(const QPointF &dest) {
-    qDebug() << Q_FUNC_INFO;
-    auto startPos = this->position();
+void Ship::calcTrajectory(const QPointF &destination)
+{
+    QList<BezierCurve> trajectory;
+    const float deltaTime = 100.0;
+    const QPointF startPosition = position(); 
+    QPointF trajectoryPoint = startPosition;
+    float angle = m_angle;
+    float targetAngle;
 
-    qDebug() << "from" << startPos << "to" << dest;
-
-    auto dx = dest.x() - startPos.x();
-    auto dy = dest.y() - startPos.y();
-    qDebug() << startPos << dest;
-    qDebug() << QString("dx = %1, dy = %2").arg(dx).arg(dy);
-
-    const int h = 20.0;
-    const qreal avgSq = qSqrt(dx * dx + dy * dy);
-    QList<BezierCurve> traj;
-    if (dx > dy) {
-        qreal alphaTan = dy / dx;
-        auto dxStep = h * dx / avgSq;
-        int fullSteps = static_cast<int>(dx / dxStep);
-        for (int i = 1; i <= fullSteps; ++i) {
-            const qreal xx = dxStep * static_cast<qreal>(i);
-            const qreal yy = xx * alphaTan;
-            auto p = QPointF(xx, yy);
-            auto curve = BezierCurve();
-            curve.p0 = curve.p1 = curve.p2 = curve.p3 = startPos + p;
-            traj.append(curve);
-        }
-    } else {
-        qreal alphaTan = dx / dy;
-        auto dyStep = h * dy / avgSq;
-        int fullSteps = static_cast<int>(dy / dyStep);
-        for (int i = 1; i <= fullSteps; ++i) {
-            const qreal yy = dyStep * static_cast<qreal>(i);
-            const qreal xx = yy * alphaTan;
-            auto p = QPointF(xx, yy);
-            auto curve = BezierCurve();
-            curve.p0 = curve.p1 = curve.p2 = curve.p3 = startPos + p;
-            traj.append(curve);
-        }
+    const float deltaX = destination.x() - startPosition.x();
+    const float deltaY = destination.y() - startPosition.y();
+    const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(angle) - deltaY * cos(angle)));
+    if (turnRadius < m_speed / m_angularSpeed) 
+    {
+        m_speed = m_angularSpeed * turnRadius;
     }
 
-    setTrajectory(traj);
-    qDebug() << "new trajectory length = " << traj.size();
+    QPointF direction = destination - trajectoryPoint;
+    float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+
+    while ((distance > deltaTime * m_speed) && (destination != startPosition))
+    {
+        const QPointF directionalVector = direction / distance;
+
+        targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
+
+        float deltaAngle = targetAngle - angle;
+        normalizeAnlge(deltaAngle);
+
+        if (std::abs(deltaAngle) <= deltaTime * m_angularSpeed || angle == targetAngle)
+        {
+            angle = targetAngle;
+        } 
+        else 
+        {
+            const float rotateDirection = deltaAngle >= 0 ? 1.0f : -1.0f; 
+            angle += deltaTime * m_angularSpeed * rotateDirection;
+        }
+
+        const QPointF newDirectionalVector(std::cos(angle), std::sin(angle));
+        trajectoryPoint += newDirectionalVector * m_speed * deltaTime;
+        auto curve = BezierCurve();
+        curve.p0 = curve.p1 = curve.p2 = curve.p3 = trajectoryPoint;
+        trajectory.append(curve);
+
+        direction = destination - trajectoryPoint;
+        distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+    }
+    m_speed = CONST_SPEED;
+
+    setTrajectory(trajectory);
+    qDebug() << "new trajectory length = " << trajectory.size();
 }
 
 Q_INVOKABLE void Ship::exitThePlace() { emit exitPlace(); }
