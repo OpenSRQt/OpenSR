@@ -404,19 +404,21 @@ Item {
         onClicked: {
             if (mouse.button !== Qt.LeftButton)
                 return;
-
             mouse.accepted = true;
 
             console.log("left clicked in space")
-            //console.log(World.context.playerShip)
             
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
 
             console.log("For parent: " + positionInSpaceNode );
             WorldManager.context.playerShip.calcTrajectory(positionInSpaceNode);
+            showTrajectory(WorldManager.context.playerShip);
+        }
+
+        onDoubleClicked: {
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            hideTrajectory(WorldManager.context.playerShip);
             WorldManager.startShipMovement(positionInSpaceNode);
-            
-            //playerTrajectoryView.updateTraj();
         }
     }
 
