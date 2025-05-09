@@ -162,6 +162,7 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+    bool m_isMoving = false;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;
