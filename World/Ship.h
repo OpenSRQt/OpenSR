@@ -61,12 +61,10 @@ class OPENSR_WORLD_API Ship : public MannedObject {
                    NOTIFY affiliationChanged)
     Q_PROPERTY(ShipRank rank READ rank WRITE setRank NOTIFY rankChanged)
     Q_PROPERTY(float angle READ angle WRITE setAngle NOTIFY angleChanged)
-    Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
-    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY
-                   destinationChanged)
-    Q_PROPERTY(
-        bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
+    Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+    Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
 
    public:
     enum class ShipAffiliation {
@@ -97,34 +95,30 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     Q_INVOKABLE Ship(WorldObject* parent = 0, quint32 id = 0);
     virtual ~Ship();
 
-    float time() const;
-    float speed() const;
-    float angularSpeed() const;
-    float angle() const;
-    QPointF destination() const;
-    bool isMoving() const;
-
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
+
     ShipAffiliation affiliation() const;
-
     ShipRank rank() const;
-
-    void startMovement(QPointF destination);
-    void processMovement(float time);
-  
-    Q_INVOKABLE void calcTrajectory(const QPointF &destination);
-
-    Q_INVOKABLE void exitThePlace();
-   public slots:
+    float angle() const;
+    float speed() const;
+    QPointF destination() const;
+    bool isMoving() const;
+    float time() const;
+    
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setTime(float time);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(WorldObject* planetToEnter,
-                              const QPointF& shipPosition);
     void setIsMoving(bool isMoving);
+
+    static const float normalLinearSpeed;
+    static const float normalAngularSpeed;
+
+    void startMovement(const QPointF& dest);
+    void processMovement(float dt);
+    Q_INVOKABLE void calcTrajectory(const QPointF &destination);
 
    signals:
     void affiliationChanged(ShipAffiliation affiliation);
@@ -133,18 +127,19 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     void speedChanged();
     void destinationChanged();
     void angleChanged();
+    void isMovingChanged();
     void shipArrived();
     void isMovingChanged();
 
-    void enterPlace();
-    void exitPlace();
-
-   private:
-    void calcPosition(float dt = 0.0f);
-    void calcAngle(float dt = 0.0f);
-    void normalizeAngle(float& deltaAngle);
-    void initTargetAngle();
-    void correctLinearSpeed();
+private:
+    QPointF calcPosition(const float dt, const float angle, const QPointF& pos, const QPointF& dest);
+    float calcAngle(const float dt, const float angle, const QPointF& pos, const QPointF& dest);
+    void updatePosition(const float dt = 0.0f);
+    void updateAngle(const float dt = 0.0f);
+    void normalizeAnlge(float& deltaAngle);
+    void initTargetAngle(const QPointF& pos, const QPointF& dest);
+    void correctLinearSpeed(const QPointF& dest, const QPointF& pos);
+    void resetSpeedParams();
 
     ShipAffiliation m_affiliation;
     ShipRank m_rank;
@@ -157,8 +152,6 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     QPointF m_destination;
     QPointF m_start_position;
     bool m_isMoving = false;
-
-    bool m_isNearPlanet = false;
 };
 }  // namespace World
 }  // namespace OpenSR
