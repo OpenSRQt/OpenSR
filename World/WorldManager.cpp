@@ -292,7 +292,7 @@ void WorldManager::finishTurn()
     m_context->finishTurn();
 }
 
-void WorldManager::startShipMovement(QPointF destination) 
+void WorldManager::startShipMovement(const QPointF& destination) 
 {
     if (!m_context)
         return;

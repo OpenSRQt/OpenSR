@@ -62,9 +62,10 @@ class OPENSR_WORLD_API Ship: public MannedObject
     Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation NOTIFY affiliationChanged)
     Q_PROPERTY(ShipRank        rank        READ rank        WRITE setRank        NOTIFY rankChanged)
     Q_PROPERTY(float angle READ angle WRITE setAngle NOTIFY angleChanged)
-    Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
     Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
+    Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+    Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
 
 public:
     enum class ShipAffiliation {
@@ -84,30 +85,30 @@ public:
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
 
-    float time() const;
-    float speed() const;
-    float angularSpeed() const;
-    float angle() const;
-    QPointF destination() const;
-
-
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
+
     ShipAffiliation affiliation() const;
-
     ShipRank rank() const;
+    float angle() const;
+    float speed() const;
+    QPointF destination() const;
+    bool isMoving() const;
+    float time() const;
     
-    void startMovement(QPointF destination);
-    void processMovement(float time);
-  
-    Q_INVOKABLE void calcTrajectory(const QPointF &destination);
-
-public slots:
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setTime(float time);
     void setDestination(QPointF destination);
     void setAngle(float angle);
+    void setIsMoving(bool isMoving);
+
+    static const float normalLinearSpeed;
+    static const float normalAngularSpeed;
+
+    void startMovement(const QPointF& dest);
+    void processMovement(float dt);
+    Q_INVOKABLE void calcTrajectory(const QPointF &destination);
 
 signals:
     void affiliationChanged(ShipAffiliation affiliation);
@@ -116,14 +117,18 @@ signals:
     void speedChanged();
     void destinationChanged();
     void angleChanged();
+    void isMovingChanged();
     void shipArrived();
 
 private:
-    void calcPosition(float dt = 0.0f);
-    void calcAngle(float dt = 0.0f);
+    QPointF calcPosition(const float dt, const float angle, const QPointF& pos, const QPointF& dest);
+    float calcAngle(const float dt, const float angle, const QPointF& pos, const QPointF& dest);
+    void updatePosition(const float dt = 0.0f);
+    void updateAngle(const float dt = 0.0f);
     void normalizeAnlge(float& deltaAngle);
-    void initTargetAngle();
-    void correctLinearSpeed();
+    void initTargetAngle(const QPointF& pos, const QPointF& dest);
+    void correctLinearSpeed(const QPointF& dest, const QPointF& pos);
+    void resetSpeedParams();
 
     ShipAffiliation m_affiliation;
     ShipRank m_rank;
@@ -135,6 +140,7 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+    bool m_isMoving = false;
 };
 }
 }
