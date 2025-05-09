@@ -402,22 +402,20 @@ Item {
         propagateComposedEvents: true
 
         onClicked: {
-            if (mouse.button !== Qt.LeftButton)
+            if (context.playerShip.isMoving) {
                 return;
+            }
             mouse.accepted = true;
 
-            console.log("left clicked in space")
             
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-
-            console.log("For parent: " + positionInSpaceNode );
             WorldManager.context.playerShip.calcTrajectory(positionInSpaceNode);
-            showTrajectory(WorldManager.context.playerShip);
+            showTrajectory(context.playerShip);
         }
 
         onDoubleClicked: {
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-            hideTrajectory(WorldManager.context.playerShip);
+            hideTrajectory(context.playerShip);
             WorldManager.startShipMovement(positionInSpaceNode);
         }
     }
