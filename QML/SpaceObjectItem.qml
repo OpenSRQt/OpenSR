@@ -50,7 +50,13 @@ Item {
         id: defaultComponent
         AnimatedImage {
             cache: false
+            MouseArea {
+                id: item
+                anchors.fill: parent
+                propagateComposedEvents: true
+            }
         }
+        
     }
 
     Component {
@@ -60,32 +66,14 @@ Item {
             property bool isWaitingForShipArrival: false
 
             MouseArea {
+                propagateComposedEvents: true
                 anchors.fill: parent
                 onDoubleClicked: {
-                    if (context.planetToEnter == null) {
+                    mouse.accepted = false;
+                    if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
+                        isWaitingForShipArrival = true;
                     }
-                }
-                preventStealing: true
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: "red"
-                    opacity: planetItem.isWaitingForShipArrival ? 0.5 : 0.3
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 200
-                        }
-                    }
-                }
-            }
-
-            Connections {
-                target: context.playerShip
-
-                function onEnterPlace() {
-                    if(planetItem.planet == context.planetToEnter)
-                        planetItem.isWaitingForShipArrival = true;
                 }
             }
 
@@ -95,9 +83,10 @@ Item {
                 function onPlayerShipArrived() {
                     if (planetItem.isWaitingForShipArrival) {
                         changeScreen("qrc:/OpenSR/PlanetView.qml", {
-                            "system": World.context.planet
+                            "planet": World.context.planetToEnter
                         });
                         planetItem.isWaitingForShipArrival = false;
+                        context.planetToEnter = null;
                     }
                 }
             }
@@ -112,23 +101,27 @@ Item {
             cache: false
             property Ship ship
             opacity: 1
+            scale: 1
             Behavior on opacity {
                 NumberAnimation {
                     duration: 500
                     easing.type: Easing.InOutQuad
                 }
             }
+            Behavior on scale {
+                NumberAnimation { duration: 2000 }
+            }
             Connections {
                 target: ship
 
                 function onEnterPlace() {
-                    console.log("onEnterThePlace()");
                     shipImage.opacity = 0;
+                    shipImage.scale = 0.5;
                 }
 
                 function onExitPlace() {
-                    console.log("onExitThePlace()");
                     shipImage.opacity = 1;
+                    shipImage.scale = 1;
                 }
             }
         }

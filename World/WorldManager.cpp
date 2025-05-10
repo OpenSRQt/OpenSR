@@ -185,7 +185,14 @@ void ShipMovementAnimation::updateCurrentTime(int currentTime)
     {
         int deltaTime = currentTime - previousTime;
         previousTime = currentTime;
-        qobject_cast<Ship*>(ctx->playerShip())->processMovement((float)deltaTime);
+
+        class InhabitedPlanet* planetToEnter = qobject_cast<class InhabitedPlanet*>(ctx->planetToEnter());
+        class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
+        auto shipPos = playerShip->position();
+        //QPointF planetPos = ctx->movementPosition();
+        playerShip->checkPlanetProximity(planetToEnter, shipPos);
+
+        playerShip->processMovement((float)deltaTime);
     }
 }
 
@@ -292,7 +299,7 @@ void WorldManager::finishTurn()
     m_context->finishTurn();
 }
 
-void WorldManager::startShipMovement(QPointF destination) 
+void WorldManager::startShipMovement(const QPointF& destination) 
 {
     if (!m_context)
         return;

@@ -19,6 +19,31 @@ Item {
 
     anchors.fill: parent
 
+    MouseArea {
+        id: spaceMouseOverlay
+        anchors.fill: parent
+        
+        propagateComposedEvents: true
+
+        onClicked: {
+            if (context.playerShip.isMoving) {
+                return;
+            }
+            mouse.accepted = true;
+
+            
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            WorldManager.context.playerShip.calcTrajectory(positionInSpaceNode);
+            showTrajectory(context.playerShip);
+        }
+
+        onDoubleClicked: {
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            hideTrajectory(context.playerShip);
+            WorldManager.startShipMovement(positionInSpaceNode);
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -98,9 +123,16 @@ Item {
             o.exited.connect(hideTrajectory);
         }
 
+        var shipObject = component.createObject(spaceNode, {
+            object: World.context.playerShip
+        });
+
+        shipObject.entered.connect(showDebugTooltip);
+        shipObject.exited.connect(hideDebugTooltip);
+
         var trajComponent = Qt.createComponent("TrajectoryItem.qml");
         trajectoryView = trajComponent.createObject(spaceNode, {
-            object: system.children[0],
+            object: null,
             visible: false
         });
     }
@@ -108,46 +140,6 @@ Item {
     DebugTooltip {
         id: debug
         visible: false
-    }
-
-    MouseArea {
-        id: spaceMouseOverlay
-        z: 1
-        anchors.fill: parent
-        propagateComposedEvents: true
-
-        Timer {
-            id: proximityTimer
-            interval: 100
-            repeat: true
-            running: false
-            onTriggered: {
-                context.playerShip.checkPlanetProximity(
-                    context.planetToEnter, 
-                    Qt.point(context.movementPosition.x, context.movementPosition.y), 
-                    Qt.point(playerShipItem.x, playerShipItem.y));
-            }
-        }
-
-        onClicked: {
-            if (mouse.button !== Qt.LeftButton)
-                return;
-
-            mouse.accepted = true;
-            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-            proximityTimer.start();
-            WorldManager.startShipMovement(positionInSpaceNode);
-            context.movementPosition = positionInSpaceNode
-        }
-
-        Connections {
-            target: context
-
-            function onPlayerShipArrived() {
-                proximityTimer.stop();
-                context.planetToEnter = null;
-            }
-        }
     }
 
     function showTrajectory(object) {
@@ -203,24 +195,6 @@ Item {
             alwaysRunToEnd: false
         }
     }
-
-    // TrajectoryItem {
-    //     id: playerTrajectoryView
-    //     //anchors.fill: parent
-    //     alwaysVisible: true
-    //     anchors.fill: parent
-
-    //     function updateVRect() {
-    //         visibleRect = spaceNode.mapFromItem(view, 0, 0, view.width, view.height);
-    //         console.log("player Vrect = ", visibleRect);
-    //     }
-
-    //     function updateTraj() {
-    //         updateVRect();
-    //         object = null;
-    //         object = WorldManager.context.playerShip
-    //     }
-    // }
 
     MouseArea {
         id: leftHoverArea

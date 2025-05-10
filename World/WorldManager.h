@@ -153,7 +153,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void startTurn();
     void finishTurn();
-    void startShipMovement(QPointF destination);
+    void startShipMovement(const QPointF& destination);
     void finishShipMovement();
 
 private:

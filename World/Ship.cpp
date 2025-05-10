@@ -1,6 +1,6 @@
 /*
-    OpenSR - opensource multi-genre game based upon "Space Rangers 2: Dominators"
-    Copyright (C) 2015 Kosyak <ObKo@mail.ru>
+    OpenSR - opensource multi-genre game based upon "Space Rangers 2:
+   Dominators" Copyright (C) 2015 Kosyak <ObKo@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,25 +17,20 @@
 */
 
 #include "Ship.h"
+
 #include "WorldBindings.h"
 
-#include <QtQml/QQmlEngine>
 #include <QtMath>
+#include <QtQml/QQmlEngine>
 #include <cmath>
-#include <qpoint.h>
 
-#define CONST_SPEED 0.3f
-#define NORMAL_ANGULAR_SPEED 0.003f
+namespace OpenSR {
+namespace World {
+const quint32 Ship::m_staticTypeId =
+    typeIdFromClassName(Ship::staticMetaObject.className());
 
-namespace OpenSR
-{
-namespace World
-{
-const quint32 Ship::m_staticTypeId = typeIdFromClassName(Ship::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
-{
+template <>
+void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script) {
     qRegisterMetaType<ShipStyle>();
     qRegisterMetaTypeStreamOperators<ShipStyle>();
     qRegisterMetaType<ShipStyle::Data>();
@@ -44,176 +39,149 @@ void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
     qmlRegisterType<Ship>("OpenSR.World", 1, 0, "Ship");
 }
 
-template<>
-Ship* WorldObject::createObject(WorldObject *parent, quint32 id)
-{
+template <>
+Ship *WorldObject::createObject(WorldObject *parent, quint32 id) {
     return new Ship(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Ship>()
-{
+template <>
+quint32 WorldObject::staticTypeId<Ship>() {
     return Ship::m_staticTypeId;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Ship>()
-{
+template <>
+const QMetaObject *WorldObject::staticTypeMeta<Ship>() {
     return &Ship::staticMetaObject;
 }
 
 /**************************************************************************************************/
 
-int ShipStyle::width() const
-{
-    return getData<Data>().width;
-}
+int ShipStyle::width() const { return getData<Data>().width; }
 
-void ShipStyle::setWidth(int w)
-{
+void ShipStyle::setWidth(int w) {
     auto d = getData<Data>();
     d.width = w;
     setData(d);
 }
 
-QString ShipStyle::texture() const
-{
-    return getData<Data>().texture;
-}
+QString ShipStyle::texture() const { return getData<Data>().texture; }
 
-void ShipStyle::setTexture(const QString &texture)
-{
+void ShipStyle::setTexture(const QString &texture) {
     auto d = getData<Data>();
     d.texture = texture;
     setData(d);
 }
 
-bool operator==(const ShipStyle& one, const ShipStyle& another)
-{
+bool operator==(const ShipStyle &one, const ShipStyle &another) {
     return one.texture() == another.texture();
 }
 
 /*  Ship */
-Ship::Ship(WorldObject *parent, quint32 id): MannedObject(parent, id), m_speed(CONST_SPEED), m_angularSpeed(NORMAL_ANGULAR_SPEED)
+
+const float Ship::normalLinearSpeed = 0.3f;
+const float Ship::normalAngularSpeed = 0.003f;
+
+Ship::Ship(WorldObject *parent, quint32 id): MannedObject(parent, id), m_speed(normalLinearSpeed), m_angularSpeed(normalAngularSpeed)
 {
 }
 
-Ship::~Ship()
-{
-}
+Ship::~Ship() {}
 
-quint32 Ship::typeId() const
-{
-    return Ship::m_staticTypeId;
-}
+quint32 Ship::typeId() const { return Ship::m_staticTypeId; }
 
-QString Ship::namePrefix() const
-{
-    return tr("Ship");
-}
+QString Ship::namePrefix() const { return tr("Ship"); }
 
-Ship::ShipAffiliation Ship::affiliation() const
-{
-    return m_affiliation;
-}
+Ship::ShipAffiliation Ship::affiliation() const { return m_affiliation; }
 
-Ship::ShipRank Ship::rank() const
-{
-    return m_rank;
-}
+Ship::ShipRank Ship::rank() const { return m_rank; }
 
-float Ship::time() const
-{
-    return m_time;
-}
+float Ship::time() const { return m_time; }
 
-float Ship::angularSpeed() const
-{
-    return m_angularSpeed;
-}
+float Ship::angle() const { return m_angle; }
 
-float Ship::angle() const
-{
-    return m_angle;
-}
-
-float Ship::speed() const
-{
-    return m_speed;
-}
+float Ship::speed() const { return m_speed; }
 
 QPointF Ship::destination() const
 {
     return m_destination;
 }
 
-void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
+bool Ship::isMoving() const
 {
-    if (m_affiliation == affiliation)
-        return;
+    return m_isMoving;
+}
+
+void Ship::setAffiliation(Ship::ShipAffiliation affiliation) {
+    if (m_affiliation == affiliation) return;
 
     m_affiliation = affiliation;
     emit affiliationChanged(m_affiliation);
 }
 
-void Ship::setRank(Ship::ShipRank rank)
-{
-    if (m_rank == rank)
-        return;
+void Ship::setRank(Ship::ShipRank rank) {
+    if (m_rank == rank) return;
 
     m_rank = rank;
     emit rankChanged(m_rank);
 }
 
-void Ship::setTime(float time)
-{
-    if (time != m_time)
-    {
+void Ship::setTime(float time) {
+    if (time != m_time) {
         m_time = time;
         emit(timeChanged());
     }
 }
 
-void Ship::setAngle(float angle)
-{
-    if (angle != m_angle)
-    {
+void Ship::setAngle(float angle) {
+    if (angle != m_angle) {
         m_angle = angle;
         emit(angleChanged());
     }
 }
 
-void Ship::setDestination(QPointF destination)
-{
-    if (destination != m_destination)
-    {
+void Ship::setDestination(QPointF destination) {
+    if (destination != m_destination) {
         m_destination = destination;
         emit(destinationChanged());
     }
 }
 
-void Ship::normalizeAngle(float& deltaAngle)
+void Ship::setIsMoving(bool isMoving)
+{
+    if (isMoving != m_isMoving)
+    {
+        m_isMoving = isMoving;
+        emit(isMovingChanged());
+    }
+}
+
+void Ship::normalizeAnlge(float& deltaAngle)
 {
     while (deltaAngle > M_PI)
         deltaAngle -= 2* M_PI;
 
-    while (deltaAngle < -M_PI) 
-        deltaAngle += 2 * M_PI; 
+    while (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
 }
 
-void Ship::initTargetAngle()
+void Ship::resetSpeedParams()
 {
-    QPointF directionalVector = m_destination - position();
+    m_speed = normalLinearSpeed;
+    m_angularSpeed = normalAngularSpeed;
+}
+
+void Ship::initTargetAngle(const QPointF& pos, const QPointF& dest)
+{
+    QPointF directionalVector = dest - pos;
     float directionNorm = std::sqrt(directionalVector.x() * directionalVector.x() + directionalVector.y() * directionalVector.y());
     directionalVector /= directionNorm;
 
     m_targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
 }
 
-void Ship::correctLinearSpeed() 
+void Ship::correctLinearSpeed(const QPointF& dest, const QPointF& pos) 
 {
-    const float deltaX = m_destination.x() - position().x();
-    const float deltaY = m_destination.y() - position().y();
+    const float deltaX = dest.x() - pos.x();
+    const float deltaY = dest.y() - pos.y();
     const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
     if (turnRadius < m_speed / m_angularSpeed) 
     {
@@ -221,125 +189,129 @@ void Ship::correctLinearSpeed()
     }
 }
 
-void Ship::startMovement(QPointF destination) // TODO: replace QPointF with QVector2d
+void Ship::startMovement(const QPointF& dest) // TODO: replace QPointF with QVector2d
 {  
+    setIsMoving(true);
+    m_isNearPlanet = false;
     m_start_position = position();
-    setDestination(destination);
-    correctLinearSpeed();
+    setDestination(dest);
+    correctLinearSpeed(dest, m_start_position);
 }
 
-void Ship::processMovement(float time)
+void Ship::processMovement(const float dt)
 {
-    //qDebug() << "m_angularSpeed: " << m_angularSpeed; 
-    calcAngle(time);
-    calcPosition(time);
+    updateAngle(dt);
+    updatePosition(dt);
 }
 
-void Ship::calcAngle(float dt)
+float Ship::calcAngle(const float dt, const float angle, const QPointF& pos, const QPointF& dest)
 {
-    initTargetAngle();
-    float deltaAngle = m_targetAngle - m_angle;
-    normalizeAngle(deltaAngle);
+    initTargetAngle(pos, dest);
+    float deltaAngle = m_targetAngle - angle;
+    normalizeAnlge(deltaAngle);
 
-    if (std::abs(deltaAngle) <= dt * m_angularSpeed || m_angle == m_targetAngle)
+    if (std::abs(deltaAngle) <= dt * m_angularSpeed || angle == m_targetAngle)
     {
-        setAngle(m_targetAngle);
+        return m_targetAngle;
     } 
     else 
     {
         const float rotateDirection = deltaAngle >= 0 ? 1.0f : -1.0f; 
-        const float newAngle = m_angle + dt * m_angularSpeed * rotateDirection;
-        setAngle(newAngle);
+        const float newAngle = angle + dt * m_angularSpeed * rotateDirection;
+        return newAngle;
     }
 }
 
-
-void Ship::calcPosition(float dt)
+QPointF Ship::calcPosition(const float dt, const float angle, const QPointF& pos, const QPointF& dest)
 {
-    const QPointF direction = m_destination - position();
-    const float distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
+    const float distance = static_cast<float>(QLineF(dest, pos).length());
     
-    if (distance <= dt * m_speed || m_destination == m_start_position) 
+    if (distance <= dt * m_speed || dest == m_start_position) 
     {
-        setPosition(m_destination);
-        m_speed = CONST_SPEED;
+        return dest;
+    } 
+    else 
+    {
+        const QPointF directionalVector(std::cos(angle), std::sin(angle));
+        const QPointF newPosition = pos + directionalVector * m_speed * dt;
+        return newPosition;
+    }
+}
+
+void Ship::updatePosition(const float dt)
+{
+    const QPointF newPosition = calcPosition(dt, m_angle, position(), m_destination);
+    
+    if (newPosition == m_destination) 
+    {
+        setIsMoving(false);
+        setPosition(newPosition);
+        resetSpeedParams();
         emit shipArrived();
     } 
     else 
     {
-        const QPointF directionalVector(std::cos(m_angle), std::sin(m_angle));
-        const QPointF next = position() + directionalVector * m_speed * dt;
-        setPosition(next);
+        setPosition(newPosition);
     }
 }
 
-void Ship::evalTrajectoryTo(const QPointF &dest)
+void Ship::updateAngle(float dt)
 {
-    qDebug() << Q_FUNC_INFO;
-    auto startPos = this->position();
+    const float newAngle = calcAngle(dt, m_angle, position(), m_destination);
+    setAngle(newAngle);
+}
 
-    qDebug() << "from" << startPos << "to" << dest;
+void Ship::calcTrajectory(const QPointF& dest)
+{
+    m_start_position = position();
+    correctLinearSpeed(dest, m_start_position);
+    
+    const float pointDensityCoeff = 60.0f;
+    const float pointStep = normalLinearSpeed * pointDensityCoeff / m_speed;
 
-    auto dx = dest.x() - startPos.x();
-    auto dy = dest.y() - startPos.y();
-    qDebug() << startPos << dest;
-    qDebug() << QString("dx = %1, dy = %2").arg(dx).arg(dy);
+    float angle = m_angle;
+    QPointF trajectoryPoint = m_start_position;
 
-    const int h = 20.0;
-    const qreal avgSq = qSqrt(dx*dx + dy*dy);
-    QList<BezierCurve> traj;
-    if (dx>dy) {
-        qreal alphaTan = dy / dx;
-        auto dxStep = h * dx / avgSq;
-        int fullSteps = static_cast<int>(dx/dxStep);
-        for (int i=1; i<=fullSteps; ++i) {
-            const qreal xx = dxStep * static_cast<qreal>(i);
-            const qreal yy = xx * alphaTan;
-            auto p = QPointF(xx,yy);
-            auto curve = BezierCurve();
-            curve.p0 = curve.p1 = curve.p2 = curve.p3 = startPos+p;
-            traj.append(curve);
-        }
-    } else {
-        qreal alphaTan = dx/dy;
-        auto dyStep = h * dy / avgSq;
-        int fullSteps = static_cast<int>(dy/dyStep);
-        for (int i=1; i<=fullSteps; ++i) {
-            const qreal yy = dyStep * static_cast<qreal>(i);
-            const qreal xx = yy * alphaTan;
-            auto p = QPointF(xx,yy);
-            auto curve = BezierCurve();
-            curve.p0 = curve.p1 = curve.p2 = curve.p3 = startPos+p;
-            traj.append(curve);
-        }
+    QList<BezierCurve> trajectory;
+
+    while (trajectoryPoint != dest)
+    {
+        const float distance = static_cast<float>(QLineF(dest, trajectoryPoint).length());
+
+        if (distance < pointStep * m_speed)
+            break;
+
+        angle = calcAngle(pointStep, angle, trajectoryPoint, dest);
+        trajectoryPoint = calcPosition(pointStep, angle, trajectoryPoint, dest);
+
+        auto curve = BezierCurve();
+        curve.p0 = curve.p1 = curve.p2 = curve.p3 = trajectoryPoint;
+        trajectory.append(curve);
     }
+    resetSpeedParams();
 
-    setTrajectory(traj);
-    qDebug() << "new trajectory length = " << traj.size();
+    setTrajectory(trajectory);
+    qDebug() << "new trajectory length = " << trajectory.size();
 }
 
+Q_INVOKABLE void Ship::exitThePlace() { emit exitPlace(); }
 
-Q_INVOKABLE void Ship::exitThePlace() {
-    emit exitPlace();
-}
-
-void Ship::checkPlanetProximity(WorldObject* planetToEnter, const QPointF &planetCenter, const QPointF &shipPosition) {
-    if(!planetToEnter) {
+void Ship::checkPlanetProximity(WorldObject *planetToEnter,
+                                const QPointF &shipPosition) {
+    if (!planetToEnter) {
         return;
     }
-    InhabitedPlanet* planet = qobject_cast<InhabitedPlanet*>(planetToEnter);
+    InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
     int planetRadius = planet->style().radius();
+    QPointF planetCenter = planet->position();
 
     const qreal distance = QLineF(shipPosition, planetCenter).length();
-    
+
     if (distance <= planetRadius && !m_isNearPlanet) {
         m_isNearPlanet = true;
-        emit enterPlace();
-    } else if (distance > planetRadius && m_isNearPlanet) {
-        m_isNearPlanet = false;
-        emit exitPlace();
+        emit(enterPlace());
     }
 }
 
-}
-}
+}  // namespace World
+}  // namespace OpenSR
