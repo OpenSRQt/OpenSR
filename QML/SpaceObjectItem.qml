@@ -66,14 +66,15 @@ Item {
             property bool isWaitingForShipArrival: false
 
             MouseArea {
-                propagateComposedEvents: true
                 anchors.fill: parent
                 onDoubleClicked: {
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
                         isWaitingForShipArrival = true;
                     }
-                    mouse.accepted = false;
+                    var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+                    WorldManager.startShipMovement(positionInSpaceNode);
+                    context.movementPosition = positionInSpaceNode;
                 }
             }
 
