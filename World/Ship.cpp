@@ -157,11 +157,10 @@ void Ship::normalizeAngle(float &deltaAngle) {
     while (deltaAngle < -M_PI) deltaAngle += 2 * M_PI;
 }
 
-void Ship::initTargetAngle() {
+void Ship::initTargetAngle()
+{
     QPointF directionalVector = m_destination - position();
-    float directionNorm =
-        std::sqrt(directionalVector.x() * directionalVector.x() +
-                  directionalVector.y() * directionalVector.y());
+    float directionNorm = std::sqrt(directionalVector.x() * directionalVector.x() + directionalVector.y() * directionalVector.y());
     directionalVector /= directionNorm;
 
     m_targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
@@ -169,21 +168,18 @@ void Ship::initTargetAngle() {
 
 void Ship::correctLinearSpeed() 
 {
-void Ship::correctLinearSpeed() {
     const float deltaX = m_destination.x() - position().x();
     const float deltaY = m_destination.y() - position().y();
-    const float turnRadius = (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
-    if (turnRadius < m_speed / m_angularSpeed) 
-    {
+    const float turnRadius =
+        (deltaX * deltaX + deltaY * deltaY) /
+        (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
+    if (turnRadius < m_speed / m_angularSpeed) {
         m_speed = m_angularSpeed * turnRadius;
     }
 }
 
-void Ship::startMovement(
-    QPointF destination)  // TODO: replace QPointF with QVector2d
-{
-    setIsMoving(true);
-    m_isNearPlanet = false;
+void Ship::startMovement(QPointF destination) // TODO: replace QPointF with QVector2d
+{  
     m_start_position = position();
     setDestination(destination);
     correctLinearSpeed();
