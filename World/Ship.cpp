@@ -180,6 +180,8 @@ void Ship::correctLinearSpeed()
 
 void Ship::startMovement(QPointF destination) // TODO: replace QPointF with QVector2d
 {  
+    setIsMoving(true);
+    m_isNearPlanet = false;
     m_start_position = position();
     setDestination(destination);
     correctLinearSpeed();
