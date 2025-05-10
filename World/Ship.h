@@ -120,11 +120,8 @@ public slots:
     void setTime(float time);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(
-        WorldObject* planetToEnter, 
-        const QPointF &planetCenter, 
-        const QPointF &shipPosition
-    );
+    void checkPlanetProximity(WorldObject* planetToEnter,
+                              const QPointF& shipPosition);
     void setIsMoving(bool isMoving);
 
     static const float normalLinearSpeed;
