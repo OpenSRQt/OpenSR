@@ -74,7 +74,6 @@ Item {
                         context.planetToEnter = planetItem.planet;
                         isWaitingForShipArrival = true;
                     }
-                    mouse.accepted = false;
                 }
             }
 
