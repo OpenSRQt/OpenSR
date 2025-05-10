@@ -18,7 +18,7 @@
 
 #include "Ship.h"
 
-#include <qpoint.h>
+#include "WorldBindings.h"
 
 #include <QLine>
 #include <QtMath>
