@@ -23,8 +23,6 @@
 #include <QtMath>
 #include <QtQml/QQmlEngine>
 #include <cmath>
-#include <qpoint.h>
-#include <QLine>
 
 namespace OpenSR {
 namespace World {
