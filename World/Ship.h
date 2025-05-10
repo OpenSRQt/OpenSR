@@ -123,7 +123,6 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     void setDestination(QPointF destination);
     void setAngle(float angle);
     void checkPlanetProximity(WorldObject* planetToEnter,
-                              const QPointF& planetCenter,
                               const QPointF& shipPosition);
     void setIsMoving(bool isMoving);
 
