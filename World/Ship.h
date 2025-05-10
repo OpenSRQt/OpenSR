@@ -103,9 +103,6 @@ public:
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
 
-    Q_INVOKABLE void evalTrajectoryTo(const QPointF& dest);
-
-    Q_INVOKABLE void exitThePlace();
 public slots:
     float angle() const;
     float speed() const;
