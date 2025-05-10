@@ -19,6 +19,19 @@ Item {
 
     anchors.fill: parent
 
+    MouseArea {
+        id: spaceMouseOverlay
+        anchors.fill: parent
+
+        onDoubleClicked: {
+            if (mouse.button !== Qt.LeftButton)
+                return;
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            WorldManager.startShipMovement(positionInSpaceNode);
+            context.movementPosition = positionInSpaceNode;
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -115,46 +128,6 @@ Item {
     DebugTooltip {
         id: debug
         visible: false
-    }
-
-    MouseArea {
-        id: spaceMouseOverlay
-        z: 1
-        anchors.fill: parent
-        propagateComposedEvents: true
-
-        Timer {
-            id: proximityTimer
-            interval: 100
-            repeat: true
-            running: false
-            onTriggered: {
-                context.playerShip.checkPlanetProximity(
-                    context.planetToEnter, 
-                    Qt.point(context.movementPosition.x, context.movementPosition.y), 
-                    Qt.point(playerShipItem.x, playerShipItem.y));
-            }
-        }
-
-        onClicked: {
-            if (mouse.button !== Qt.LeftButton)
-                return;
-
-            mouse.accepted = true;
-            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-            proximityTimer.start();
-            WorldManager.startShipMovement(positionInSpaceNode);
-            context.movementPosition = positionInSpaceNode
-        }
-
-        Connections {
-            target: context
-
-            function onPlayerShipArrived() {
-                proximityTimer.stop();
-                context.planetToEnter = null;
-            }
-        }
     }
 
     function showTrajectory(object) {

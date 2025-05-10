@@ -1,6 +1,6 @@
 /*
-    OpenSR - opensource multi-genre game based upon "Space Rangers 2: Dominators"
-    Copyright (C) 2015 Kosyak <ObKo@mail.ru>
+    OpenSR - opensource multi-genre game based upon "Space Rangers 2:
+   Dominators" Copyright (C) 2015 Kosyak <ObKo@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@
 */
 
 #include "Ship.h"
-#include "WorldBindings.h"
+
+#include <qpoint.h>
 
 #include <QLine>
 #include <QtMath>
 #include <QtQml/QQmlEngine>
 #include <cmath>
 
-namespace OpenSR
-{
-namespace World
-{
-const quint32 Ship::m_staticTypeId = typeIdFromClassName(Ship::staticMetaObject.className());
+namespace OpenSR {
+namespace World {
+const quint32 Ship::m_staticTypeId =
+    typeIdFromClassName(Ship::staticMetaObject.className());
 
 template <> void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
 {
@@ -57,25 +57,17 @@ template <> const QMetaObject *WorldObject::staticTypeMeta<Ship>()
 
 /**************************************************************************************************/
 
-int ShipStyle::width() const
-{
-    return getData<Data>().width;
-}
+int ShipStyle::width() const { return getData<Data>().width; }
 
-void ShipStyle::setWidth(int w)
-{
+void ShipStyle::setWidth(int w) {
     auto d = getData<Data>();
     d.width = w;
     setData(d);
 }
 
-QString ShipStyle::texture() const
-{
-    return getData<Data>().texture;
-}
+QString ShipStyle::texture() const { return getData<Data>().texture; }
 
-void ShipStyle::setTexture(const QString &texture)
-{
+void ShipStyle::setTexture(const QString &texture) {
     auto d = getData<Data>();
     d.texture = texture;
     setData(d);
@@ -96,39 +88,22 @@ Ship::Ship(WorldObject *parent, quint32 id)
 {
 }
 
-Ship::~Ship()
-{
-}
+Ship::~Ship() {}
 
-quint32 Ship::typeId() const
-{
-    return Ship::m_staticTypeId;
-}
+quint32 Ship::typeId() const { return Ship::m_staticTypeId; }
 
-QString Ship::namePrefix() const
-{
-    return tr("Ship");
-}
+QString Ship::namePrefix() const { return tr("Ship"); }
 
-Ship::ShipAffiliation Ship::affiliation() const
-{
-    return m_affiliation;
-}
+Ship::ShipAffiliation Ship::affiliation() const { return m_affiliation; }
 
 Ship::ShipRank Ship::rank() const
 {
     return m_rank;
 }
 
-float Ship::angle() const
-{
-    return m_angle;
-}
+float Ship::angle() const { return m_angle; }
 
-float Ship::speed() const
-{
-    return m_speed;
-}
+float Ship::speed() const { return m_speed; }
 
 QPointF Ship::destination() const
 {
@@ -140,19 +115,15 @@ bool Ship::isMoving() const
     return m_isMoving;
 }
 
-void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
-{
-    if (m_affiliation == affiliation)
-        return;
+void Ship::setAffiliation(Ship::ShipAffiliation affiliation) {
+    if (m_affiliation == affiliation) return;
 
     m_affiliation = affiliation;
     emit affiliationChanged(m_affiliation);
 }
 
-void Ship::setRank(Ship::ShipRank rank)
-{
-    if (m_rank == rank)
-        return;
+void Ship::setRank(Ship::ShipRank rank) {
+    if (m_rank == rank) return;
 
     m_rank = rank;
     emit rankChanged(m_rank);
@@ -347,20 +318,22 @@ void Ship::calcTrajectory(const QPointF &dest)
     setTrajectory(trajectory);
 }
 
-
-Q_INVOKABLE void Ship::exitThePlace() {
-    emit exitPlace();
+Q_INVOKABLE void Ship::exitThePlace() 
+{ 
+    emit exitPlace(); 
 }
 
-void Ship::checkPlanetProximity(WorldObject* planetToEnter, const QPointF &planetCenter, const QPointF &shipPosition) {
-    if(!planetToEnter) {
+void Ship::checkPlanetProximity(WorldObject *planetToEnter,
+                                const QPointF &planetCenter,
+                                const QPointF &shipPosition) {
+    if (!planetToEnter) {
         return;
     }
-    InhabitedPlanet* planet = qobject_cast<InhabitedPlanet*>(planetToEnter);
+    InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
     int planetRadius = planet->style().radius();
 
     const qreal distance = QLineF(shipPosition, planetCenter).length();
-    
+
     if (distance <= planetRadius && !m_isNearPlanet) {
         m_isNearPlanet = true;
         emit enterPlace();

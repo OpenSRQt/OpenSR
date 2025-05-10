@@ -99,6 +99,17 @@ void InhabitedPlanetStyle::setBackground(const QString& texture)
     setData(d);
 }
 
+bool operator==(const InhabitedPlanetStyle& one, const InhabitedPlanetStyle& another)
+{
+    return  (one.surface()  == another.surface() ) &&
+        (one.cloud0() == another.cloud0()) &&
+        (one.cloud1() == another.cloud1()) &&
+        (one.radius() == another.radius()) &&
+        (one.atmosphere() == another.atmosphere()) &&
+        (one.background() == another.background())
+        ;
+}
+
 QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style)
 {
     return stream << style.id();
@@ -179,6 +190,9 @@ InhabitedPlanetStyle InhabitedPlanet::style() const
 
 void InhabitedPlanet::setStyle(const InhabitedPlanetStyle& style)
 {
+    if (m_style == style)
+        return;
+
     m_style = style;
     emit(styleChanged());
 }
@@ -191,7 +205,6 @@ void InhabitedPlanet::prepareSave()
 
 void InhabitedPlanet::waitForArrival()
 {
-    qDebug() << "InhabitedPlanet::waitForArrival()";
     emit(planetToEnter());
 }
 

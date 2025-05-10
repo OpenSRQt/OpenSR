@@ -1,6 +1,6 @@
 /*
-    OpenSR - opensource multi-genre game based upon "Space Rangers 2: Dominators"
-    Copyright (C) 2015 Kosyak <ObKo@mail.ru>
+    OpenSR - opensource multi-genre game based upon "Space Rangers 2:
+   Dominators" Copyright (C) 2015 Kosyak <ObKo@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,10 +25,8 @@
 #include <QPoint>
 #include "InhabitedPlanet.h"
 
-namespace OpenSR
-{
-namespace World
-{
+namespace OpenSR {
+namespace World {
 
 class OPENSR_WORLD_API ShipStyle : public Resource
 {
@@ -96,7 +94,7 @@ public:
     };
     Q_ENUM(ShipRank)
 
-    Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
+    Q_INVOKABLE Ship(WorldObject* parent = 0, quint32 id = 0);
     virtual ~Ship();
 
     virtual quint32 typeId() const override;
@@ -126,7 +124,7 @@ public:
     void calcTrajectory(const QPointF &destination);
     bool checkPlannedActions() const;
 
-signals:
+   signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
     void timeChanged();
@@ -135,6 +133,7 @@ signals:
     void angleChanged();
     void isMovingChanged();
     void shipArrived();
+    void isMovingChanged();
 
     void enterPlace();
     void exitPlace();
@@ -158,6 +157,7 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+    bool m_isMoving = false;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;
@@ -169,4 +169,4 @@ private:
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle)
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle::Data)
 
-#endif // OPENSR_WORLD_SHIP_H
+#endif  // OPENSR_WORLD_SHIP_H

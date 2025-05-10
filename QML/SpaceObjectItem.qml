@@ -50,7 +50,13 @@ Item {
         id: defaultComponent
         AnimatedImage {
             cache: false
+            MouseArea {
+                id: item
+                anchors.fill: parent
+                propagateComposedEvents: true
+            }
         }
+        
     }
 
     Component {
@@ -60,13 +66,15 @@ Item {
             property bool isWaitingForShipArrival: false
 
             MouseArea {
+                propagateComposedEvents: true
                 anchors.fill: parent
                 onDoubleClicked: {
-                    if (context.planetToEnter == null) {
+                    if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
+                        isWaitingForShipArrival = true;
                     }
+                    mouse.accepted = false;
                 }
-                preventStealing: true
 
                 Rectangle {
                     anchors.fill: parent
@@ -81,23 +89,15 @@ Item {
             }
 
             Connections {
-                target: context.playerShip
-
-                function onEnterPlace() {
-                    if(planetItem.planet == context.planetToEnter)
-                        planetItem.isWaitingForShipArrival = true;
-                }
-            }
-
-            Connections {
                 target: context
 
                 function onPlayerShipArrived() {
                     if (planetItem.isWaitingForShipArrival) {
                         changeScreen("qrc:/OpenSR/PlanetView.qml", {
-                            "system": World.context.planet
+                            "planet": World.context.planetToEnter
                         });
                         planetItem.isWaitingForShipArrival = false;
+                        context.planetToEnter = null;
                     }
                 }
             }
@@ -122,12 +122,10 @@ Item {
                 target: ship
 
                 function onEnterPlace() {
-                    console.log("onEnterThePlace()");
                     shipImage.opacity = 0;
                 }
 
                 function onExitPlace() {
-                    console.log("onExitThePlace()");
                     shipImage.opacity = 1;
                 }
             }
