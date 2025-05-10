@@ -3,6 +3,7 @@ import OpenSR 1.0
 import OpenSR.World 1.0
 
 Item {
+    id: view
     property PlanetarySystem system
     property int speed: 500
     property int bgSpeed: 10
@@ -12,10 +13,37 @@ Item {
 
     property var trajectoryView
 
+    property SpaceObjectItem playerShipItem
+    property list<SpaceObjectItem> clickables
+    property var object 
+
     anchors.fill: parent
-    
-    id: view
-    
+
+    MouseArea {
+        id: spaceMouseOverlay
+        anchors.fill: parent
+        
+        propagateComposedEvents: true
+
+        onClicked: {
+            if (context.playerShip.isMoving) {
+                return;
+            }
+            mouse.accepted = true;
+
+            
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            WorldManager.context.playerShip.calcTrajectory(positionInSpaceNode);
+            showTrajectory(context.playerShip);
+        }
+
+        onDoubleClicked: {
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            hideTrajectory(context.playerShip);
+            WorldManager.startShipMovement(positionInSpaceNode);
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -48,7 +76,7 @@ Item {
         height: width
 
         Image {
-            source: "res:/DATA/PanelSpace2/1RadarA.gi";
+            source: "res:/DATA/PanelSpace2/1RadarA.gi"
             anchors.fill: parent
             cache: true
         }
@@ -56,15 +84,15 @@ Item {
             id: radarCenterButton
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            normalImage:  "res:/DATA/PanelSpace2/1CenterN.gi"
+            normalImage: "res:/DATA/PanelSpace2/1CenterN.gi"
             hoveredImage: "res:/DATA/PanelSpace2/1CenterA.gi"
-            downImage:    "res:/DATA/PanelSpace2/1CenterD.gi"
+            downImage: "res:/DATA/PanelSpace2/1CenterD.gi"
             onClicked: console.log("Centering not implemented")
         }
     }
 
     onSystemChanged: {
-        for(var i in spaceNode.children) {
+        for (var i in spaceNode.children) {
             spaceNode.children[i].destroy();
         }
 
@@ -73,19 +101,40 @@ Item {
 
         var component = Qt.createComponent("SpaceObjectItem.qml");
 
-        var o = component.createObject(spaceNode, {object: system, mouseDelta: 50});
+        var o = component.createObject(spaceNode, {
+            object: system,
+            mouseDelta: 50
+        });
         o.entered.connect(showDebugTooltip);
         o.exited.connect(hideDebugTooltip);
         for (var c in system.children) {
-            o = component.createObject(spaceNode, {object: system.children[c]});
+            o = component.createObject(spaceNode, {
+                object: system.children[c]
+            });
+
+            if(system.children[c] == WorldManager.context.playerShip){
+                playerShipItem = o;
+                console.log("Player ship item initialized:", playerShipItem);
+            }
+            
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
             o.entered.connect(showTrajectory);
             o.exited.connect(hideTrajectory);
         }
 
+        var shipObject = component.createObject(spaceNode, {
+            object: World.context.playerShip
+        });
+
+        shipObject.entered.connect(showDebugTooltip);
+        shipObject.exited.connect(hideDebugTooltip);
+
         var trajComponent = Qt.createComponent("TrajectoryItem.qml");
-        trajectoryView = trajComponent.createObject(spaceNode, {object: system.children[0], visible: false});
+        trajectoryView = trajComponent.createObject(spaceNode, {
+            object: null,
+            visible: false
+        });
     }
 
     DebugTooltip {
@@ -94,7 +143,7 @@ Item {
     }
 
     function showTrajectory(object) {
-        trajectoryView.visibleRect = spaceNode.mapFromItem(view, 0, 0, view.width, view.height)
+        trajectoryView.visibleRect = spaceNode.mapFromItem(view, 0, 0, view.width, view.height);
         if (trajectoryView.object !== object)
             trajectoryView.object = object;
         trajectoryView.visible = true;
@@ -163,9 +212,11 @@ Item {
         onEntered: {
             hBgAnim.to = bg.x + maxScrollTime * bgSpeed;
             hFgAnim.to = spaceNode.x + maxScrollTime * speed;
-            hAnim.start()
+            hAnim.start();
         }
-        onExited: { hAnim.stop() }
+        onExited: {
+            hAnim.stop();
+        }
     }
     MouseArea {
         id: rightHoverArea
@@ -183,9 +234,11 @@ Item {
         onEntered: {
             hBgAnim.to = bg.x - maxScrollTime * bgSpeed;
             hFgAnim.to = spaceNode.x - maxScrollTime * speed;
-            hAnim.start()
+            hAnim.start();
         }
-        onExited: { hAnim.stop() }
+        onExited: {
+            hAnim.stop();
+        }
     }
     MouseArea {
         id: topHoverArea
@@ -203,9 +256,11 @@ Item {
         onEntered: {
             vBgAnim.to = bg.y + maxScrollTime * bgSpeed;
             vFgAnim.to = spaceNode.y + maxScrollTime * speed;
-            vAnim.start()
+            vAnim.start();
         }
-        onExited: { vAnim.stop() }
+        onExited: {
+            vAnim.stop();
+        }
     }
     MouseArea {
         id: bottomHoverArea
@@ -223,9 +278,11 @@ Item {
         onEntered: {
             vBgAnim.to = bg.y - maxScrollTime * bgSpeed;
             vFgAnim.to = spaceNode.y - maxScrollTime * speed;
-            vAnim.start()
+            vAnim.start();
         }
-        onExited: { vAnim.stop() }
+        onExited: {
+            vAnim.stop();
+        }
     }
     MouseArea {
         id: topleftHoverArea
@@ -242,10 +299,13 @@ Item {
             hFgAnim.to = spaceNode.x + maxScrollTime * speed / Math.sqrt(2);
             vBgAnim.to = bg.y + maxScrollTime * bgSpeed / Math.sqrt(2);
             vFgAnim.to = spaceNode.y + maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start()
-            vAnim.start()
+            hAnim.start();
+            vAnim.start();
         }
-        onExited: { hAnim.stop(); vAnim.stop() }
+        onExited: {
+            hAnim.stop();
+            vAnim.stop();
+        }
     }
     MouseArea {
         id: toprightHoverArea
@@ -262,10 +322,13 @@ Item {
             hFgAnim.to = spaceNode.x - maxScrollTime * speed / Math.sqrt(2);
             vBgAnim.to = bg.y + maxScrollTime * bgSpeed / Math.sqrt(2);
             vFgAnim.to = spaceNode.y + maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start()
-            vAnim.start()
+            hAnim.start();
+            vAnim.start();
         }
-        onExited: { hAnim.stop(); vAnim.stop() }
+        onExited: {
+            hAnim.stop();
+            vAnim.stop();
+        }
     }
     MouseArea {
         id: bottomleftHoverArea
@@ -282,10 +345,13 @@ Item {
             hFgAnim.to = spaceNode.x + maxScrollTime * speed / Math.sqrt(2);
             vBgAnim.to = bg.y - maxScrollTime * bgSpeed / Math.sqrt(2);
             vFgAnim.to = spaceNode.y - maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start()
-            vAnim.start()
+            hAnim.start();
+            vAnim.start();
         }
-        onExited: { hAnim.stop(); vAnim.stop() }
+        onExited: {
+            hAnim.stop();
+            vAnim.stop();
+        }
     }
     MouseArea {
         id: bottomrightHoverArea
@@ -302,11 +368,15 @@ Item {
             hFgAnim.to = spaceNode.x - maxScrollTime * speed / Math.sqrt(2);
             vBgAnim.to = bg.y - maxScrollTime * bgSpeed / Math.sqrt(2);
             vFgAnim.to = spaceNode.y - maxScrollTime * speed / Math.sqrt(2);
-            hAnim.start()
-            vAnim.start()
+            hAnim.start();
+            vAnim.start();
         }
-        onExited: { hAnim.stop(); vAnim.stop() }
+        onExited: {
+            hAnim.stop();
+            vAnim.stop();
+        }
     }
+
 
     Button {
         id: turnButton

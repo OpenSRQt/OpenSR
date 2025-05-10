@@ -17,11 +17,12 @@
 */
 
 #include "WorldContext.h"
+#include "InhabitedPlanet.h"
 
 #include <QMap>
 #include <QDataStream>
-
 #include <QtQml>
+#include <qglobal.h>
 
 namespace OpenSR
 {
@@ -122,6 +123,20 @@ bool WorldContext::load(QDataStream &stream, const QMap<quint32, WorldObject*>& 
     return stream.status() == QDataStream::Ok;
 }
 
+WorldObject *WorldContext::playerShip() const
+{
+    return m_playerShip;
+}
+
+void WorldContext::setPlayerShip(WorldObject *ship)
+{
+    if (m_playerShip != ship) 
+    {
+        m_playerShip = ship;
+        emit playerShipChanged(ship);
+    }
+}
+
 ResourceManager* WorldContext::resources() const
 {
     return m_resources;
@@ -131,5 +146,38 @@ QObject* WorldContext::findObject(const QString& name) const
 {
     return findChild<QObject*>(name);
 }
+
+void WorldContext::playerShipArrivalNotify()
+{
+    m_shipIsMoving = false;
+    emit playerShipArrived();
+}
+
+WorldObject* WorldContext::planetToEnter() const
+{
+    return m_planetToEnter;
+}
+
+void WorldContext::setPlanetToEnter(WorldObject * planet)
+{
+    if(m_planetToEnter == planet) 
+        return;
+    m_planetToEnter = planet;
+    emit planetToEnterChanged(planet);
+}
+
+QPointF WorldContext::movementPosition() 
+{
+    return m_planetPosition;
+}
+
+void WorldContext::setMovementPosition(const QPointF& pos) 
+{
+    if(m_planetPosition == pos) 
+        return;
+    m_planetPosition = pos;
+    emit movementPositionChanged(pos);
+}
+
 }
 }

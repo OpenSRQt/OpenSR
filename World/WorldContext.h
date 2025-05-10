@@ -20,10 +20,9 @@
 #define OPENSR_WORLD_WORLDCONTEXT_H
 
 #include "WorldObject.h"
-
+#include <qpoint.h>
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
-
 namespace OpenSR
 {
 namespace World
@@ -34,15 +33,22 @@ class OPENSR_WORLD_API WorldContext: public WorldObject
     OPENSR_WORLD_OBJECT
 
     Q_PROPERTY(PlanetarySystem* currentSystem READ currentSystem WRITE setCurrentSystem NOTIFY currentSystemChanged STORED false)
-    Q_PROPERTY(ResourceManager* resources READ resources NOTIFY resourcesChanged STORED false)
+    Q_PROPERTY(ResourceManager* resources  READ resources  NOTIFY resourcesChanged  STORED false)
+    Q_PROPERTY(WorldObject*     playerShip READ playerShip NOTIFY playerShipChanged STORED false
+                                           WRITE setPlayerShip)
 
+    Q_PROPERTY(WorldObject* planetToEnter READ planetToEnter  
+        NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
+    Q_PROPERTY(QPointF movementPosition READ movementPosition  
+        NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
+    
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = 0, quint32 id = 0);
     virtual ~WorldContext();
 
     PlanetarySystem* currentSystem() const;
     ResourceManager* resources() const;
-    
+
     Q_INVOKABLE QObject* findObject(const QString& name) const;
 
     void setCurrentSystem(PlanetarySystem *system);
@@ -53,13 +59,41 @@ public:
     virtual bool save(QDataStream &stream) const;
     virtual bool load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects);
 
+    WorldObject *playerShip() const;
+    void setPlayerShip(WorldObject *);
+
+    WorldObject* planetToEnter() const;
+    void setPlanetToEnter(WorldObject *);
+
+    QPointF movementPosition();
+    void setMovementPosition(const QPointF& pos);
+
+public slots:
+    void playerShipArrivalNotify();
+
 Q_SIGNALS:
     void currentSystemChanged();
     void resourcesChanged();
 
+    void playerShipChanged(WorldObject* playerShip);
+    void playerShipArrived();
+
+    void planetToEnterChanged(WorldObject* playerShip);
+    void movementPositionChanged(const QPointF& pos);
+
+    void enteringPlanet();
+    
+    void stillMoving();
+
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
+    WorldObject* m_playerShip;
+
+    WorldObject* m_planetToEnter;
+    QPointF m_planetPosition;
+
+    bool m_shipIsMoving = false;
 };
 }
 }
