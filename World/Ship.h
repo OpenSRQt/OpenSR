@@ -123,6 +123,7 @@ public slots:
     void startMovement(const QPointF& dest);
     void processMovement(const float dt);
     Q_INVOKABLE void calcTrajectory(const QPointF &destination);
+    Q_INVOKABLE void exitThePlace();
 
    signals:
     void affiliationChanged(ShipAffiliation affiliation);
