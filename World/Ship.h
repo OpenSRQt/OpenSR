@@ -102,9 +102,6 @@ class OPENSR_WORLD_API Ship : public MannedObject {
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
 
-    void startMovement(QPointF destination);
-    void processMovement(float time);
-
     Q_INVOKABLE void evalTrajectoryTo(const QPointF& dest);
 
     Q_INVOKABLE void exitThePlace();
@@ -123,12 +120,8 @@ public slots:
     void checkPlanetProximity(WorldObject* planetToEnter,
                               const QPointF& shipPosition);
     void setIsMoving(bool isMoving);
-
-    static const float normalLinearSpeed;
-    static const float normalAngularSpeed;
-
     void startMovement(const QPointF& dest);
-    void processMovement(float dt);
+    void processMovement(const float dt);
     Q_INVOKABLE void calcTrajectory(const QPointF &destination);
 
    signals:
@@ -140,8 +133,6 @@ public slots:
     void angleChanged();
     void isMovingChanged();
     void shipArrived();
-    void isMovingChanged();
-
     void enterPlace();
     void exitPlace();
 
@@ -165,10 +156,12 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
-    bool m_isMoving = false;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;
+
+    static const float normalLinearSpeed;
+    static const float normalAngularSpeed;
 };
 }  // namespace World
 }  // namespace OpenSR

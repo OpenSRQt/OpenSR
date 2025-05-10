@@ -160,7 +160,7 @@ void Ship::setIsMoving(bool isMoving)
     }
 }
 
-void Ship::normalizeAgnle(float& deltaAngle)
+void Ship::normalizeAnlge(float& deltaAngle)
 {
     while (deltaAngle > M_PI)
         deltaAngle -= 2* M_PI;
@@ -314,7 +314,7 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter,
 
     if (distance <= planetRadius && !m_isNearPlanet) {
         m_isNearPlanet = true;
-        emit enterPlace();
+        emit(enterPlace());
     }
 }
 
