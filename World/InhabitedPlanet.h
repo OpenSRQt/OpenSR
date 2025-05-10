@@ -63,6 +63,8 @@ public:
 
 };
 
+bool operator==(const InhabitedPlanetStyle& one, const InhabitedPlanetStyle& another);
+
 QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style);
 QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style);
 QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle::Data& data);

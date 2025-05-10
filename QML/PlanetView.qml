@@ -35,7 +35,6 @@ Item {
         anchors.fill: parent
 
         onClicked: {
-            console.log("Clicked planet");
         }
     }
 

@@ -1,6 +1,6 @@
 /*
-    OpenSR - opensource multi-genre game based upon "Space Rangers 2: Dominators"
-    Copyright (C) 2015 Kosyak <ObKo@mail.ru>
+    OpenSR - opensource multi-genre game based upon "Space Rangers 2:
+   Dominators" Copyright (C) 2015 Kosyak <ObKo@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,24 +19,22 @@
 #ifndef OPENSR_WORLD_SHIP_H
 #define OPENSR_WORLD_SHIP_H
 
-#include "World.h"
+#include <qpoint.h>
+
+#include "InhabitedPlanet.h"
 #include "MannedObject.h"
 #include "Resource.h"
-#include <qpoint.h>
-#include "InhabitedPlanet.h"
+#include "World.h"
 
-namespace OpenSR
-{
-namespace World
-{
+namespace OpenSR {
+namespace World {
 
-class OPENSR_WORLD_API ShipStyle: public Resource
-{
+class OPENSR_WORLD_API ShipStyle : public Resource {
     Q_GADGET
-    Q_PROPERTY(QString texture READ texture  WRITE setTexture)
-    Q_PROPERTY(int     width   READ width    WRITE setWidth)
+    Q_PROPERTY(QString texture READ texture WRITE setTexture)
+    Q_PROPERTY(int width READ width WRITE setWidth)
 
-public:
+   public:
     struct Data {
         QString texture;
         int width;
@@ -50,39 +48,53 @@ public:
 
 bool operator==(const ShipStyle& one, const ShipStyle& another);
 
-QDataStream& operator<<(QDataStream & stream, const ShipStyle& style);
-QDataStream& operator>>(QDataStream & stream, ShipStyle& style);
-QDataStream& operator<<(QDataStream & stream, const ShipStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, ShipStyle::Data& data);
+QDataStream& operator<<(QDataStream& stream, const ShipStyle& style);
+QDataStream& operator>>(QDataStream& stream, ShipStyle& style);
+QDataStream& operator<<(QDataStream& stream, const ShipStyle::Data& data);
+QDataStream& operator>>(QDataStream& stream, ShipStyle::Data& data);
 
-class OPENSR_WORLD_API Ship: public MannedObject
-{
+class OPENSR_WORLD_API Ship : public MannedObject {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
-    Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation NOTIFY affiliationChanged)
-    Q_PROPERTY(ShipRank        rank        READ rank        WRITE setRank        NOTIFY rankChanged)
+    Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation
+                   NOTIFY affiliationChanged)
+    Q_PROPERTY(ShipRank rank READ rank WRITE setRank NOTIFY rankChanged)
     Q_PROPERTY(float angle READ angle WRITE setAngle NOTIFY angleChanged)
     Q_PROPERTY(float time READ time WRITE setTime NOTIFY timeChanged)
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
-    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
+    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY
+                   destinationChanged)
+    Q_PROPERTY(
+        bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
 
-public:
+   public:
     enum class ShipAffiliation {
         Unspecified = 0,
-        Gaal, Fei, People, Peleng, Malok,
-        Keller, Terron, Blazer,
+        Gaal,
+        Fei,
+        People,
+        Peleng,
+        Malok,
+        Keller,
+        Terron,
+        Blazer,
         UnknownRace
     };
     Q_ENUM(ShipAffiliation)
 
     enum class ShipRank {
         Unspecified = 0,
-        Diplomat, Liner, Ranger, Pirate, Warrior, Transport
+        Diplomat,
+        Liner,
+        Ranger,
+        Pirate,
+        Warrior,
+        Transport
     };
     Q_ENUM(ShipRank)
 
-    Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
+    Q_INVOKABLE Ship(WorldObject* parent = 0, quint32 id = 0);
     virtual ~Ship();
 
     float time() const;
@@ -90,33 +102,32 @@ public:
     float angularSpeed() const;
     float angle() const;
     QPointF destination() const;
-
+    bool isMoving() const;
 
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
     ShipAffiliation affiliation() const;
 
     ShipRank rank() const;
-    
+
     void startMovement(QPointF destination);
     void processMovement(float time);
-  
-    Q_INVOKABLE void evalTrajectoryTo(const QPointF &dest);
+
+    Q_INVOKABLE void evalTrajectoryTo(const QPointF& dest);
 
     Q_INVOKABLE void exitThePlace();
-public slots:
+   public slots:
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setTime(float time);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(
-        WorldObject* planetToEnter, 
-        const QPointF &planetCenter, 
-        const QPointF &shipPosition
-    );
+    void checkPlanetProximity(WorldObject* planetToEnter,
+                              const QPointF& planetCenter,
+                              const QPointF& shipPosition);
+    void setIsMoving(bool isMoving);
 
-signals:
+   signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
     void timeChanged();
@@ -124,11 +135,12 @@ signals:
     void destinationChanged();
     void angleChanged();
     void shipArrived();
+    void isMovingChanged();
 
     void enterPlace();
     void exitPlace();
 
-private:
+   private:
     void calcPosition(float dt = 0.0f);
     void calcAngle(float dt = 0.0f);
     void normalizeAngle(float& deltaAngle);
@@ -145,13 +157,14 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+    bool m_isMoving = false;
 
     bool m_isNearPlanet = false;
 };
-}
-}
+}  // namespace World
+}  // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle)
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle::Data)
 
-#endif // OPENSR_WORLD_SHIP_H
+#endif  // OPENSR_WORLD_SHIP_H

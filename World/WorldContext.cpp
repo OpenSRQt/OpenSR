@@ -130,7 +130,8 @@ WorldObject *WorldContext::playerShip() const
 
 void WorldContext::setPlayerShip(WorldObject *ship)
 {
-    if (m_playerShip != ship) {
+    if (m_playerShip != ship) 
+    {
         m_playerShip = ship;
         emit playerShipChanged(ship);
     }
@@ -152,22 +153,28 @@ void WorldContext::playerShipArrivalNotify()
     emit playerShipArrived();
 }
 
-WorldObject* WorldContext::planetToEnter() const{
+WorldObject* WorldContext::planetToEnter() const
+{
     return m_planetToEnter;
 }
 
-void WorldContext::setPlanetToEnter(WorldObject * planet){
-    if(m_planetToEnter == planet) return;
+void WorldContext::setPlanetToEnter(WorldObject * planet)
+{
+    if(m_planetToEnter == planet) 
+        return;
     m_planetToEnter = planet;
     emit planetToEnterChanged(planet);
 }
 
-QPointF WorldContext::movementPosition() {
+QPointF WorldContext::movementPosition() 
+{
     return m_planetPosition;
 }
 
-void WorldContext::setMovementPosition(const QPointF& pos) {
-    if(m_planetPosition == pos) return;
+void WorldContext::setMovementPosition(const QPointF& pos) 
+{
+    if(m_planetPosition == pos) 
+        return;
     m_planetPosition = pos;
     emit movementPositionChanged(pos);
 }
