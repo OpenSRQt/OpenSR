@@ -97,10 +97,7 @@ Ship::ShipAffiliation Ship::affiliation() const { return m_affiliation; }
 
 Ship::ShipRank Ship::rank() const { return m_rank; }
 
-float Ship::time() const
-{
-    return m_time;
-}
+float Ship::time() const { return m_time; }
 
 float Ship::angle() const { return m_angle; }
 
