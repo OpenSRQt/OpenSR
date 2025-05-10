@@ -337,7 +337,7 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter,
 
     if (distance <= planetRadius && !m_isNearPlanet) {
         m_isNearPlanet = true;
-        emit enterPlace();
+        emit(enterPlace());
     }
 }
 

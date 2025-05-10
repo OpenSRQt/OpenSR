@@ -22,13 +22,25 @@ Item {
     MouseArea {
         id: spaceMouseOverlay
         anchors.fill: parent
+        
+        propagateComposedEvents: true
+
+        onClicked: {
+            if (context.playerShip.isMoving) {
+                return;
+            }
+            mouse.accepted = true;
+
+            
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            WorldManager.context.playerShip.calcTrajectory(positionInSpaceNode);
+            showTrajectory(context.playerShip);
+        }
 
         onDoubleClicked: {
-            if (mouse.button !== Qt.LeftButton)
-                return;
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            hideTrajectory(context.playerShip);
             WorldManager.startShipMovement(positionInSpaceNode);
-            context.movementPosition = positionInSpaceNode;
         }
     }
 
