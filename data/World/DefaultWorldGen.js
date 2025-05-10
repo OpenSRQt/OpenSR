@@ -78,7 +78,7 @@ function getPlanetStyleFromDat(id) {
     style.cloud1 = cloud1;
     style.atmosphere = color
     style.radius = planet["Radius"];
-    
+
     return style
 }
 
@@ -131,6 +131,44 @@ function initStation(obj, kind) {
 var rangerCenter1 = World.SpaceStation(system);
 initStation(rangerCenter1, "ranger")
 rangerCenter1.position = Qt.point(-400, -100);
+
+function shipStyleByAffiliation(ship) {
+    var raceStr = "";
+    switch (ship.affiliation) {
+        case World.ShipAffiliation.Gaal: raceStr = "People"; break;
+        case World.ShipAffiliation.Fei: raceStr = "Fei"; break;
+        case World.ShipAffiliation.People: raceStr = "People"; break;
+        case World.ShipAffiliation.Peleng: raceStr = "Peleng"; break;
+        case World.ShipAffiliation.Maloc: raceStr = "Maloc"; break;
+        default: return null;
+    }
+    var rankStr = "";
+    switch (ship.rank) {
+        case World.ShipRank.Diplomat: rankStr = "Diplomat"; break;
+        case World.ShipRank.Liner: rankStr = "Liner"; break;
+        case World.ShipRank.Ranger: rankStr = "Ranger"; break;
+        case World.ShipRank.Pirate: rankStr = "Pirate"; break;
+        case World.ShipRank.Warrior: rankStr = "Warrior"; break;
+        case World.ShipRank.Transport: rankStr = "Transport"; break;
+        default: return null;
+    }
+
+    var info = Engine.datValue("Data.SE.Ship." + raceStr + "." + rankStr);
+    var style = World.ShipStyle();
+    style.texture = "dat:/" + info.Image; // animated
+    return style;
+}
+
+var ship1 = World.Ship(context);
+
+ship1.position    = Qt.point(-300, -300);
+ship1.affiliation = World.ShipAffiliation.People;
+ship1.rank        = World.ShipRank.Diplomat;
+ship1.style       = shipStyleByAffiliation(ship1);
+ship1.angle       = 0;
+
+ship1.style.width = 64;
+context.playerShip = ship1;
 
 context.currentSystem = system;
 

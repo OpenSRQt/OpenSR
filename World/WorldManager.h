@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <QAbstractAnimation>
+#include <qpoint.h>
 
 #include "WorldContext.h"
 #include "WorldBindings.h"
@@ -34,6 +35,7 @@
 #include "Asteroid.h"
 #include "Planet.h"
 #include "SpaceStation.h"
+#include "Ship.h"
 
 namespace OpenSR
 {
@@ -48,6 +50,17 @@ public:
     virtual int	duration() const;
     virtual void updateCurrentTime(int currentTime);
 };
+
+class OPENSR_WORLD_API ShipMovementAnimation: public QAbstractAnimation
+{
+    Q_OBJECT
+public:
+    ShipMovementAnimation(QObject *parent = 0);
+
+    virtual int	duration() const;
+    virtual void updateCurrentTime(int currentTime);
+    int previousTime;
+}; 
 
 class Race;
 class Item;
@@ -96,6 +109,7 @@ public:
     Q_INVOKABLE bool saveWorld(const QString& path);
     Q_INVOKABLE bool loadWorld(const QString& path);
 
+    Q_INVOKABLE OpenSR::World::ShipStyle            ShipStyle();
     Q_INVOKABLE OpenSR::World::RaceStyle            RaceStyle();
     Q_INVOKABLE OpenSR::World::PlanetarySystemStyle PlanetarySystemStyle();
     Q_INVOKABLE OpenSR::World::AsteroidStyle        AsteroidStyle();
@@ -129,16 +143,21 @@ public:
     Q_INVOKABLE OpenSR::World::Ship*                Ship(OpenSR::World::WorldObject *parent = 0);
     Q_INVOKABLE OpenSR::World::SpaceStation*        SpaceStation(OpenSR::World::WorldObject *parent = 0);
 
+
+
 Q_SIGNALS:
     void contextChanged();
 
 public Q_SLOTS:
     void startTurn();
     void finishTurn();
+    void startShipMovement(const QPointF& destination);
+    void finishShipMovement();
 
 private:
     WorldContext* m_context;
     TurnAnimation *m_animation;
+    ShipMovementAnimation *m_ship_animation;
 
     static WorldManager* m_staticInstance;
     static quint32 m_idPool;
