@@ -66,6 +66,7 @@ Item {
             property bool isWaitingForShipArrival: false
 
             MouseArea {
+                propagateComposedEvents: true
                 anchors.fill: parent
                 onDoubleClicked: {
                     mouse.accepted = false;
