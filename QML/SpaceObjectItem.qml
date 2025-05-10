@@ -55,6 +55,11 @@ Item {
                 anchors.fill: parent
                 propagateComposedEvents: true
             }
+            MouseArea {
+                id: item
+                anchors.fill: parent
+                propagateComposedEvents: true
+            }
         }
         
     }
