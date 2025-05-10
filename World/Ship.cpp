@@ -324,27 +324,20 @@ Q_INVOKABLE void Ship::exitThePlace()
 }
 
 void Ship::checkPlanetProximity(WorldObject *planetToEnter,
-                                const QPointF &planetCenter,
                                 const QPointF &shipPosition) {
     if (!planetToEnter) {
         return;
     }
     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
     int planetRadius = planet->style().radius();
+    QPointF planetCenter = planet->position();
 
     const qreal distance = QLineF(shipPosition, planetCenter).length();
 
     if (distance <= planetRadius && !m_isNearPlanet) {
         m_isNearPlanet = true;
         emit enterPlace();
-    } else if (distance > planetRadius && m_isNearPlanet) {
-        m_isNearPlanet = false;
-        emit exitPlace();
     }
-}
-bool Ship::checkPlannedActions() const
-{
-    return m_actionsPlanned;
 }
 
 } // namespace World

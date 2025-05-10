@@ -112,6 +112,8 @@ public:
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
+    void checkPlanetProximity(WorldObject* planetToEnter,
+                              const QPointF& shipPosition);
     void setIsMoving(bool isMoving);
 
     static const float normalLinearSpeed;

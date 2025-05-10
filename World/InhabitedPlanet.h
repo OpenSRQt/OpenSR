@@ -38,7 +38,7 @@ class OPENSR_WORLD_API InhabitedPlanetStyle: public Resource
     Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
     Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
     Q_PROPERTY(QString background READ background WRITE setBackground)
-
+    
 public:
     struct Data
     {
@@ -53,6 +53,7 @@ public:
     int radius() const;
     QColor atmosphere() const;
     QString background() const;
+    QPointF center() const;
 
     void setSurface(const QString&);
     void setCloud0(const QString&);

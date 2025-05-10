@@ -75,17 +75,6 @@ Item {
                     }
                     mouse.accepted = false;
                 }
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: "red"
-                    opacity: planetItem.isWaitingForShipArrival ? 0.5 : 0.3
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 200
-                        }
-                    }
-                }
             }
 
             Connections {
@@ -112,21 +101,27 @@ Item {
             cache: false
             property Ship ship
             opacity: 1
+            scale: 1
             Behavior on opacity {
                 NumberAnimation {
                     duration: 500
                     easing.type: Easing.InOutQuad
                 }
             }
+            Behavior on scale {
+                NumberAnimation { duration: 2000 }
+            }
             Connections {
                 target: ship
 
                 function onEnterPlace() {
                     shipImage.opacity = 0;
+                    shipImage.scale = 0.5;
                 }
 
                 function onExitPlace() {
                     shipImage.opacity = 1;
+                    shipImage.scale = 1;
                 }
             }
         }
