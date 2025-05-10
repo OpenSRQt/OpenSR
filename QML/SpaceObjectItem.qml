@@ -55,6 +55,11 @@ Item {
                 anchors.fill: parent
                 propagateComposedEvents: true
             }
+            MouseArea {
+                id: item
+                anchors.fill: parent
+                propagateComposedEvents: true
+            }
         }
         
     }
@@ -66,6 +71,7 @@ Item {
             property bool isWaitingForShipArrival: false
 
             MouseArea {
+                propagateComposedEvents: true
                 anchors.fill: parent
                 onDoubleClicked: {
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
