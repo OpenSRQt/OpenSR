@@ -19,26 +19,147 @@
 #ifndef OPENSR_WORLD_SHIP_H
 #define OPENSR_WORLD_SHIP_H
 
-#include "World.h"
 #include "MannedObject.h"
+#include "Resource.h"
+#include "World.h"
+#include <QPoint>
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Ship: public MannedObject
+
+class OPENSR_WORLD_API ShipStyle : public Resource
+{
+    Q_GADGET
+    Q_PROPERTY(QString texture READ texture WRITE setTexture)
+    Q_PROPERTY(int width READ width WRITE setWidth)
+
+public:
+    struct Data
+    {
+        QString texture;
+        int width;
+    };
+
+    int width() const;
+    void setWidth(int);
+    QString texture() const;
+    void setTexture(const QString &texture);
+};
+
+bool operator==(const ShipStyle &one, const ShipStyle &another);
+
+QDataStream &operator<<(QDataStream &stream, const ShipStyle &style);
+QDataStream &operator>>(QDataStream &stream, ShipStyle &style);
+QDataStream &operator<<(QDataStream &stream, const ShipStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, ShipStyle::Data &data);
+
+class OPENSR_WORLD_API Ship : public MannedObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
+    Q_PROPERTY(ShipAffiliation affiliation READ affiliation WRITE setAffiliation NOTIFY affiliationChanged)
+    Q_PROPERTY(ShipRank rank READ rank WRITE setRank NOTIFY rankChanged)
+    Q_PROPERTY(float angle READ angle WRITE setAngle NOTIFY angleChanged)
+    Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
+    Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
+    Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+
 public:
+    enum class ShipAffiliation
+    {
+        Unspecified = 0,
+        Gaal,
+        Fei,
+        People,
+        Peleng,
+        Malok,
+        Keller,
+        Terron,
+        Blazer,
+        UnknownRace
+    };
+    Q_ENUM(ShipAffiliation)
+
+    enum class ShipRank
+    {
+        Unspecified = 0,
+        Diplomat,
+        Liner,
+        Ranger,
+        Pirate,
+        Warrior,
+        Transport
+    };
+    Q_ENUM(ShipRank)
+
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    virtual quint32 typeId() const override;
+    virtual QString namePrefix() const override;
+
+    ShipAffiliation affiliation() const;
+    ShipRank rank() const;
+    float angle() const;
+    float speed() const;
+    QPointF destination() const;
+    bool isMoving() const;
+
+    void setAffiliation(ShipAffiliation affiliation);
+    void setRank(ShipRank rank);
+    void setDestination(QPointF destination);
+    void setAngle(float angle);
+    void setIsMoving(bool isMoving);
+
+    static const float normalLinearSpeed;
+    static const float normalAngularSpeed;
+
+    void startTurn() override;
+    void processTurn(float time) override;
+    void finishTurn() override;
+    Q_INVOKABLE void prepareToMove(const QPointF &dest);
+    void calcTrajectory(const QPointF &destination);
+    bool checkPlannedActions() const;
+
+signals:
+    void affiliationChanged(ShipAffiliation affiliation);
+    void rankChanged(ShipRank rank);
+    void timeChanged();
+    void speedChanged();
+    void destinationChanged();
+    void angleChanged();
+    void isMovingChanged();
+    void shipArrived();
+
+private:
+    QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
+    float calcAngle(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
+    void updatePosition(const float dt = 0.0f);
+    void updateAngle(const float dt = 0.0f);
+    void normalizeAnlge(float &deltaAngle);
+    void initTargetAngle(const QPointF &pos, const QPointF &dest);
+    void correctLinearSpeed(const QPointF &dest, const QPointF &pos);
+    void resetSpeedParams();
+
+    ShipAffiliation m_affiliation;
+    ShipRank m_rank;
+
+    float m_angle;
+    float m_speed;
+    float m_angularSpeed;
+    float m_targetAngle;
+    QPointF m_destination;
+    QPointF m_start_position;
+    bool m_isMoving = false;
+    bool m_actionsPlanned = false;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
+
+Q_DECLARE_METATYPE(OpenSR::World::ShipStyle)
+Q_DECLARE_METATYPE(OpenSR::World::ShipStyle::Data)
 
 #endif // OPENSR_WORLD_SHIP_H

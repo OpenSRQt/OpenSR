@@ -28,13 +28,14 @@ namespace World
 {
 namespace
 {
+const float TIME_DELTA_FOR_SPEED_CALC_MS = 16.0f;
+const float MS_IN_ONE_SECOND = 1000.0f;
 const int ITERATION_COUNTS = 10;
-}
+} // namespace
 
 const quint32 Asteroid::m_staticTypeId = typeIdFromClassName(Asteroid::staticMetaObject.className());
 
-template<>
-void WorldObject::registerType<Asteroid>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Asteroid>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<AsteroidStyle>();
     qRegisterMetaTypeStreamOperators<AsteroidStyle>();
@@ -43,20 +44,17 @@ void WorldObject::registerType<Asteroid>(QQmlEngine *qml, QJSEngine *script)
     qmlRegisterType<Asteroid>("OpenSR.World", 1, 0, "Asteroid");
 }
 
-template<>
-Asteroid* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Asteroid *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Asteroid(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Asteroid>()
+template <> quint32 WorldObject::staticTypeId<Asteroid>()
 {
     return Asteroid::m_staticTypeId;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Asteroid>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Asteroid>()
 {
     return &Asteroid::staticMetaObject;
 }
@@ -71,26 +69,26 @@ QColor AsteroidStyle::color() const
     return getData<Data>().color;
 }
 
-void AsteroidStyle::setTexture(const QString& texture)
+void AsteroidStyle::setTexture(const QString &texture)
 {
     auto d = getData<Data>();
     d.texture = texture;
     setData(d);
 }
 
-void AsteroidStyle::setColor(const QColor& color)
+void AsteroidStyle::setColor(const QColor &color)
 {
     auto d = getData<Data>();
     d.color = color;
     setData(d);
 }
 
-QDataStream& operator<<(QDataStream & stream, const AsteroidStyle& style)
+QDataStream &operator<<(QDataStream &stream, const AsteroidStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, AsteroidStyle& style)
+QDataStream &operator>>(QDataStream &stream, AsteroidStyle &style)
 {
     quint32 id;
     stream >> id;
@@ -100,18 +98,18 @@ QDataStream& operator>>(QDataStream & stream, AsteroidStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const AsteroidStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const AsteroidStyle::Data &data)
 {
     return stream << data.color << data.texture;
 }
 
-QDataStream& operator>>(QDataStream & stream, AsteroidStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, AsteroidStyle::Data &data)
 {
     return stream >> data.color >> data.texture;
 }
 
-Asteroid::Asteroid(WorldObject *parent, quint32 id): SpaceObject(parent, id),
-    m_angle(0), m_period(0), m_time(0), m_speed(0)
+Asteroid::Asteroid(WorldObject *parent, quint32 id)
+    : SpaceObject(parent, id), m_angle(0), m_period(0), m_time(0), m_speed(0)
 {
 }
 
@@ -149,13 +147,13 @@ float Asteroid::speed() const
     return m_speed;
 }
 
-void Asteroid::setStyle(const AsteroidStyle& style)
+void Asteroid::setStyle(const AsteroidStyle &style)
 {
     m_style = style;
     emit(styleChanged());
 }
 
-void Asteroid::setSemiAxis(const QPointF& axis)
+void Asteroid::setSemiAxis(const QPointF &axis)
 {
     if (axis != m_semiAxis)
     {
@@ -232,25 +230,37 @@ void Asteroid::calcEccentricity()
     m_e = sqrt(1 - (m_semiAxis.y() * m_semiAxis.y()) / (m_semiAxis.x() * m_semiAxis.x()));
 }
 
-void Asteroid::calcPosition(float dt)
+void Asteroid::updateOrbitalTime(float dt)
 {
-    QPointF next = E(solveKepler(m_time + dt));
+    setTime(m_time + dt);
+    float periodInMS = m_period * MS_IN_ONE_SECOND;
+    if (m_period > 0.0f)
+    {
+        m_time = fmod(m_time, periodInMS);
+    }
+}
+
+void Asteroid::calcPosition()
+{
+    QPointF next = E(solveKepler(m_time));
     setPosition(next);
 }
 
-void Asteroid::calcSpeed(float dt)
+void Asteroid::calcSpeed()
 {
-    QPointF nextPos = E(solveKepler(m_time + dt + 1.0f));
+    QPointF nextPos = E(solveKepler(m_time + TIME_DELTA_FOR_SPEED_CALC_MS));
     float dx = nextPos.x() - position().x();
     float dy = nextPos.y() - position().y();
-    m_speed = sqrt(dx * dx + dy * dy);
+    const float dtInMS = TIME_DELTA_FOR_SPEED_CALC_MS / MS_IN_ONE_SECOND;
+    m_speed = sqrt(dx * dx + dy * dy) / dtInMS;
     emit(speedChanged());
 }
 
 float Asteroid::solveKepler(float t)
 {
     // http://en.wikipedia.org/wiki/Kepler's_equation
-    float M = 2.0f * M_PI / m_period * t;
+    float periodInMS = m_period * MS_IN_ONE_SECOND;
+    float M = (2.0f * M_PI / periodInMS) * t;
     float E = M;
     for (int j = 0; j < ITERATION_COUNTS; j++)
         E = m_e * sin(E) + M;
@@ -260,33 +270,36 @@ float Asteroid::solveKepler(float t)
 QPointF Asteroid::E(float eta)
 {
     QPointF p;
-    p.setX(-(m_semiAxis.x() * m_e) * cos(m_angle) + m_semiAxis.x() * cos(m_angle) * cos(eta) - m_semiAxis.y() * sin(m_angle) * sin(eta));
-    p.setY(-(m_semiAxis.x() * m_e) * sin(m_angle) + m_semiAxis.x() * sin(m_angle) * cos(eta) + m_semiAxis.y() * cos(m_angle) * sin(eta));
+    p.setX(-(m_semiAxis.x() * m_e) * cos(m_angle) + m_semiAxis.x() * cos(m_angle) * cos(eta) -
+           m_semiAxis.y() * sin(m_angle) * sin(eta));
+    p.setY(-(m_semiAxis.x() * m_e) * sin(m_angle) + m_semiAxis.x() * sin(m_angle) * cos(eta) +
+           m_semiAxis.y() * cos(m_angle) * sin(eta));
     return p;
 }
 
 QPointF Asteroid::Ederiv(float eta)
 {
     QPointF p;
-    p.setX(- m_semiAxis.x() * cos(m_angle) * sin(eta) - m_semiAxis.y() * sin(m_angle) * cos(eta));
-    p.setY(- m_semiAxis.x() * sin(m_angle) * sin(eta) + m_semiAxis.y() * cos(m_angle) * cos(eta));
+    p.setX(-m_semiAxis.x() * cos(m_angle) * sin(eta) - m_semiAxis.y() * sin(m_angle) * cos(eta));
+    p.setY(-m_semiAxis.x() * sin(m_angle) * sin(eta) + m_semiAxis.y() * cos(m_angle) * cos(eta));
     return p;
 }
 
 void Asteroid::updateTrajectory()
 {
     QList<BezierCurve> trajectory;
+    float periodInMS = m_period * MS_IN_ONE_SECOND;
 
     float prev = solveKepler(m_time);
 
     for (int i = 1; i < int(round(m_period)) + 1; i++)
     {
-        float t = m_time + i;
-        if (fabs(t) > m_period)
-            t = fmod(t, m_period);
+        float t = m_time + i * MS_IN_ONE_SECOND;
+        if (fabs(t) > periodInMS)
+            t = fmod(t, periodInMS);
 
         if (t < 0)
-            t = m_period + t;
+            t = periodInMS + t;
 
         float eta = solveKepler(t);
 
@@ -321,14 +334,14 @@ void Asteroid::startTurn()
 
 void Asteroid::processTurn(float time)
 {
-    calcPosition(time);
+    updateOrbitalTime(time);
+    calcPosition();
     SpaceObject::processTurn(time);
 }
 
 void Asteroid::finishTurn()
 {
-    setTime(m_time + 1.0);
     SpaceObject::finishTurn();
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

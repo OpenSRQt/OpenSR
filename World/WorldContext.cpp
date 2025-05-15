@@ -18,9 +18,9 @@
 
 #include "WorldContext.h"
 
-#include <QMap>
+#include "Ship.h"
 #include <QDataStream>
-
+#include <QMap>
 #include <QtQml>
 
 namespace OpenSR
@@ -29,31 +29,27 @@ namespace World
 {
 const quint32 WorldContext::m_staticTypeId = typeIdFromClassName(WorldContext::staticMetaObject.className());
 
-template<>
-void WorldObject::registerType<WorldContext>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<WorldContext>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<WorldContext>("OpenSR.World", 1, 0, "WorldContext");
 }
 
-template<>
-WorldContext* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> WorldContext *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new WorldContext(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<WorldContext>()
+template <> quint32 WorldObject::staticTypeId<WorldContext>()
 {
     return WorldContext::m_staticTypeId;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<WorldContext>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<WorldContext>()
 {
     return &WorldContext::staticMetaObject;
 }
 
-WorldContext::WorldContext(WorldObject *parent, quint32 id): WorldObject(parent, id), m_currentSystem(0)
+WorldContext::WorldContext(WorldObject *parent, quint32 id) : WorldObject(parent, id), m_currentSystem(0)
 {
     m_resources = new ResourceManager(this);
 }
@@ -72,8 +68,7 @@ QString WorldContext::namePrefix() const
     return tr("World");
 }
 
-
-PlanetarySystem* WorldContext::currentSystem() const
+PlanetarySystem *WorldContext::currentSystem() const
 {
     return m_currentSystem;
 }
@@ -98,19 +93,19 @@ bool WorldContext::save(QDataStream &stream) const
     return stream.status() == QDataStream::Ok;
 }
 
-bool WorldContext::load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects)
+bool WorldContext::load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects)
 {
     quint32 id;
     stream >> id;
     auto it = objects.find(id);
     if (it != objects.end())
-        setCurrentSystem(qobject_cast<PlanetarySystem*>(it.value()));
+        setCurrentSystem(qobject_cast<PlanetarySystem *>(it.value()));
 
     stream >> id;
     it = objects.find(id);
     if (it != objects.end())
     {
-        ResourceManager *m = qobject_cast<ResourceManager*>(it.value());
+        ResourceManager *m = qobject_cast<ResourceManager *>(it.value());
         if (m)
         {
             delete m_resources;
@@ -122,14 +117,47 @@ bool WorldContext::load(QDataStream &stream, const QMap<quint32, WorldObject*>& 
     return stream.status() == QDataStream::Ok;
 }
 
-ResourceManager* WorldContext::resources() const
+WorldObject *WorldContext::playerShip() const
+{
+    return m_playerShip;
+}
+
+void WorldContext::setPlayerShip(WorldObject *ship)
+{
+    if (m_playerShip == ship)
+        return;
+
+    if (m_playerShip)
+        disconnect(qobject_cast<Ship *>(m_playerShip), &Ship::shipArrived, this, &WorldContext::onShipArrived);
+
+    m_playerShip = ship;
+    emit playerShipChanged(ship);
+
+    if (m_playerShip)
+        connect(qobject_cast<Ship *>(m_playerShip), &Ship::shipArrived, this, &WorldContext::onShipArrived);
+}
+
+bool WorldContext::checkPlannedActions() const
+{
+    if (m_playerShip)
+        return qobject_cast<Ship *>(m_playerShip)->checkPlannedActions();
+
+    return false;
+}
+
+ResourceManager *WorldContext::resources() const
 {
     return m_resources;
 }
 
-QObject* WorldContext::findObject(const QString& name) const
+QObject *WorldContext::findObject(const QString &name) const
 {
-    return findChild<QObject*>(name);
+    return findChild<QObject *>(name);
 }
+
+void WorldContext::onShipArrived()
+{
+    emit plannedActionsCompleted();
 }
-}
+} // namespace World
+} // namespace OpenSR

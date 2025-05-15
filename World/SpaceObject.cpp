@@ -19,6 +19,7 @@
 #include "SpaceObject.h"
 
 #include <QtQml>
+#include <qglobal.h>
 
 namespace OpenSR
 {
