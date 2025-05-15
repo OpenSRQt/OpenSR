@@ -28,6 +28,7 @@ SET(SOURCES
     SpaceObject.cpp
     SpaceStation.cpp
     Tank.cpp
+    TurnAnimation.cpp
     Weapon.cpp
     WorldContext.cpp
     WorldObject.cpp
@@ -64,6 +65,7 @@ SET(HEADERS
     SpaceObject.h
     SpaceStation.h
     Tank.h
+    TurnAnimation.h
     Weapon.h
     WorldContext.h
     WorldObject.h

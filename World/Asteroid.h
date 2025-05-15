@@ -19,9 +19,9 @@
 #ifndef OPENSR_WORLD_ASTEROID_H
 #define OPENSR_WORLD_ASTEROID_H
 
-#include "World.h"
-#include "SpaceObject.h"
 #include "Resource.h"
+#include "SpaceObject.h"
+#include "World.h"
 
 #include <QColor>
 
@@ -29,7 +29,7 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API AsteroidStyle: public Resource
+class OPENSR_WORLD_API AsteroidStyle : public Resource
 {
     Q_GADGET
 
@@ -46,16 +46,16 @@ public:
     QString texture() const;
     QColor color() const;
 
-    void setTexture(const QString& texture);
-    void setColor(const QColor& color);
+    void setTexture(const QString &texture);
+    void setColor(const QColor &color);
 };
 
-QDataStream& operator<<(QDataStream & stream, const AsteroidStyle& style);
-QDataStream& operator>>(QDataStream & stream, AsteroidStyle& style);
-QDataStream& operator<<(QDataStream & stream, const AsteroidStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, AsteroidStyle::Data& data);
+QDataStream &operator<<(QDataStream &stream, const AsteroidStyle &style);
+QDataStream &operator>>(QDataStream &stream, AsteroidStyle &style);
+QDataStream &operator<<(QDataStream &stream, const AsteroidStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, AsteroidStyle::Data &data);
 
-class OPENSR_WORLD_API Asteroid: public SpaceObject
+class OPENSR_WORLD_API Asteroid : public SpaceObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -78,8 +78,8 @@ public:
     float time() const;
     float speed() const;
 
-    void setStyle(const AsteroidStyle& style);
-    void setSemiAxis(const QPointF& axis);
+    void setStyle(const AsteroidStyle &style);
+    void setSemiAxis(const QPointF &axis);
     void setAngle(float angle);
     void setPeriod(float period);
     void setTime(float time);
@@ -95,7 +95,7 @@ public:
     virtual void processTurn(float time);
     virtual void finishTurn();
 
-Q_SIGNALS:
+signals:
     void styleChanged();
     void semiAxisChanged();
     void angleChanged();
@@ -105,11 +105,12 @@ Q_SIGNALS:
 
 private:
     void calcEccentricity();
-    void calcPosition(float dt = 0.0f);
-    void calcSpeed(float dt = 0.0f);
+    void calcPosition();
+    void calcSpeed();
     float solveKepler(float t);
     QPointF E(float eta);
     QPointF Ederiv(float eta);
+    void updateOrbitalTime(float dt);
 
     AsteroidStyle m_style;
     QPointF m_semiAxis;
@@ -120,8 +121,8 @@ private:
 
     float m_e;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::AsteroidStyle)
 Q_DECLARE_METATYPE(OpenSR::World::AsteroidStyle::Data)

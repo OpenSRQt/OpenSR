@@ -84,12 +84,6 @@ Item {
         }
     }
 
-    // onShipAngleChanged: {
-    //     if (object && WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
-    //         rotation = radToDeg(shipAngle);
-    //     }
-    // }
-
     function mouseEntered() {
         if (object)
             entered(object);
