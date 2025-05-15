@@ -155,7 +155,6 @@ private:
     QPointF m_start_position;
     bool m_isMoving = false;
     bool m_actionsPlanned = false;
-    // int prevTime = 0;
 };
 } // namespace World
 } // namespace OpenSR

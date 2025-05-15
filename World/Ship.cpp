@@ -315,7 +315,7 @@ void Ship::updateAngle(float dt)
     setAngle(newAngle);
 }
 
-void Ship::calcTrajectory(const QPointF &dest) // change name to updateTrajectory
+void Ship::calcTrajectory(const QPointF &dest)
 {
     m_start_position = position();
     correctLinearSpeed(dest, m_start_position);
