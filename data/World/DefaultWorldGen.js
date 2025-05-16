@@ -184,6 +184,7 @@ ship1.angle       = 0;
 
 ship1.style.width = 64;
 context.playerShip = ship1;
+context.objectToShoot = null;
 context.planetToEnter = null;
 context.currentSystem = system;
 

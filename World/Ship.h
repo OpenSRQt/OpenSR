@@ -113,6 +113,7 @@ public:
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
+    Q_INVOKABLE bool checkProximity(QPointF center, WorldObject *obj, int radius);
     void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
 

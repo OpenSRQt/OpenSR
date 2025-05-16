@@ -110,6 +110,26 @@ Item {
             Behavior on scale {
                 NumberAnimation { duration: 2000 }
             }
+            Canvas {
+                anchors.centerIn: parent
+                width: 400
+                height: 400
+                
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.reset()
+                    ctx.beginPath()
+                    ctx.arc(width/2, height/2, width/2 - 2, 0, 2 * Math.PI)
+                    ctx.strokeStyle = "red"
+                    ctx.lineWidth = 2
+                    ctx.setLineDash([5, 5])
+                    ctx.stroke()
+                }
+                
+                // Автоматически перерисовывает круг при изменении размеров
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+            }
             Connections {
                 target: ship
 
@@ -127,6 +147,60 @@ Item {
 
     }
 
+    Component {
+        id: asteroidComponent
+        AnimatedImage {
+            id: asteroidImage;
+            property bool isHighlighted: false
+            cache: false
+            opacity: 1
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 500
+                    easing.type: Easing.InOutQuad
+                }
+            }
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border {
+                    width: 2
+                    color: "blue"
+                }
+                visible: parent.isHighlighted
+            }
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                propagateComposedEvents: true
+                onEntered: asteroidImage.isHighlighted = true
+                onExited: asteroidImage.isHighlighted = false
+                onClicked: {
+                    if (!WorldManager.turnFinished) {
+                        return;
+                    }
+                    if(!context.playerShip.checkProximity(
+                        object.position, 
+                        object, 
+                        200)
+                    ) {
+                        // message that the target is too far
+                        context.objectToShoot = null;
+                        return;
+                    }
+                    context.prepareToShoot(object);
+                }
+            }
+            Connections {
+                target: object
+                function onAsteroidDestroyed() {
+                    asteroidImage.opacity = 0.3
+                    console.log("destroyed asteroid");
+                }
+            }
+        }
+    }
+
     onObjectChanged: {
         objectLoader.source = "";
         objectLoader.sourceComponent = undefined;
@@ -141,7 +215,7 @@ Item {
             objectLoader.sourceComponent = defaultComponent;
             positioning = false;
         } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
-            objectLoader.sourceComponent = defaultComponent;
+            objectLoader.sourceComponent = asteroidComponent;
             positioning = true;
         } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
             objectLoader.sourceComponent = planetComponent;
