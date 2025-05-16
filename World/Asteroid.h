@@ -100,6 +100,9 @@ public:
     Q_INVOKABLE void damageObject();
     void destroyObject();
 
+    Q_INVOKABLE void damageObject();
+    void destroyObject();
+
 signals:
     void styleChanged();
     void semiAxisChanged();

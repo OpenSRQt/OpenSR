@@ -370,16 +370,34 @@ Q_INVOKABLE void Ship::exitThePlace()
     emit exitPlace();
 }
 
+// void Ship::checkPlanetProximity(WorldObject *planetToEnter)
+// {
+//     if (!planetToEnter)
+//     {
+//         return;
+//     }
+//     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
+//     int planetRadius = planet->style().radius();
+//     QPointF planetCenter = planet->position(); //
+//     QPointF shipPosition = position(); //
+
+//     const qreal distance = QLineF(shipPosition, planetCenter).length();
+
+//     if (distance <= planetRadius && !m_isNearPlanet)
+//     {
+//         m_isNearPlanet = true;
+//         emit(enterPlace());
+//     }
+// }
+
 void Ship::checkPlanetProximity(WorldObject *planetToEnter)
 {
     if (!planetToEnter)
     {
         return;
     }
-    Planet *planet = qobject_cast<Planet *>(planetToEnter);
-    int planetRadius = planet->radius();
-    QPointF planetCenter = planet->position();
-    QPointF shipPosition = position();
+    InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
+    int planetRadius = planet->style().radius();
 
     if (checkProximity(planet->position(), planetToEnter, planetRadius) && !m_isNearPlanet)
     {

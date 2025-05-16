@@ -18,6 +18,7 @@
 
 #include "WorldContext.h"
 #include "Asteroid.h"
+#include "Asteroid.h"
 #include "Ship.h"
 #include "WorldObject.h"
 #include <QDataStream>
@@ -205,11 +206,6 @@ void WorldContext::setMovementPosition(const QPointF &pos)
     emit movementPositionChanged(pos);
 }
 
-WorldObject* WorldContext::objectToShoot() const
-{
-    return m_objectToShoot;
-}
-
 void WorldContext::setObjectToShoot(WorldObject *obj)
 {
     if(m_objectToShoot == obj) 
@@ -224,6 +220,7 @@ void WorldContext::prepareToShoot(WorldObject* obj)
     if(obj)
         setObjectToShoot(obj);
 }
+
 
 void WorldContext::damageObject() 
 {

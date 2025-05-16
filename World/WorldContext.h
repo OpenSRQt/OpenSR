@@ -91,7 +91,6 @@ signals:
 
     void planetToEnterChanged(WorldObject *playerShip);
     void movementPositionChanged(const QPointF &pos);
-
     void enteringPlanet();
     void objectToShootChanged(WorldObject*);
     void isChoosingToShootChanged(bool isChoosingToShoot);
