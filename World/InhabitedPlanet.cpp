@@ -80,42 +80,41 @@ QColor InhabitedPlanetStyle::atmosphere() const
     return getData<Data>().atmosphere;
 }
 
-void InhabitedPlanetStyle::setAtmosphere(const QColor& c)
+void InhabitedPlanetStyle::setAtmosphere(const QColor &c)
 {
     auto d = getData<Data>();
     d.atmosphere = c;
     setData(d);
 }
 
-QString InhabitedPlanetStyle::background() const 
+QString InhabitedPlanetStyle::background() const
 {
     return getData<Data>().background;
 }
 
-void InhabitedPlanetStyle::setBackground(const QString& texture)
+void InhabitedPlanetStyle::setBackground(const QString &texture)
 {
     auto d = getData<Data>();
     d.background = texture;
     setData(d);
 }
 
-bool operator==(const InhabitedPlanetStyle& one, const InhabitedPlanetStyle& another)
+bool operator==(const InhabitedPlanetStyle &one, const InhabitedPlanetStyle &another)
 {
-    return  (one.surface()  == another.surface() ) &&
-        (one.cloud0() == another.cloud0()) &&
-        (one.cloud1() == another.cloud1()) &&
-        (one.radius() == another.radius()) &&
-        (one.atmosphere() == another.atmosphere()) &&
-        (one.background() == another.background())
-        ;
+    return (one.surface() == another.surface()) &&
+            (one.cloud0() == another.cloud0()) &&
+            (one.cloud1() == another.cloud1()) &&
+            (one.radius() == another.radius()) &&
+            (one.atmosphere() == another.atmosphere()) &&
+            (one.background() == another.background());
 }
 
-QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style)
+QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style)
+QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle &style)
 {
     quint32 id;
     stream >> id;
@@ -125,19 +124,19 @@ QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle::Data &data)
 {
     return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.background;
 }
 
-QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle::Data &data)
 {
     return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius >> data.background;
 }
 
 const quint32 InhabitedPlanet::m_staticTypeId = typeIdFromClassName(InhabitedPlanet::staticMetaObject.className());
 
-template<>
+template <>
 void WorldObject::registerType<InhabitedPlanet>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<InhabitedPlanetStyle>();
@@ -147,25 +146,25 @@ void WorldObject::registerType<InhabitedPlanet>(QQmlEngine *qml, QJSEngine *scri
     qmlRegisterType<InhabitedPlanet>("OpenSR.World", 1, 0, "InhabitedPlanet");
 }
 
-template<>
-InhabitedPlanet* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <>
+InhabitedPlanet *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new InhabitedPlanet(parent, id);
 }
 
-template<>
+template <>
 quint32 WorldObject::staticTypeId<InhabitedPlanet>()
 {
     return InhabitedPlanet::m_staticTypeId;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<InhabitedPlanet>()
+template <>
+const QMetaObject *WorldObject::staticTypeMeta<InhabitedPlanet>()
 {
     return &InhabitedPlanet::staticMetaObject;
 }
 
-InhabitedPlanet::InhabitedPlanet(WorldObject *parent, quint32 id): Planet(parent, id)
+InhabitedPlanet::InhabitedPlanet(WorldObject *parent, quint32 id) : Planet(parent, id)
 {
 }
 
@@ -188,13 +187,13 @@ InhabitedPlanetStyle InhabitedPlanet::style() const
     return m_style;
 }
 
-void InhabitedPlanet::setStyle(const InhabitedPlanetStyle& style)
+void InhabitedPlanet::setStyle(const InhabitedPlanetStyle &style)
 {
     if (m_style == style)
         return;
 
     m_style = style;
-    emit(styleChanged());
+    emit styleChanged();
 }
 
 void InhabitedPlanet::prepareSave()
@@ -205,8 +204,8 @@ void InhabitedPlanet::prepareSave()
 
 void InhabitedPlanet::waitForArrival()
 {
-    emit(planetToEnter());
+    emit planetToEnter();
 }
 
-}
-}
+} //namespace World
+} //namespace OpenSR

@@ -96,22 +96,39 @@ Ship::Ship(WorldObject *parent, quint32 id)
 {
 }
 
-Ship::~Ship() {}
+Ship::~Ship() 
+{
+}
 
-quint32 Ship::typeId() const { return Ship::m_staticTypeId; }
+quint32 Ship::typeId() const 
+{ 
+    return Ship::m_staticTypeId; 
+}
 
-QString Ship::namePrefix() const { return tr("Ship"); }
+QString Ship::namePrefix() const 
+{ 
+    return tr("Ship"); 
+}
 
-Ship::ShipAffiliation Ship::affiliation() const { return m_affiliation; }
+Ship::ShipAffiliation Ship::affiliation() const 
+{ 
+    return m_affiliation; 
+}
 
 Ship::ShipRank Ship::rank() const
 {
     return m_rank;
 }
 
-float Ship::angle() const { return m_angle; }
+float Ship::angle() const 
+{ 
+    return m_angle; 
+}
 
-float Ship::speed() const { return m_speed; }
+float Ship::speed() const 
+{ 
+    return m_speed; 
+}
 
 QPointF Ship::destination() const
 {

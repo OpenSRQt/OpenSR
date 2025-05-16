@@ -28,17 +28,17 @@ namespace OpenSR
 namespace World
 {
 
-class OPENSR_WORLD_API InhabitedPlanetStyle: public Resource
+class OPENSR_WORLD_API InhabitedPlanetStyle : public Resource
 {
     Q_GADGET
 
     Q_PROPERTY(QString surface READ surface WRITE setSurface)
-    Q_PROPERTY(QString cloud0  READ cloud0  WRITE setCloud0 )
-    Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
-    Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
-    Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString cloud0 READ cloud0 WRITE setCloud0)
+    Q_PROPERTY(QString cloud1 READ cloud1 WRITE setCloud1)
+    Q_PROPERTY(int radius READ radius WRITE setRadius)
+    Q_PROPERTY(QColor atmosphere READ atmosphere WRITE setAtmosphere)
     Q_PROPERTY(QString background READ background WRITE setBackground)
-    
+
 public:
     struct Data
     {
@@ -55,30 +55,27 @@ public:
     QString background() const;
     QPointF center() const;
 
-    void setSurface(const QString&);
-    void setCloud0(const QString&);
-    void setCloud1(const QString&);
+    void setSurface(const QString &);
+    void setCloud0(const QString &);
+    void setCloud1(const QString &);
     void setRadius(int);
-    void setAtmosphere(const QColor&);
-    void setBackground(const QString&);
-
+    void setAtmosphere(const QColor &);
+    void setBackground(const QString &);
 };
 
-bool operator==(const InhabitedPlanetStyle& one, const InhabitedPlanetStyle& another);
+bool operator==(const InhabitedPlanetStyle &one, const InhabitedPlanetStyle &another);
 
-QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle& style);
-QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle& style);
-QDataStream& operator<<(QDataStream & stream, const InhabitedPlanetStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, InhabitedPlanetStyle::Data& data);
+QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle &style);
+QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle &style);
+QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle::Data &data);
 
-
-class OPENSR_WORLD_API InhabitedPlanet: public Planet
+class OPENSR_WORLD_API InhabitedPlanet : public Planet
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
     Q_PROPERTY(OpenSR::World::InhabitedPlanetStyle style READ style WRITE setStyle NOTIFY styleChanged)
-    //Q_PROPERTY(bool waitingForArrival READ waitForArrival WRITE setWaitForArrival NOTIFY waitForArrivalChanged)
 public:
     Q_INVOKABLE InhabitedPlanet(WorldObject *parent = 0, quint32 id = 0);
     virtual ~InhabitedPlanet();
@@ -87,7 +84,7 @@ public:
     virtual QString namePrefix() const;
 
     InhabitedPlanetStyle style() const;
-    void setStyle(const InhabitedPlanetStyle& style);
+    void setStyle(const InhabitedPlanetStyle &style);
 
     void waitForArrival();
 
@@ -102,8 +99,8 @@ private:
     InhabitedPlanetStyle m_style;
     bool m_PlayerShipIsNearPlanet = false;
 };
-}
-}
+} //namespace World
+} //namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle::Data)
 Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle)
