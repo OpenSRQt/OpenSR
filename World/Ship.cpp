@@ -336,8 +336,7 @@ Q_INVOKABLE void Ship::exitThePlace()
     emit exitPlace();
 }
 
-void Ship::checkPlanetProximity(WorldObject *planetToEnter,
-                                const QPointF &shipPosition)
+void Ship::checkPlanetProximity(WorldObject *planetToEnter)
 {
     if (!planetToEnter)
     {
@@ -346,6 +345,7 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter,
     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
     int planetRadius = planet->style().radius();
     QPointF planetCenter = planet->position();
+    QPointF shipPosition = position();
 
     const qreal distance = QLineF(shipPosition, planetCenter).length();
 

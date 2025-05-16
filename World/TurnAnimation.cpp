@@ -29,11 +29,10 @@ void TurnAnimation::updateCurrentTime(int currentTime)
     m_prevTime = currentTime;
 
     WorldContext *ctx = WorldManager::instance()->context();
-    class InhabitedPlanet* planetToEnter = qobject_cast<class InhabitedPlanet*>(ctx->planetToEnter());
-    class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
-    auto shipPos = playerShip->position();
     if (ctx){
-        if(playerShip) playerShip->checkPlanetProximity(planetToEnter, shipPos);
+        class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
+        if(playerShip) 
+            playerShip->checkPlanetProximity(ctx->planetToEnter());
         ctx->processTurn(dt);
     }
         
