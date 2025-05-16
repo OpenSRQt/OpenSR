@@ -353,6 +353,26 @@ Q_INVOKABLE void Ship::exitThePlace()
     emit exitPlace();
 }
 
+// void Ship::checkPlanetProximity(WorldObject *planetToEnter)
+// {
+//     if (!planetToEnter)
+//     {
+//         return;
+//     }
+//     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
+//     int planetRadius = planet->style().radius();
+//     QPointF planetCenter = planet->position(); //
+//     QPointF shipPosition = position(); //
+
+//     const qreal distance = QLineF(shipPosition, planetCenter).length();
+
+//     if (distance <= planetRadius && !m_isNearPlanet)
+//     {
+//         m_isNearPlanet = true;
+//         emit(enterPlace());
+//     }
+// }
+
 void Ship::checkPlanetProximity(WorldObject *planetToEnter)
 {
     if (!planetToEnter)
@@ -361,16 +381,24 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
     }
     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
     int planetRadius = planet->style().radius();
-    QPointF planetCenter = planet->position();
-    QPointF shipPosition = position();
 
-    const qreal distance = QLineF(shipPosition, planetCenter).length();
-
-    if (distance <= planetRadius && !m_isNearPlanet)
+    if (checkProximity(planet->position(), planetToEnter, planetRadius) && !m_isNearPlanet)
     {
         m_isNearPlanet = true;
         emit(enterPlace());
     }
+}
+
+bool Ship::checkProximity(QPointF center, WorldObject *obj, int radius)
+{
+    if (!obj)
+    {
+        return false;
+    }
+    QPointF shipPosition = position();
+
+    const qreal distance = QLineF(shipPosition, center).length();
+    return distance <= radius;
 }
 
 bool Ship::checkPlannedActions() const
