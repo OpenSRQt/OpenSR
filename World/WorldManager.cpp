@@ -270,6 +270,7 @@ void WorldManager::startTurn()
         connect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
     m_context->startTurn();
+    m_context->damageObject();
 
     m_turnFinished = false;
 

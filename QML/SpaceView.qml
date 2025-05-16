@@ -383,6 +383,16 @@ Item {
     }
 
     Button {
+        id: getGunTemporary
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        text: "Get Gun"
+        onClicked: {
+            console.log("Getting gun");
+        }
+    }
+
+    Button {
         id: turnButton
         anchors.bottom: parent.bottom
         anchors.right: parent.right

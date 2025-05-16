@@ -77,6 +77,8 @@ public:
     float period() const;
     float time() const;
     float speed() const;
+    bool destroyed() const;
+    void setDestroyed(bool);
 
     void setStyle(const AsteroidStyle &style);
     void setSemiAxis(const QPointF &axis);
@@ -95,6 +97,9 @@ public:
     void processTurn(float time) override;
     void finishTurn() override;
 
+    Q_INVOKABLE void damageObject();
+    void destroyObject();
+
 signals:
     void styleChanged();
     void semiAxisChanged();
@@ -102,6 +107,9 @@ signals:
     void periodChanged();
     void timeChanged();
     void speedChanged();
+
+    void asteroidDamaged();
+    void asteroidDestroyed();
 
 private:
     void calcEccentricity();

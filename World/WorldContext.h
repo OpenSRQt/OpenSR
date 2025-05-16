@@ -38,6 +38,8 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
     Q_PROPERTY(WorldObject *playerShip READ playerShip NOTIFY playerShipChanged STORED false WRITE setPlayerShip)
     Q_PROPERTY(
         WorldObject *planetToEnter READ planetToEnter NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
+    Q_PROPERTY(WorldObject*  objectToShoot READ objectToShoot
+        WRITE setObjectToShoot)    
     Q_PROPERTY(QPointF movementPosition READ movementPosition NOTIFY movementPositionChanged
                    STORED false WRITE setMovementPosition)
 
@@ -69,6 +71,11 @@ public:
     QPointF movementPosition();
     void setMovementPosition(const QPointF &pos);
 
+    Q_INVOKABLE void prepareToShoot(WorldObject *);
+    Q_INVOKABLE void damageObject();
+    WorldObject* objectToShoot() const;
+    void setObjectToShoot(WorldObject *);
+
 public slots:
     void onShipArrived();
 
@@ -83,16 +90,15 @@ signals:
     void movementPositionChanged(const QPointF &pos);
 
     void enteringPlanet();
-
-    void stillMoving();
-
+    void objectToShootChanged(WorldObject*);
 private:
     PlanetarySystem *m_currentSystem{};
     ResourceManager *m_resources{};
     WorldObject *m_playerShip{};
     WorldObject *m_planetToEnter{};
+    WorldObject* m_objectToShoot{};
     QPointF m_planetPosition{};
-
+    
     bool m_shipIsMoving{};
 };
 } // namespace World

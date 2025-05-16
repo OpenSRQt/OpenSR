@@ -18,6 +18,7 @@
 
 #include "WorldContext.h"
 
+#include "Asteroid.h"
 #include "Ship.h"
 #include "WorldObject.h"
 #include <QDataStream>
@@ -203,6 +204,37 @@ void WorldContext::setMovementPosition(const QPointF &pos)
     }
     m_planetPosition = pos;
     emit movementPositionChanged(pos);
+}
+
+WorldObject* WorldContext::objectToShoot() const
+{
+    return m_objectToShoot;
+}
+
+void WorldContext::setObjectToShoot(WorldObject *obj)
+{
+    if(m_objectToShoot == obj)
+        return;
+    m_objectToShoot = obj;
+    emit objectToShootChanged(obj);
+}
+
+void WorldContext::prepareToShoot(WorldObject* obj)
+{
+    qDebug() << "Asteroid::prepareToShoot(obj)";
+    if(obj)
+        setObjectToShoot(obj);
+}
+
+void WorldContext::damageObject()
+{
+    if(auto* allowedChild = qobject_cast<Asteroid*>(objectToShoot()))
+        allowedChild->damageObject();
+}
+
+WorldObject* WorldContext::objectToShoot() const
+{
+    return m_objectToShoot;
 }
 
 } // namespace World
