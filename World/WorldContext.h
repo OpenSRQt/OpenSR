@@ -20,7 +20,7 @@
 #define OPENSR_WORLD_WORLDCONTEXT_H
 
 #include "WorldObject.h"
-#include <qpoint.h>
+#include <QPoint>
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
 namespace OpenSR

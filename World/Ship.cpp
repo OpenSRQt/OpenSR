@@ -25,12 +25,15 @@
 #include <QtQml/QQmlEngine>
 #include <cmath>
 
-namespace OpenSR {
-namespace World {
+namespace OpenSR
+{
+namespace World
+{
 const quint32 Ship::m_staticTypeId =
     typeIdFromClassName(Ship::staticMetaObject.className());
 
-template <> void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
+template <>
+void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<ShipStyle>();
     qRegisterMetaTypeStreamOperators<ShipStyle>();
@@ -40,17 +43,20 @@ template <> void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *scr
     qmlRegisterType<Ship>("OpenSR.World", 1, 0, "Ship");
 }
 
-template <> Ship *WorldObject::createObject(WorldObject *parent, quint32 id)
+template <>
+Ship *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Ship(parent, id);
 }
 
-template <> quint32 WorldObject::staticTypeId<Ship>()
+template <>
+quint32 WorldObject::staticTypeId<Ship>()
 {
     return Ship::m_staticTypeId;
 }
 
-template <> const QMetaObject *WorldObject::staticTypeMeta<Ship>()
+template <>
+const QMetaObject *WorldObject::staticTypeMeta<Ship>()
 {
     return &Ship::staticMetaObject;
 }
@@ -59,7 +65,8 @@ template <> const QMetaObject *WorldObject::staticTypeMeta<Ship>()
 
 int ShipStyle::width() const { return getData<Data>().width; }
 
-void ShipStyle::setWidth(int w) {
+void ShipStyle::setWidth(int w)
+{
     auto d = getData<Data>();
     d.width = w;
     setData(d);
@@ -67,7 +74,8 @@ void ShipStyle::setWidth(int w) {
 
 QString ShipStyle::texture() const { return getData<Data>().texture; }
 
-void ShipStyle::setTexture(const QString &texture) {
+void ShipStyle::setTexture(const QString &texture)
+{
     auto d = getData<Data>();
     d.texture = texture;
     setData(d);
@@ -115,15 +123,19 @@ bool Ship::isMoving() const
     return m_isMoving;
 }
 
-void Ship::setAffiliation(Ship::ShipAffiliation affiliation) {
-    if (m_affiliation == affiliation) return;
+void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
+{
+    if (m_affiliation == affiliation)
+        return;
 
     m_affiliation = affiliation;
     emit affiliationChanged(m_affiliation);
 }
 
-void Ship::setRank(Ship::ShipRank rank) {
-    if (m_rank == rank) return;
+void Ship::setRank(Ship::ShipRank rank)
+{
+    if (m_rank == rank)
+        return;
 
     m_rank = rank;
     emit rankChanged(m_rank);
@@ -196,6 +208,7 @@ void Ship::prepareToMove(const QPointF &dest)
 {
     if (dest != position())
     {
+        m_isNearPlanet = false;
         m_actionsPlanned = true;
         m_start_position = position();
         setDestination(dest);
@@ -246,7 +259,6 @@ float Ship::calcAngle(const float dt, const float angle, const QPointF &pos, con
         return newAngle;
     }
 }
-
 
 QPointF Ship::calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest)
 {
@@ -319,14 +331,16 @@ void Ship::calcTrajectory(const QPointF &dest)
     setTrajectory(trajectory);
 }
 
-Q_INVOKABLE void Ship::exitThePlace() 
-{ 
-    emit exitPlace(); 
+Q_INVOKABLE void Ship::exitThePlace()
+{
+    emit exitPlace();
 }
 
 void Ship::checkPlanetProximity(WorldObject *planetToEnter,
-                                const QPointF &shipPosition) {
-    if (!planetToEnter) {
+                                const QPointF &shipPosition)
+{
+    if (!planetToEnter)
+    {
         return;
     }
     InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
@@ -335,10 +349,16 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter,
 
     const qreal distance = QLineF(shipPosition, planetCenter).length();
 
-    if (distance <= planetRadius && !m_isNearPlanet) {
+    if (distance <= planetRadius && !m_isNearPlanet)
+    {
         m_isNearPlanet = true;
         emit(enterPlace());
     }
+}
+
+bool Ship::checkPlannedActions() const
+{
+    return m_actionsPlanned;
 }
 
 } // namespace World

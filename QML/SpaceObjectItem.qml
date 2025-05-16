@@ -80,7 +80,7 @@ Item {
             Connections {
                 target: context
 
-                function onPlayerShipArrived() {
+                function onPlannedActionsCompleted() {
                     if (planetItem.isWaitingForShipArrival) {
                         changeScreen("qrc:/OpenSR/PlanetView.qml", {
                             "planet": World.context.planetToEnter

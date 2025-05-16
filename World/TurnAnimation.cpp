@@ -33,7 +33,7 @@ void TurnAnimation::updateCurrentTime(int currentTime)
     class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
     auto shipPos = playerShip->position();
     if (ctx){
-        ctx->checkPlanetProximity(planetToEnter, shipPos);
+        if(playerShip) playerShip->checkPlanetProximity(planetToEnter, shipPos);
         ctx->processTurn(dt);
     }
         

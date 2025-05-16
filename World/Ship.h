@@ -103,7 +103,6 @@ public:
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
 
-public slots:
     float angle() const;
     float speed() const;
     QPointF destination() const;
@@ -160,9 +159,6 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
-
-    bool m_isNearPlanet = false;
-    bool m_isMoving = false;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;
