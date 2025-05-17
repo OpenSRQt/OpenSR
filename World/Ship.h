@@ -23,7 +23,7 @@
 #include "Resource.h"
 #include "World.h"
 #include <QPoint>
-#include "InhabitedPlanet.h"
+#include "Planet.h"
 
 namespace OpenSR {
 namespace World {

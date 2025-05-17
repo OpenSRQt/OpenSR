@@ -33,18 +33,18 @@ class OPENSR_WORLD_API InhabitedPlanetStyle : public Resource
     Q_GADGET
 
     Q_PROPERTY(QString surface READ surface WRITE setSurface)
-    Q_PROPERTY(QString cloud0 READ cloud0 WRITE setCloud0)
-    Q_PROPERTY(QString cloud1 READ cloud1 WRITE setCloud1)
-    Q_PROPERTY(int radius READ radius WRITE setRadius)
-    Q_PROPERTY(QColor atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString cloud0  READ cloud0  WRITE setCloud0 )
+    Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
+    Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
+    Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
     Q_PROPERTY(QString background READ background WRITE setBackground)
+    Q_PROPERTY(QString affiliation READ affiliation WRITE setAffiliation)
 
 public:
+    PlanetStyle planetStyle;
     struct Data
     {
-        QString surface, cloud0, cloud1, background;
-        int radius;
-        QColor atmosphere;
+        QString affiliation;
     };
 
     QString surface() const;
@@ -53,14 +53,16 @@ public:
     int radius() const;
     QColor atmosphere() const;
     QString background() const;
-    QPointF center() const;
 
-    void setSurface(const QString &);
-    void setCloud0(const QString &);
-    void setCloud1(const QString &);
+    void setSurface(const QString&);
+    void setCloud0(const QString&);
+    void setCloud1(const QString&);
     void setRadius(int);
-    void setAtmosphere(const QColor &);
+    void setAtmosphere(const QColor&);
     void setBackground(const QString &);
+
+    QString affiliation() const;
+    void setAffiliation(const QString &);
 };
 
 bool operator==(const InhabitedPlanetStyle &one, const InhabitedPlanetStyle &another);
@@ -80,24 +82,20 @@ public:
     Q_INVOKABLE InhabitedPlanet(WorldObject *parent = 0, quint32 id = 0);
     virtual ~InhabitedPlanet();
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    virtual quint32 typeId() const override;
+    virtual QString namePrefix() const override;
+
+    virtual void prepareSave() override;
 
     InhabitedPlanetStyle style() const;
+    virtual int radius() override;
     void setStyle(const InhabitedPlanetStyle &style);
-
-    void waitForArrival();
-
-    virtual void prepareSave();
 
 Q_SIGNALS:
     void styleChanged();
-    void sizeChanged();
-    void planetToEnter();
 
 private:
     InhabitedPlanetStyle m_style;
-    bool m_PlayerShipIsNearPlanet = false;
 };
 } //namespace World
 } //namespace OpenSR

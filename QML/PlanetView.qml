@@ -3,7 +3,7 @@ import OpenSR 1.0
 import OpenSR.World 1.0
 
 Item {
-    property InhabitedPlanet planet
+    property Planet planet
     id: planetView
     anchors.fill: parent
 

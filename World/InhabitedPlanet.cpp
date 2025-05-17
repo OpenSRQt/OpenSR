@@ -17,8 +17,8 @@
 */
 
 #include "InhabitedPlanet.h"
+#include "Planet.h"
 #include "ResourceManager.h"
-#include "WorldContext.h"
 
 #include <QtQml>
 
@@ -29,84 +29,81 @@ namespace World
 
 QString InhabitedPlanetStyle::surface() const
 {
-    return getData<Data>().surface;
+    return planetStyle.surface();
 }
 
 void InhabitedPlanetStyle::setSurface(const QString &texture)
 {
-    auto d = getData<Data>();
-    d.surface = texture;
-    setData(d);
+    planetStyle.setSurface(texture);
 }
 
 QString InhabitedPlanetStyle::cloud0() const
 {
-    return getData<Data>().cloud0;
+    return planetStyle.cloud0();
 }
 
 void InhabitedPlanetStyle::setCloud0(const QString &texture)
 {
-    auto d = getData<Data>();
-    d.cloud0 = texture;
-    setData(d);
+    planetStyle.setCloud0(texture);
 }
 
 QString InhabitedPlanetStyle::cloud1() const
 {
-    return getData<Data>().cloud1;
+    return planetStyle.cloud1();
 }
 
 void InhabitedPlanetStyle::setCloud1(const QString &texture)
 {
-    auto d = getData<Data>();
-    d.cloud1 = texture;
-    setData(d);
+    planetStyle.setCloud1(texture);
 }
 
 int InhabitedPlanetStyle::radius() const
 {
-    return getData<Data>().radius;
+    return planetStyle.radius();
 }
 
 void InhabitedPlanetStyle::setRadius(const int r)
 {
-    auto d = getData<Data>();
-    d.radius = r;
-    setData(d);
+    planetStyle.setRadius(r);
 }
 
 QColor InhabitedPlanetStyle::atmosphere() const
 {
-    return getData<Data>().atmosphere;
+    return planetStyle.atmosphere();
 }
 
 void InhabitedPlanetStyle::setAtmosphere(const QColor &c)
 {
-    auto d = getData<Data>();
-    d.atmosphere = c;
-    setData(d);
+    planetStyle.setAtmosphere(c);
 }
 
 QString InhabitedPlanetStyle::background() const
 {
-    return getData<Data>().background;
+    return planetStyle.background();
 }
 
 void InhabitedPlanetStyle::setBackground(const QString &texture)
 {
+    planetStyle.setBackground(texture);
+}
+
+QString InhabitedPlanetStyle::affiliation() const
+{
+    return getData<Data>().affiliation;
+}
+
+void InhabitedPlanetStyle::setAffiliation(const QString &texture)
+{
     auto d = getData<Data>();
-    d.background = texture;
+    d.affiliation = texture;
     setData(d);
 }
 
+
 bool operator==(const InhabitedPlanetStyle &one, const InhabitedPlanetStyle &another)
 {
-    return (one.surface() == another.surface()) &&
-            (one.cloud0() == another.cloud0()) &&
-            (one.cloud1() == another.cloud1()) &&
-            (one.radius() == another.radius()) &&
-            (one.atmosphere() == another.atmosphere()) &&
-            (one.background() == another.background());
+    return (one.planetStyle == another.planetStyle) &&
+            (one.affiliation() == another.affiliation());
 }
 
 QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle &style)
@@ -126,12 +123,12 @@ QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle &style)
 
 QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle::Data &data)
 {
-    return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.background;
+    return stream << data.affiliation;
 }
 
 QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle::Data &data)
 {
-    return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius >> data.background;
+    return stream >> data.affiliation;
 }
 
 const quint32 InhabitedPlanet::m_staticTypeId = typeIdFromClassName(InhabitedPlanet::staticMetaObject.className());
@@ -202,10 +199,10 @@ void InhabitedPlanet::prepareSave()
     m_style.registerResource();
 }
 
-void InhabitedPlanet::waitForArrival()
-{
-    emit planetToEnter();
+int InhabitedPlanet::radius() {
+    return style().radius();
 }
+
 
 } //namespace World
 } //namespace OpenSR

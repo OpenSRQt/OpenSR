@@ -15,21 +15,21 @@ Item {
 
     property SpaceObjectItem playerShipItem
     property list<SpaceObjectItem> clickables
-    property var object 
+    property var object
 
     anchors.fill: parent
 
     MouseArea {
         id: spaceMouseOverlay
         anchors.fill: parent
-        
+
         propagateComposedEvents: true
 
         onDoubleClicked: {
             if (!WorldManager.turnFinished) {
                 return;
             }
-            
+
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
             context.playerShip.prepareToMove(positionInSpaceNode);
             showTrajectory(context.playerShip);
@@ -42,7 +42,7 @@ Item {
                 return;
             }
             mouse.accepted = true;
-            
+
             var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
             context.playerShip.prepareToMove(positionInSpaceNode);
             showTrajectory(context.playerShip);
@@ -121,7 +121,7 @@ Item {
                 playerShipItem = o;
                 console.log("Player ship item initialized:", playerShipItem);
             }
-            
+
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
             o.entered.connect(showTrajectory);

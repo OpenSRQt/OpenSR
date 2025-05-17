@@ -17,7 +17,6 @@
 */
 
 #include "WorldContext.h"
-#include "InhabitedPlanet.h"
 
 #include "Ship.h"
 #include <QDataStream>

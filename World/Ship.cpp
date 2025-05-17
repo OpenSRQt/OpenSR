@@ -96,23 +96,23 @@ Ship::Ship(WorldObject *parent, quint32 id)
 {
 }
 
-Ship::~Ship() 
+Ship::~Ship()
 {
 }
 
-quint32 Ship::typeId() const 
-{ 
-    return Ship::m_staticTypeId; 
+quint32 Ship::typeId() const
+{
+    return Ship::m_staticTypeId;
 }
 
-QString Ship::namePrefix() const 
-{ 
-    return tr("Ship"); 
+QString Ship::namePrefix() const
+{
+    return tr("Ship");
 }
 
-Ship::ShipAffiliation Ship::affiliation() const 
-{ 
-    return m_affiliation; 
+Ship::ShipAffiliation Ship::affiliation() const
+{
+    return m_affiliation;
 }
 
 Ship::ShipRank Ship::rank() const
@@ -120,14 +120,14 @@ Ship::ShipRank Ship::rank() const
     return m_rank;
 }
 
-float Ship::angle() const 
-{ 
-    return m_angle; 
+float Ship::angle() const
+{
+    return m_angle;
 }
 
-float Ship::speed() const 
-{ 
-    return m_speed; 
+float Ship::speed() const
+{
+    return m_speed;
 }
 
 QPointF Ship::destination() const
@@ -359,8 +359,8 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
     {
         return;
     }
-    InhabitedPlanet *planet = qobject_cast<InhabitedPlanet *>(planetToEnter);
-    int planetRadius = planet->style().radius();
+    Planet *planet = qobject_cast<Planet *>(planetToEnter);
+    int planetRadius = planet->radius();
     QPointF planetCenter = planet->position();
     QPointF shipPosition = position();
 
@@ -369,7 +369,7 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
     if (distance <= planetRadius && !m_isNearPlanet)
     {
         m_isNearPlanet = true;
-        emit(enterPlace());
+        emit enterPlace();
     }
 }
 
