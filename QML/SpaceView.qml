@@ -13,7 +13,41 @@ Item {
 
     property var trajectoryView
 
+    property SpaceObjectItem playerShipItem
+    property list<SpaceObjectItem> clickables
+    property var object
+
     anchors.fill: parent
+
+    MouseArea {
+        id: spaceMouseOverlay
+        anchors.fill: parent
+
+        propagateComposedEvents: true
+
+        onDoubleClicked: {
+            if (!WorldManager.turnFinished) {
+                return;
+            }
+
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            context.playerShip.prepareToMove(positionInSpaceNode);
+            showTrajectory(context.playerShip);
+            WorldManager.startTurn();
+            hideTrajectory(context.playerShip);
+        }
+
+        onClicked: {
+            if (!WorldManager.turnFinished) {
+                return;
+            }
+            mouse.accepted = true;
+
+            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
+            context.playerShip.prepareToMove(positionInSpaceNode);
+            showTrajectory(context.playerShip);
+        }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -82,6 +116,12 @@ Item {
             o = component.createObject(spaceNode, {
                 object: system.children[c]
             });
+
+            if(system.children[c] == WorldManager.context.playerShip){
+                playerShipItem = o;
+                console.log("Player ship item initialized:", playerShipItem);
+            }
+
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
             o.entered.connect(showTrajectory);
@@ -158,36 +198,6 @@ Item {
             property: "y"
             duration: maxScrollTime * 1000
             alwaysRunToEnd: false
-        }
-    }
-
-    MouseArea {
-        id: spaceMouseOverlay
-        anchors.fill: parent
-        
-        propagateComposedEvents: true
-
-        onDoubleClicked: {
-            if (!WorldManager.turnFinished) {
-                return;
-            }
-            
-            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-            context.playerShip.prepareToMove(positionInSpaceNode);
-            showTrajectory(context.playerShip);
-            WorldManager.startTurn();
-            hideTrajectory(context.playerShip);
-        }
-
-        onClicked: {
-            if (!WorldManager.turnFinished) {
-                return;
-            }
-            mouse.accepted = true;
-            
-            var positionInSpaceNode = mapToItem(spaceNode, mouse.x, mouse.y);
-            context.playerShip.prepareToMove(positionInSpaceNode);
-            showTrajectory(context.playerShip);
         }
     }
 

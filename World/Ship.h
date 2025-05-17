@@ -23,11 +23,10 @@
 #include "Resource.h"
 #include "World.h"
 #include <QPoint>
+#include "Planet.h"
 
-namespace OpenSR
-{
-namespace World
-{
+namespace OpenSR {
+namespace World {
 
 class OPENSR_WORLD_API ShipStyle : public Resource
 {
@@ -95,7 +94,7 @@ public:
     };
     Q_ENUM(ShipRank)
 
-    Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
+    Q_INVOKABLE Ship(WorldObject* parent = 0, quint32 id = 0);
     virtual ~Ship();
 
     virtual quint32 typeId() const override;
@@ -103,15 +102,18 @@ public:
 
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
+
     float angle() const;
     float speed() const;
     QPointF destination() const;
     bool isMoving() const;
 
+    Q_INVOKABLE void exitThePlace();
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
+    void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
 
     static const float normalLinearSpeed;
@@ -124,7 +126,7 @@ public:
     void calcTrajectory(const QPointF &destination);
     bool checkPlannedActions() const;
 
-signals:
+   signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
     void timeChanged();
@@ -133,6 +135,9 @@ signals:
     void angleChanged();
     void isMovingChanged();
     void shipArrived();
+
+    void enterPlace();
+    void exitPlace();
 
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
@@ -153,6 +158,8 @@ private:
     float m_targetAngle;
     QPointF m_destination;
     QPointF m_start_position;
+
+    bool m_isNearPlanet = false;
     bool m_isMoving = false;
     bool m_actionsPlanned = false;
 };
@@ -162,4 +169,4 @@ private:
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle)
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle::Data)
 
-#endif // OPENSR_WORLD_SHIP_H
+#endif  // OPENSR_WORLD_SHIP_H

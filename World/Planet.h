@@ -38,26 +38,29 @@ class OPENSR_WORLD_API PlanetStyle: public Resource
     Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
     Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
     Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString background READ background WRITE setBackground)
 
 public:
     struct Data
     {
-        QString surface, cloud0, cloud1;
+        QString surface, cloud0, cloud1, background;
         int radius;
         QColor atmosphere;
     };
-
+public:
     QString surface() const;
     QString cloud0() const;
     QString cloud1() const;
     int radius() const;
     QColor atmosphere() const;
+    QString background() const;
 
     void setSurface(const QString&);
     void setCloud0(const QString&);
     void setCloud1(const QString&);
     void setRadius(int);
     void setAtmosphere(const QColor&);
+    void setBackground(const QString &);
 };
 
 bool operator==(const PlanetStyle& one, const PlanetStyle& another);
@@ -75,15 +78,14 @@ class OPENSR_WORLD_API Planet: public SpaceObject
     Q_PROPERTY(OpenSR::World::PlanetStyle style READ style WRITE setStyle NOTIFY styleChanged)
 
 public:
-    Q_INVOKABLE Planet(WorldObject *parent = 0, quint32 id = 0);
+    Planet(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Planet();
 
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
 
     PlanetStyle style() const;
-
-public slots:
+    virtual int radius();
     void setStyle(const PlanetStyle& style);
 
 signals:
@@ -92,8 +94,8 @@ signals:
 private:
     PlanetStyle m_style;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::PlanetStyle)
 Q_DECLARE_METATYPE(OpenSR::World::PlanetStyle::Data)

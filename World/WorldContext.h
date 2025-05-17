@@ -20,10 +20,9 @@
 #define OPENSR_WORLD_WORLDCONTEXT_H
 
 #include "WorldObject.h"
-
+#include <QPoint>
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
-
 namespace OpenSR
 {
 namespace World
@@ -37,7 +36,11 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
                    STORED false)
     Q_PROPERTY(ResourceManager *resources READ resources NOTIFY resourcesChanged STORED false)
     Q_PROPERTY(WorldObject *playerShip READ playerShip NOTIFY playerShipChanged STORED false WRITE setPlayerShip)
-
+    Q_PROPERTY(WorldObject* planetToEnter READ planetToEnter  
+        NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
+    Q_PROPERTY(QPointF movementPosition READ movementPosition  
+        NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
+    
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = 0, quint32 id = 0);
     virtual ~WorldContext();
@@ -60,6 +63,12 @@ public:
 
     bool checkPlannedActions() const;
 
+    WorldObject* planetToEnter() const;
+    void setPlanetToEnter(WorldObject *);
+
+    QPointF movementPosition();
+    void setMovementPosition(const QPointF& pos);
+
 public slots:
     void onShipArrived();
 
@@ -70,10 +79,21 @@ signals:
     void playerShipChanged(WorldObject *playerShip);
     void plannedActionsCompleted();
 
+    void planetToEnterChanged(WorldObject* playerShip);
+    void movementPositionChanged(const QPointF& pos);
+
+    void enteringPlanet();
+    
+    void stillMoving();
+
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
     WorldObject *m_playerShip;
+    WorldObject* m_planetToEnter;
+    QPointF m_planetPosition;
+
+    bool m_shipIsMoving = false;
 };
 } // namespace World
 } // namespace OpenSR
