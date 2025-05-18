@@ -148,14 +148,26 @@ void PlanetStyle::setAtmosphere(const QColor& c)
     setData(d);
 }
 
+QString PlanetStyle::background() const
+{
+    return getData<Data>().background;
+}
+
+void PlanetStyle::setBackground(const QString &texture)
+{
+    auto d = getData<Data>();
+    d.background = texture;
+    setData(d);
+}
+
 bool operator==(const PlanetStyle& one, const PlanetStyle& another)
 {
-    return  (one.surface()  == another.surface() ) &&
+    return (one.surface() == another.surface()) &&
             (one.cloud0() == another.cloud0()) &&
             (one.cloud1() == another.cloud1()) &&
             (one.radius() == another.radius()) &&
-            (one.atmosphere() == another.atmosphere())
-            ;
+            (one.atmosphere() == another.atmosphere()) &&
+            (one.background() == another.background());
 }
 
 // PlanetStyle Streaming
@@ -176,13 +188,17 @@ QDataStream& operator>>(QDataStream & stream, PlanetStyle& style)
 
 QDataStream& operator<<(QDataStream & stream, const PlanetStyle::Data& data)
 {
-    return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.atmosphere;
+    return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.background;
 }
 
 QDataStream& operator>>(QDataStream & stream, PlanetStyle::Data& data)
 {
-    return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius << data.atmosphere;
+    return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius >> data.background;
 }
 
+int Planet::radius() {
+    return style().radius();
 }
-}
+
+} // namespace World
+} // namespace OpenSR

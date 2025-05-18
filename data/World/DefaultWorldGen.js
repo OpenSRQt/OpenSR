@@ -50,7 +50,7 @@ function createAsteroidStyles() {
     }
 }
 
-function getPlanetStyleFromDat(id) {
+function getPlanetStyleFromDat(id, isInhabitedPlanet) {
     var planet = Engine.datValue("Data.SE.Planet." + id)
     var color;
     if ("AtmColor" in planet) {
@@ -71,14 +71,21 @@ function getPlanetStyleFromDat(id) {
         cloud1 = "dat:/" + splitted[1]
         cloud1Speed = parseFloat(splitted[0])
     }
-    
-    var style = World.PlanetStyle();
+
+    var style = isInhabitedPlanet
+        ? World.InhabitedPlanetStyle()
+        : World.DesertPlanetStyle();
+
+    if(isInhabitedPlanet) {
+        style.affiliation = "test affiliation";
+    }
+
+    style.background = "res:/DATA/PlanetBG/2/" + planet["BG"] + ".gi";
     style.surface  = "dat:/" + planet["Image"];
     style.cloud0 = cloud0;
     style.cloud1 = cloud1;
     style.atmosphere = color
     style.radius = planet["Radius"];
-
     return style
 }
 
@@ -110,12 +117,20 @@ for(var k in asteroidStyles)
     i++
 }
 
-var planet = World.InhabitedPlanet(system);
+var planet = World.DesertPlanet(system);
 planet.name = "PlanetName.Solar.2"
-planet.style = getPlanetStyleFromDat("200")
+planet.style = getPlanetStyleFromDat("198", false)
 planet.period = 15;
 planet.angle = 3.1415 / 4;
 planet.position = Qt.point(355, -222);
+
+var planet = World.InhabitedPlanet(system);
+planet.name = "PlanetName.Solar.1"
+planet.style = getPlanetStyleFromDat("100", true)
+planet.period = 15;
+planet.angle = 3.1415 / 4;
+planet.position = Qt.point(355, 222);
+
 
 function initStation(obj, kind) {
     switch (kind) {
@@ -169,7 +184,7 @@ ship1.angle       = 0;
 
 ship1.style.width = 64;
 context.playerShip = ship1;
-
+context.planetToEnter = null;
 context.currentSystem = system;
 
 World.saveWorld("/tmp/test.osr");

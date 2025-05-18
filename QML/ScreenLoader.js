@@ -17,7 +17,6 @@ function processObjectRequests() {
     var newObjectRequests = []
     for (var i = 0; i < objectRequests.length; i++) {
         var req = objectRequests[i];
-        console.log("object request " + i + ": " + req);
         if (req[0] in components) {
             var obj = components[req[0]].createObject(req[1], req[3]);
             req[1].componentObjectCreated(obj, req[2]);
@@ -39,7 +38,6 @@ function finishComponentLoad() {
             components[comp.url] = comp;
         } else if (comp.status == Component.Error) {
             failedComponents[comp.url] = comp
-            console.log("Error loading component:", comp.errorString());
         }
         else {
             newPending.push(comp);

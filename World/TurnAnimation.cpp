@@ -29,8 +29,13 @@ void TurnAnimation::updateCurrentTime(int currentTime)
     m_prevTime = currentTime;
 
     WorldContext *ctx = WorldManager::instance()->context();
-    if (ctx)
+    if (ctx){
+        class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
+        if(playerShip) 
+            playerShip->checkPlanetProximity(ctx->planetToEnter());
         ctx->processTurn(dt);
+    }
+        
 }
 
 void TurnAnimation::setTurnDurationLock(bool turnDurationLock)
