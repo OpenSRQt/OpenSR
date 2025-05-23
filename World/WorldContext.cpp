@@ -208,6 +208,7 @@ void WorldContext::setMovementPosition(const QPointF &pos)
 
 void WorldContext::setObjectToShoot(WorldObject *obj)
 {
+    qDebug() << "setObjectToShoot(WorldObject *obj)";
     if(m_objectToShoot == obj) 
         return;
     m_objectToShoot = obj;
@@ -216,7 +217,6 @@ void WorldContext::setObjectToShoot(WorldObject *obj)
 
 void WorldContext::prepareToShoot(WorldObject* obj)
 {
-    qDebug() << "Asteroid::prepareToShoot(obj)";
     if(obj)
         setObjectToShoot(obj);
 }

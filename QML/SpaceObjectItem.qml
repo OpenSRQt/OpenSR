@@ -184,6 +184,9 @@ Item {
                     shipImage.scale = 1;
                 }
             }
+            Connections {
+                target: context
+            }
         }
 
     }
@@ -194,13 +197,6 @@ Item {
             id: asteroidImage;
             property bool isHighlighted: false
             cache: false
-            opacity: 1
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 500
-                    easing.type: Easing.InOutQuad
-                }
-            }
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
@@ -217,26 +213,13 @@ Item {
                 onEntered: asteroidImage.isHighlighted = true
                 onExited: asteroidImage.isHighlighted = false
                 onClicked: {
-                    if (!WorldManager.turnFinished) {
-                        return;
-                    }
-                    if(!context.playerShip.checkProximity(
-                        object.position, 
-                        object, 
-                        200)
-                    ) {
-                        // message that the target is too far
-                        context.objectToShoot = null;
-                        return;
-                    }
-                    context.prepareToShoot(object);
+                    if(context.isChoosingToShoot) destroyComponent();
                 }
             }
             Connections {
                 target: object
                 function onAsteroidDestroyed() {
-                    asteroidImage.opacity = 0.3
-                    console.log("destroyed asteroid");
+                    self.destroy();
                 }
             }
         }
