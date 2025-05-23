@@ -269,8 +269,9 @@ void WorldManager::startTurn()
         m_animation->setTurnDurationLock(true);
         connect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
+    m_context->setIsChoosingToShoot(false);
     m_context->startTurn();
-    m_context->damageObject();
+    if(m_context->objectToShoot()) m_context->damageObject();
 
     m_turnFinished = false;
 

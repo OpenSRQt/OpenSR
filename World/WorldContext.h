@@ -40,9 +40,10 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
         WorldObject *planetToEnter READ planetToEnter NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
     Q_PROPERTY(WorldObject*  objectToShoot READ objectToShoot
         WRITE setObjectToShoot)    
-    Q_PROPERTY(QPointF movementPosition READ movementPosition NOTIFY movementPositionChanged
-                   STORED false WRITE setMovementPosition)
-
+    Q_PROPERTY(QPointF movementPosition READ movementPosition  
+        NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
+    Q_PROPERTY(bool isChoosingToShoot READ isChoosingToShoot WRITE setIsChoosingToShoot NOTIFY isChoosingToShootChanged)
+    
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = nullptr, quint32 id = 0);
     ~WorldContext() override;
@@ -75,6 +76,8 @@ public:
     Q_INVOKABLE void damageObject();
     WorldObject* objectToShoot() const;
     void setObjectToShoot(WorldObject *);
+    bool isChoosingToShoot() const;
+    void setIsChoosingToShoot(bool value);
 
 public slots:
     void onShipArrived();
@@ -91,6 +94,7 @@ signals:
 
     void enteringPlanet();
     void objectToShootChanged(WorldObject*);
+    void isChoosingToShootChanged(bool isChoosingToShoot);
 private:
     PlanetarySystem *m_currentSystem{};
     ResourceManager *m_resources{};
@@ -100,6 +104,7 @@ private:
     QPointF m_planetPosition{};
     
     bool m_shipIsMoving{};
+    bool m_isChoosingToShoot = false;
 };
 } // namespace World
 } // namespace OpenSR

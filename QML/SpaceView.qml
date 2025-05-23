@@ -13,7 +13,6 @@ Item {
 
     property var trajectoryView
 
-    property SpaceObjectItem playerShipItem
     property list<SpaceObjectItem> clickables
     property var object
 
@@ -388,7 +387,7 @@ Item {
         anchors.left: parent.left
         text: "Get Gun"
         onClicked: {
-            console.log("Getting gun");
+            context.isChoosingToShoot = !context.isChoosingToShoot;
         }
     }
 

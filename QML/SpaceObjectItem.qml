@@ -8,6 +8,8 @@ Item {
     property bool positioning: false
     property int mouseDelta: 0
 
+    property bool isDestructible: false;
+
     property real shipAngle: object && object.hasOwnProperty("angle") ? object.angle : 0
 
     signal entered(WorldObject obj)
@@ -28,6 +30,8 @@ Item {
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
                 item.source = object.style.texture;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
+                isDestructible = true;
+            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
                 item.planet = object;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
                 item.source = object.style.texture;
@@ -44,6 +48,25 @@ Item {
             onEntered: mouseEntered()
             onExited: mouseExited()
         }
+    }
+
+    function destroyComponent() {
+        if(!context.isChoosingToShoot){
+            return;
+        }
+        if (!WorldManager.turnFinished) {
+            return;
+        }
+        if(!context.playerShip.checkProximity(
+            object.position,
+            object,
+            200)
+        ) {
+            context.objectToShoot = null;
+            return;
+        }
+        context.isChoosingToShoot = false;
+        context.prepareToShoot(object);
     }
 
     Component {
@@ -78,7 +101,6 @@ Item {
 
             Connections {
                 target: context
-
                 function onPlannedActionsCompleted() {
                     if (planetItem.isWaitingForShipArrival) {
                         changeScreen("qrc:/OpenSR/PlanetView.qml", {
@@ -99,6 +121,7 @@ Item {
             id: shipImage;
             cache: false
             property Ship ship
+            property bool targetingCircleVisible: context.isChoosingToShoot
             opacity: 1
             scale: 1
             Behavior on opacity {
@@ -111,25 +134,45 @@ Item {
                 NumberAnimation { duration: 2000 }
             }
             Canvas {
+                id: targetingCircle
                 anchors.centerIn: parent
                 width: 400
                 height: 400
-                
-                onPaint: {
-                    var ctx = getContext("2d")
-                    ctx.reset()
-                    ctx.beginPath()
-                    ctx.arc(width/2, height/2, width/2 - 2, 0, 2 * Math.PI)
-                    ctx.strokeStyle = "red"
-                    ctx.lineWidth = 2
-                    ctx.setLineDash([5, 5])
-                    ctx.stroke()
+                visible: targetingCircleVisible
+                property real padding: 2
+
+                RotationAnimator on rotation {
+                    from: 0
+                    to: 360
+                    duration: 100000
+                    loops: Animation.Infinite
+                    running: targetingCircle.visible
                 }
-                
-                // Автоматически перерисовывает круг при изменении размеров
+
+                onPaint: {
+                    const ctx = getContext("2d");
+                    ctx.reset();
+                    ctx.beginPath();
+
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(width, height) / 2 - padding;
+
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "red";
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                }
+
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
+                onVisibleChanged: requestPaint()
+
+                renderTarget: Canvas.Image
+                renderStrategy: Canvas.Cooperative
             }
+
             Connections {
                 target: ship
 
@@ -137,11 +180,13 @@ Item {
                     shipImage.opacity = 0;
                     shipImage.scale = 0.5;
                 }
-
                 function onExitPlace() {
                     shipImage.opacity = 1;
                     shipImage.scale = 1;
                 }
+            }
+            Connections {
+                target: context
             }
         }
 
@@ -153,13 +198,6 @@ Item {
             id: asteroidImage;
             property bool isHighlighted: false
             cache: false
-            opacity: 1
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 500
-                    easing.type: Easing.InOutQuad
-                }
-            }
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
@@ -176,26 +214,13 @@ Item {
                 onEntered: asteroidImage.isHighlighted = true
                 onExited: asteroidImage.isHighlighted = false
                 onClicked: {
-                    if (!WorldManager.turnFinished) {
-                        return;
-                    }
-                    if(!context.playerShip.checkProximity(
-                        object.position, 
-                        object, 
-                        200)
-                    ) {
-                        // message that the target is too far
-                        context.objectToShoot = null;
-                        return;
-                    }
-                    context.prepareToShoot(object);
+                    if(context.isChoosingToShoot) destroyComponent();
                 }
             }
             Connections {
                 target: object
                 function onAsteroidDestroyed() {
-                    asteroidImage.opacity = 0.3
-                    console.log("destroyed asteroid");
+                    self.destroy();
                 }
             }
         }
