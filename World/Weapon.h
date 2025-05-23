@@ -21,12 +21,58 @@
 
 #include "Equipment.h"
 #include "World.h"
+#include "Planet.h"
+#include <QGraphicsItem>
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Weapon : public Equipment
+
+class OPENSR_WORLD_API WeaponStyle : public Resource
+{
+    Q_GADGET
+
+    Q_PROPERTY(QString SoundExpl READ SoundExpl WRITE setSoundExpl)
+    Q_PROPERTY(QString SoundShot READ SoundShot WRITE setSoundShot)
+    Q_PROPERTY(QString weaponAnim READ weaponAnim WRITE setWeaponAnim)
+    Q_PROPERTY(QString typeWeapon READ typeWeapon WRITE setTypeWeapon)
+    Q_PROPERTY(int radius READ radius WRITE setRadius)
+    Q_PROPERTY(int hitPoints READ hitPoints WRITE setHitPoints)
+
+public:
+    struct Data
+    {
+        QString SoundExpl, SoundShot;
+        QString weaponAnim;
+        QString typeWeapon;
+        int radius;
+        int hitPoints;
+    };
+
+    QString SoundExpl() const;
+    QString SoundShot() const;
+    QString weaponAnim() const;
+    QString typeWeapon() const;
+    int radius() const;
+    int hitPoints() const;
+
+    void setSoundExpl(const QString &);
+    void setSoundShot(const QString &);
+    void setWeaponAnim(const QString &);
+    void setTypeWeapon(const QString &);
+    void setRadius(int);
+    void setHitPoints(int);
+};
+
+bool operator==(const WeaponStyle &one, const WeaponStyle &another);
+
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle &style);
+QDataStream &operator>>(QDataStream &stream, WeaponStyle &style);
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data);
+
+class OPENSR_WORLD_API Weapon: public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -37,8 +83,13 @@ public:
 
     quint32 typeId() const override;
     QString namePrefix() const override;
+private:
+    WeaponStyle style;
 };
-} // namespace World
-} // namespace OpenSR
+}
+}
+
+Q_DECLARE_METATYPE(OpenSR::World::WeaponStyle::Data)
+Q_DECLARE_METATYPE(OpenSR::World::WeaponStyle)
 
 #endif // OPENSR_WORLD_WEAPON_H

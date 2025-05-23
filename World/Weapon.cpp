@@ -17,15 +17,121 @@
 */
 
 #include "Weapon.h"
-
+#include "ResourceManager.h"
 #include <QtQml>
 
 namespace OpenSR
 {
 namespace World
 {
-template <> void WorldObject::registerType<Weapon>(QQmlEngine *qml, QJSEngine *script)
+
+QString WeaponStyle::SoundExpl() const
 {
+    return getData<Data>().SoundExpl;
+}
+QString WeaponStyle::SoundShot() const
+{
+    return getData<Data>().SoundShot;
+}
+QString WeaponStyle::weaponAnim() const
+{
+    return getData<Data>().weaponAnim;
+}
+QString WeaponStyle::typeWeapon() const
+{
+    return getData<Data>().typeWeapon;
+}
+int WeaponStyle::radius() const
+{
+    return getData<Data>().radius;
+}
+int WeaponStyle::hitPoints() const
+{
+    return getData<Data>().hitPoints;
+}
+
+void WeaponStyle::setSoundExpl(const QString & c)
+{
+    auto d = getData<Data>();
+    d.SoundExpl = c;
+    setData(d);
+}
+void WeaponStyle::setSoundShot(const QString & c)
+{
+    auto d = getData<Data>();
+    d.SoundShot = c;
+    setData(d);
+}
+void WeaponStyle::setWeaponAnim(const QString & c)
+{
+    auto d = getData<Data>();
+    d.weaponAnim = c;
+    setData(d);
+}
+void WeaponStyle::setTypeWeapon(const QString & c)
+{
+    auto d = getData<Data>();
+    d.typeWeapon = c;
+    setData(d);
+}
+void WeaponStyle::setRadius(int c)
+{
+    auto d = getData<Data>();
+    d.radius = c;
+    setData(d);
+}
+void WeaponStyle::setHitPoints(int c)
+{
+    auto d = getData<Data>();
+    d.hitPoints = c;
+    setData(d);
+}
+
+bool operator==(const WeaponStyle &one, const WeaponStyle &another)
+{
+    return (one.SoundExpl() == another.SoundExpl()) &&
+            (one.SoundShot() == another.SoundShot()) &&
+            (one.weaponAnim() == another.weaponAnim()) &&
+            (one.typeWeapon() == another.typeWeapon()) &&
+            (one.radius() == another.radius()) &&
+            (one.hitPoints() == another.hitPoints());
+}
+
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle &style)
+{
+    return stream << style.id();
+}
+
+QDataStream &operator>>(QDataStream &stream, WeaponStyle &style)
+{
+    quint32 id;
+    stream >> id;
+    ResourceManager *m = ResourceManager::instance();
+    Q_ASSERT(m != 0);
+    Resource::replaceData(style, m->getResource(id));
+    return stream;
+}
+
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle::Data &data)
+{
+    return stream << data.SoundExpl << data.SoundShot << data.weaponAnim << data.typeWeapon << data.radius << data.hitPoints;
+}
+
+QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data)
+{
+    return stream >> data.SoundExpl >> data.SoundShot >> data.weaponAnim >> data.typeWeapon >> data.radius >> data.hitPoints;
+}
+
+
+const quint32 Weapon::m_staticTypeId = typeIdFromClassName(Weapon::staticMetaObject.className());
+
+template<>
+void WorldObject::registerType<Weapon>(QQmlEngine *qml, QJSEngine *script)
+{
+    qRegisterMetaType<WeaponStyle>();
+    qRegisterMetaTypeStreamOperators<WeaponStyle>();
+    qRegisterMetaType<WeaponStyle::Data>();
+    qRegisterMetaTypeStreamOperators<WeaponStyle::Data>();
     qmlRegisterType<Weapon>("OpenSR.World", 1, 0, "Weapon");
 }
 
