@@ -13,7 +13,6 @@ Item {
 
     property var trajectoryView
 
-    property SpaceObjectItem playerShipItem
     property list<SpaceObjectItem> clickables
     property var object 
 
@@ -116,11 +115,6 @@ Item {
             o = component.createObject(spaceNode, {
                 object: system.children[c]
             });
-
-            if(system.children[c] == WorldManager.context.playerShip){
-                playerShipItem = o;
-                console.log("Player ship item initialized:", playerShipItem);
-            }
             
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
@@ -388,7 +382,7 @@ Item {
         anchors.left: parent.left
         text: "Get Gun"
         onClicked: {
-            console.log("Getting gun");
+            context.isChoosingToShoot = !context.isChoosingToShoot;
         }
     }
 

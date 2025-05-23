@@ -194,6 +194,7 @@ WorldObject* WorldContext::objectToShoot() const
 
 void WorldContext::setObjectToShoot(WorldObject *obj)
 {
+    qDebug() << "setObjectToShoot(WorldObject *obj)";
     if(m_objectToShoot == obj) 
         return;
     m_objectToShoot = obj;
@@ -202,7 +203,6 @@ void WorldContext::setObjectToShoot(WorldObject *obj)
 
 void WorldContext::prepareToShoot(WorldObject* obj)
 {
-    qDebug() << "Asteroid::prepareToShoot(obj)";
     if(obj)
         setObjectToShoot(obj);
 }
@@ -211,6 +211,20 @@ void WorldContext::damageObject()
 {
     if(auto* allowedChild = qobject_cast<Asteroid*>(objectToShoot()))
         allowedChild->damageObject();
+    setObjectToShoot(nullptr);
+
+}
+
+bool WorldContext::isChoosingToShoot() const
+{
+    return m_isChoosingToShoot;
+}
+
+void WorldContext::setIsChoosingToShoot(bool isChoosingToShoot)
+{
+    if(m_isChoosingToShoot == isChoosingToShoot) return;
+    m_isChoosingToShoot = isChoosingToShoot;
+    emit isChoosingToShootChanged(isChoosingToShoot);
 }
 
 }
