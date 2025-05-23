@@ -17,7 +17,6 @@
 */
 
 #include "Weapon.h"
-#include "ResourceManager.h"
 #include <QtQml>
 
 namespace OpenSR

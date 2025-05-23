@@ -86,6 +86,7 @@ public:
     QString namePrefix() const override;
 private:
     WeaponStyle style;
+
 };
 }
 }
