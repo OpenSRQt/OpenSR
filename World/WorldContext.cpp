@@ -202,7 +202,6 @@ void WorldContext::setObjectToShoot(WorldObject *obj)
 
 void WorldContext::prepareToShoot(WorldObject* obj)
 {
-    qDebug() << "Asteroid::prepareToShoot(obj)";
     if(obj)
         setObjectToShoot(obj);
 }

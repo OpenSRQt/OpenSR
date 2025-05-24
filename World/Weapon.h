@@ -85,8 +85,6 @@ public:
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
 
-    friend QDataStream &operator<<(QDataStream &out, const OpenSR::World::Weapon* container);
-    friend QDataStream &operator>>(QDataStream &in, OpenSR::World::Weapon* &container);
 private:
     WeaponStyle style;
 };

@@ -393,6 +393,9 @@ Item {
             id: getGun0
             text: "Get Gun 0"
             onClicked: {
+                if (!WorldManager.turnFinished) {
+                    return;
+                }
                 context.isChoosingToShoot = context.setActiveWeapon(0);
             }
         }
@@ -401,6 +404,9 @@ Item {
             id: getGun1
             text: "Get Gun 1"
             onClicked: {
+                if (!WorldManager.turnFinished) {
+                    return;
+                }
                 context.isChoosingToShoot = context.setActiveWeapon(1);
             }
         }
