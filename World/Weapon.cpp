@@ -25,13 +25,13 @@ namespace OpenSR
 namespace World
 {
 
-QString WeaponStyle::SoundExpl() const
+QString WeaponStyle::SoundPath() const
 {
-    return getData<Data>().SoundExpl;
+    return getData<Data>().SoundPath;
 }
-QString WeaponStyle::SoundShot() const
+QString WeaponStyle::preview() const
 {
-    return getData<Data>().SoundShot;
+    return getData<Data>().preview;
 }
 QString WeaponStyle::weaponAnim() const
 {
@@ -50,16 +50,16 @@ int WeaponStyle::hitPoints() const
     return getData<Data>().hitPoints;
 }
 
-void WeaponStyle::setSoundExpl(const QString & c)
+void WeaponStyle::setSoundPath(const QString & c)
 {
     auto d = getData<Data>();
-    d.SoundExpl = c;
+    d.SoundPath = c;
     setData(d);
 }
-void WeaponStyle::setSoundShot(const QString & c)
+void WeaponStyle::setPreview(const QString & c)
 {
     auto d = getData<Data>();
-    d.SoundShot = c;
+    d.preview = c;
     setData(d);
 }
 void WeaponStyle::setWeaponAnim(const QString & c)
@@ -89,8 +89,8 @@ void WeaponStyle::setHitPoints(int c)
 
 bool operator==(const WeaponStyle &one, const WeaponStyle &another)
 {
-    return (one.SoundExpl() == another.SoundExpl()) &&
-            (one.SoundShot() == another.SoundShot()) &&
+    return (one.SoundPath() == another.SoundPath()) &&
+            (one.preview() == another.preview()) &&
             (one.weaponAnim() == another.weaponAnim()) &&
             (one.typeWeapon() == another.typeWeapon()) &&
             (one.radius() == another.radius()) &&
@@ -114,12 +114,12 @@ QDataStream &operator>>(QDataStream &stream, WeaponStyle &style)
 
 QDataStream &operator<<(QDataStream &stream, const WeaponStyle::Data &data)
 {
-    return stream << data.SoundExpl << data.SoundShot << data.weaponAnim << data.typeWeapon << data.radius << data.hitPoints;
+    return stream << data.SoundPath << data.preview << data.weaponAnim << data.typeWeapon << data.radius << data.hitPoints;
 }
 
 QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data)
 {
-    return stream >> data.SoundExpl >> data.SoundShot >> data.weaponAnim >> data.typeWeapon >> data.radius >> data.hitPoints;
+    return stream >> data.SoundPath >> data.preview >> data.weaponAnim >> data.typeWeapon >> data.radius >> data.hitPoints;
 }
 
 
