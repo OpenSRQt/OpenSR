@@ -270,6 +270,7 @@ void WorldManager::startTurn()
         connect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
     m_context->setIsChoosingToShoot(false);
+    m_context->setActiveWeapon(-1);
     m_context->startTurn();
     if(m_context->objectToShoot()) m_context->damageObject();
 

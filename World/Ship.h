@@ -22,7 +22,8 @@
 #include <Container.h>
 
 #include "MannedObject.h"
-#include "Resource.h"
+#include "WorldObject.h"
+#include "ResourceManager.h"
 #include "World.h"
 #include <QPoint>
 
@@ -69,6 +70,7 @@ class OPENSR_WORLD_API Ship : public MannedObject
     Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
     Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
     Q_PROPERTY(int structure READ structure WRITE setStructure NOTIFY structureChanged)
+    Q_PROPERTY(Weapon* activeWeapon READ activeWeapon WRITE setActiveWeapon STORED false NOTIFY activeWeaponChanged)
 
 public:
     enum class ShipAffiliation
@@ -112,6 +114,7 @@ public:
     QPointF destination() const;
     bool isMoving() const;
     int structure() const;
+    Weapon* activeWeapon() const;
 
     Q_INVOKABLE void exitThePlace();
     void setAffiliation(ShipAffiliation affiliation);
@@ -122,6 +125,7 @@ public:
     void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
     void setStructure(int structure);
+    void setActiveWeapon(Weapon* weapon);
 
     static const float normalLinearSpeed;
     static const float normalAngularSpeed;
@@ -146,6 +150,7 @@ signals:
 
     void enterPlace();
     void exitPlace();
+    void activeWeaponChanged(Weapon*);
 
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
@@ -159,6 +164,7 @@ private:
 
     ShipAffiliation m_affiliation{};
     ShipRank m_rank{};
+    Weapon* m_activeWeapon{};
 
     float m_angle{};
     float m_speed{};

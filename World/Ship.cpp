@@ -435,5 +435,18 @@ void Ship::setStructure(int structure)
     emit structureChanged(structure);
 }
 
+Weapon* Ship::activeWeapon() const
+{
+    return m_activeWeapon;
+}
+
+void Ship::setActiveWeapon(Weapon* weapon)
+{
+    if(weapon == m_activeWeapon) return;
+    m_activeWeapon = weapon;
+    emit activeWeaponChanged(weapon);
+}
+
+
 } // namespace World
 } // namespace OpenSR

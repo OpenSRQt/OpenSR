@@ -167,5 +167,5 @@ QString Weapon::namePrefix() const
 {
     return tr("Weapon");
 }
-} // namespace World
-} // namespace OpenSR
+}
+}

@@ -389,6 +389,28 @@ Item {
         }
     }
 
+    Column {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        spacing: 5
+
+        Button {
+            id: getGun0
+            text: "Get Gun 0"
+            onClicked: {
+                context.isChoosingToShoot = context.setActiveWeapon(0);
+            }
+        }
+
+        Button {
+            id: getGun1
+            text: "Get Gun 1"
+            onClicked: {
+                context.isChoosingToShoot = context.setActiveWeapon(1);
+            }
+        }
+    }
+
     Button {
         id: turnButton
         anchors.bottom: parent.bottom

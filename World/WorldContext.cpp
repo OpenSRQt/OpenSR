@@ -17,8 +17,6 @@
 */
 
 #include "WorldContext.h"
-#include "Asteroid.h"
-#include "Asteroid.h"
 #include "Ship.h"
 #include "WorldObject.h"
 #include <QDataStream>
@@ -241,6 +239,30 @@ void WorldContext::setIsChoosingToShoot(bool isChoosingToShoot)
     m_isChoosingToShoot = isChoosingToShoot;
     emit isChoosingToShootChanged(isChoosingToShoot);
 }
+
+bool WorldContext::setActiveWeapon(int pos) const
+{
+    if(!playerShip()) return false;
+    auto weapon = m_container->getWeaponByPos(pos);
+    auto ship = qobject_cast<Ship*>(playerShip());
+    if(m_container && ship && weapon && (weapon != ship->activeWeapon()))
+    {
+        ship->setActiveWeapon(weapon);
+        return true;
+    }
+    ship->setActiveWeapon(nullptr);
+    return false;
+}
+
+Container* WorldContext::container() const {
+    return m_container;
+}
+
+void WorldContext::setContainer(Container* i) {
+    if(i == m_container) return;
+    m_container = i;
+}
+
 
 WorldObject* WorldContext::objectToShoot() const
 {
