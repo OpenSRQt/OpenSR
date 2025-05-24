@@ -21,6 +21,8 @@
 
 #include "World.h"
 #include "SpaceObject.h"
+#include "Weapon.h"
+#include "Item.h"
 
 namespace OpenSR
 {
@@ -37,6 +39,21 @@ public:
 
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
+
+    Q_INVOKABLE void addWeapon(Weapon* weapon, int pos);
+    Q_INVOKABLE void addResources(Item* item);
+    Q_INVOKABLE void removeWeapon(int pos);
+    Q_INVOKABLE void removeResources(Item* item);
+    Q_INVOKABLE Weapon* getWeaponByPos(int pos) const;
+    Q_INVOKABLE QMap<Item*,int> getResources() const;
+    Q_INVOKABLE int getResources(Item* item) const;
+
+private:
+    int weight = 0;
+    int maxWeight = 1000;
+    QMap<int,Weapon*> weapons;
+    QMap<Item*,int> resources;
+
 };
 }
 }
