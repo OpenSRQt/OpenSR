@@ -12,8 +12,6 @@ Item {
     property int maxScrollTime: 600
 
     property var trajectoryView
-
-    property list<SpaceObjectItem> clickables
     property var object
 
     anchors.fill: parent

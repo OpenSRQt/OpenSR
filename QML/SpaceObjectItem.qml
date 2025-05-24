@@ -29,9 +29,8 @@ Item {
                 item.source = object.style.star;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
                 item.source = object.style.texture;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
+            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet") {
                 isDestructible = true;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
                 item.planet = object;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
                 item.source = object.style.texture;
