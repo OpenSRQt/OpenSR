@@ -170,5 +170,16 @@ QString Weapon::namePrefix() const
 {
     return tr("Weapon");
 }
+
+QDataStream &operator<<(QDataStream &out, const OpenSR::World::Weapon* weapon) {
+    out << weapon->style;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, OpenSR::World::Weapon* &weapon) {
+    in >> weapon->style;
+    return in;
+}
+
 }
 }

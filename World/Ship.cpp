@@ -361,8 +361,6 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
     }
     Planet *planet = qobject_cast<Planet *>(planetToEnter);
     int planetRadius = planet->radius();
-    QPointF planetCenter = planet->position();
-    QPointF shipPosition = position();
 
     if (checkProximity(planet->position(), planetToEnter, planetRadius) && !m_isNearPlanet)
     {
@@ -399,6 +397,19 @@ void Ship::setStructure(int structure)
     structure = m_structure;
     emit structureChanged(structure);
 }
+
+Weapon* Ship::activeWeapon() const
+{
+    return m_activeWeapon;
+}
+
+void Ship::setActiveWeapon(Weapon* weapon)
+{
+    if(weapon == m_activeWeapon) return;
+    m_activeWeapon = weapon;
+    emit activeWeaponChanged(weapon);
+}
+
 
 } // namespace World
 } // namespace OpenSR

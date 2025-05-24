@@ -19,6 +19,8 @@ Item {
     y: positioning && object ? object.position.y : 0
     rotation: positioning && object ? radToDeg(shipAngle) : 0
 
+    property int weaponRadius: 0
+
     Loader {
         id: objectLoader
         anchors.centerIn: parent
@@ -36,6 +38,7 @@ Item {
                 item.source = object.style.texture;
                 item.height = item.width = object.style.width;
                 item.ship = object;
+                weaponRadius = object.activeWeapon ? object.activeWeapon.style.radius : 100
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::SpaceStation") {
                 item.source = object.style.texture;
             }
@@ -59,7 +62,7 @@ Item {
         if(!context.playerShip.checkProximity(
             object.position,
             object,
-            200)
+            context.playerShip.activeWeapon ? context.playerShip.activeWeapon.style.radius : 100)
         ) {
             context.objectToShoot = null;
             return;
@@ -121,8 +124,10 @@ Item {
             cache: false
             property Ship ship
             property bool targetingCircleVisible: context.isChoosingToShoot
+            property int weaponRadius: object.activeWeapon ? object.activeWeapon.style.radius : 100
             opacity: 1
             scale: 1
+
             Behavior on opacity {
                 NumberAnimation {
                     duration: 500
@@ -135,8 +140,8 @@ Item {
             Canvas {
                 id: targetingCircle
                 anchors.centerIn: parent
-                width: 400
-                height: 400
+                width: weaponRadius * 2
+                height: weaponRadius * 2
                 visible: targetingCircleVisible
                 property real padding: 2
 
@@ -165,7 +170,6 @@ Item {
                 }
 
                 onWidthChanged: requestPaint()
-                onHeightChanged: requestPaint()
                 onVisibleChanged: requestPaint()
 
                 renderTarget: Canvas.Image

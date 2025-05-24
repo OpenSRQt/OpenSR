@@ -1,5 +1,20 @@
 var context = World.context;
 
+function weapon(SoundPath, preview, weaponAnim, typeWeapon, radius, hitPoints) {
+    var style = World.WeaponStyle();
+
+    style.SoundPath = SoundPath;
+    style.preview = preview;
+    style.weaponAnim = weaponAnim;
+    style.typeWeapon = typeWeapon;
+    style.radius = radius;
+    style.hitPoints = hitPoints;
+
+    var weapon = World.Weapon(context);
+    weapon.style = style;
+
+    return weapon
+}
 function genRace(idName, name, icon, color, sound) {
     var style = World.RaceStyle();
 
@@ -131,7 +146,6 @@ planet.period = 15;
 planet.angle = 3.1415 / 4;
 planet.position = Qt.point(355, 222);
 
-
 function initStation(obj, kind) {
     switch (kind) {
     case "ranger":
@@ -171,18 +185,25 @@ function shipStyleByAffiliation(ship) {
     var info = Engine.datValue("Data.SE.Ship." + raceStr + "." + rankStr);
     var style = World.ShipStyle();
     style.texture = "dat:/" + info.Image; // animated
-    return style;
+    return style
 }
 
 var ship1 = World.Ship(context);
+var container = World.Container(context);
+var weapon1 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/10/ABMap.map_10", "SWeapon/GAI/Bm.Weapon.W02", "energy", 200, 12);
+var weapon2 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/1/ABMap.map_1", "SWeapon/GAI/Bm.Weapon.W02", "fragment", 300, 20);
+container.addWeapon(weapon1, 0);
+container.addWeapon(weapon2, 1);
 
 ship1.position    = Qt.point(-300, -300);
 ship1.affiliation = World.ShipAffiliation.People;
 ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
 ship1.angle       = 0;
+ship1.activeWeapon = null;
 
 ship1.style.width = 64;
+context.container = container;
 context.playerShip = ship1;
 context.objectToShoot = null;
 context.planetToEnter = null;

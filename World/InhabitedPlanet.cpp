@@ -193,12 +193,6 @@ void InhabitedPlanet::setStyle(const InhabitedPlanetStyle &style)
     emit styleChanged();
 }
 
-void InhabitedPlanet::prepareSave()
-{
-    WorldObject::prepareSave();
-    m_style.registerResource();
-}
-
 int InhabitedPlanet::radius() {
     return style().radius();
 }

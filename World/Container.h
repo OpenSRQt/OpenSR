@@ -20,6 +20,7 @@
 #define OPENSR_WORLD_CONTAINER_H
 
 #include "World.h"
+#include "WorldObject.h"
 #include "SpaceObject.h"
 #include "Weapon.h"
 #include "Item.h"
@@ -48,6 +49,9 @@ public:
     Q_INVOKABLE QMap<Item*,int> getResources() const;
     Q_INVOKABLE int getResources(Item* item) const;
 
+
+    friend QDataStream &operator<<(QDataStream &out, const OpenSR::World::Container* container);
+    friend QDataStream &operator>>(QDataStream &in, OpenSR::World::Container* &container);
 private:
     int weight = 0;
     int maxWeight = 1000;
