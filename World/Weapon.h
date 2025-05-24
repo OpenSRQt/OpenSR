@@ -33,8 +33,8 @@ class OPENSR_WORLD_API WeaponStyle : public Resource
 {
     Q_GADGET
 
-    Q_PROPERTY(QString SoundExpl READ SoundExpl WRITE setSoundExpl)
-    Q_PROPERTY(QString SoundShot READ SoundShot WRITE setSoundShot)
+    Q_PROPERTY(QString SoundPath READ SoundPath WRITE setSoundPath)
+    Q_PROPERTY(QString preview READ preview WRITE setPreview)
     Q_PROPERTY(QString weaponAnim READ weaponAnim WRITE setWeaponAnim)
     Q_PROPERTY(QString typeWeapon READ typeWeapon WRITE setTypeWeapon)
     Q_PROPERTY(int radius READ radius WRITE setRadius)
@@ -43,22 +43,23 @@ class OPENSR_WORLD_API WeaponStyle : public Resource
 public:
     struct Data
     {
-        QString SoundExpl, SoundShot;
+        QString SoundPath;
+        QString preview;
         QString weaponAnim;
         QString typeWeapon;
         int radius;
         int hitPoints;
     };
 
-    QString SoundExpl() const;
-    QString SoundShot() const;
+    QString SoundPath() const;
+    QString preview() const;
     QString weaponAnim() const;
     QString typeWeapon() const;
     int radius() const;
     int hitPoints() const;
 
-    void setSoundExpl(const QString &);
-    void setSoundShot(const QString &);
+    void setSoundPath(const QString &);
+    void setPreview(const QString &);
     void setWeaponAnim(const QString &);
     void setTypeWeapon(const QString &);
     void setRadius(int);
