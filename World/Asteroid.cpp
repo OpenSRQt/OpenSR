@@ -349,14 +349,14 @@ void Asteroid::finishTurn()
     SpaceObject::finishTurn();
 }
 
-void Asteroid::damageObject() {
-    qDebug() << "Asteroid::damageObject()";
+void Asteroid::damageObject()
+{
     destroyObject();
     emit asteroidDamaged();
 }
 
-void Asteroid::destroyObject() {
-    qDebug() << "Asteroid::destroyObject()";
+void Asteroid::destroyObject()
+{
     emit asteroidDestroyed();
 }
 

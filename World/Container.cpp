@@ -76,7 +76,6 @@ void Container::addResources(Item* item)
 Weapon* Container::getWeaponByPos(int pos) const
 {
     if (pos < 0 || pos >= weapons.size()) {
-        qWarning() << "Invalid weapon position:" << pos;
         return nullptr;
     }
     return weapons.value(pos);
@@ -99,29 +98,6 @@ void Container::removeWeapon(int pos)
 
 void Container::removeResources(Item* item) {
     resources[item]--;
-}
-
-
-QDataStream &operator<<(QDataStream &out, const OpenSR::World::Container* container) {
-    out << container->weight << container->maxWeight;
-    for(auto& e : container->weapons) {
-        out << e;
-    }
-    for(auto& e : container->resources) {
-        out << e;
-    }
-    return out;
-}
-
-QDataStream &operator>>(QDataStream &in, OpenSR::World::Container* &container) {
-    in >> container->weight >> container->maxWeight;
-    for(auto& e : container->weapons) {
-        in >> e;
-    }
-    for(auto& e : container->resources) {
-        in >> e;
-    }
-    return in;
 }
 
 }
