@@ -423,5 +423,17 @@ bool Ship::checkPlannedActions() const
     return m_actionsPlanned;
 }
 
+int Ship::structure() const
+{
+    return m_structure;
+}
+
+void Ship::setStructure(int structure)
+{
+    if(structure == m_structure) return;
+    structure = m_structure;
+    emit structureChanged(structure);
+}
+
 } // namespace World
 } // namespace OpenSR

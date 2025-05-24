@@ -19,6 +19,8 @@
 #ifndef OPENSR_WORLD_SHIP_H
 #define OPENSR_WORLD_SHIP_H
 
+#include <Container.h>
+
 #include "MannedObject.h"
 #include "Resource.h"
 #include "World.h"
@@ -66,6 +68,7 @@ class OPENSR_WORLD_API Ship : public MannedObject
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
     Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
     Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+    Q_PROPERTY(int structure READ structure WRITE setStructure NOTIFY structureChanged)
 
 public:
     enum class ShipAffiliation
@@ -108,6 +111,7 @@ public:
     float speed() const;
     QPointF destination() const;
     bool isMoving() const;
+    int structure() const;
 
     Q_INVOKABLE void exitThePlace();
     void setAffiliation(ShipAffiliation affiliation);
@@ -117,6 +121,7 @@ public:
     Q_INVOKABLE bool checkProximity(QPointF center, WorldObject *obj, int radius);
     void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
+    void setStructure(int structure);
 
     static const float normalLinearSpeed;
     static const float normalAngularSpeed;
@@ -131,6 +136,7 @@ public:
 signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
+    void structureChanged(int);
     void timeChanged();
     void speedChanged();
     void destinationChanged();
@@ -160,6 +166,8 @@ private:
     float m_targetAngle{};
     QPointF m_destination{};
     QPointF m_start_position{};
+
+    int m_structure;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;

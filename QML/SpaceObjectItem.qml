@@ -209,7 +209,6 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                propagateComposedEvents: true
                 onEntered: asteroidImage.isHighlighted = true
                 onExited: asteroidImage.isHighlighted = false
                 onClicked: {
