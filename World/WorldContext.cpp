@@ -217,6 +217,8 @@ void WorldContext::prepareToShoot(WorldObject* obj)
 {
     if(obj)
         setObjectToShoot(obj);
+    if(playerShip())
+        qobject_cast<Ship*>(playerShip())->setActiveWeapon(nullptr);
 }
 
 
@@ -225,7 +227,6 @@ void WorldContext::damageObject()
     if(auto* allowedChild = qobject_cast<Asteroid*>(objectToShoot()))
         allowedChild->damageObject();
     setObjectToShoot(nullptr);
-
 }
 
 bool WorldContext::isChoosingToShoot() const

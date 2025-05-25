@@ -127,6 +127,7 @@ Item {
             property int weaponRadius: object.activeWeapon ? object.activeWeapon.style.radius : 100
             opacity: 1
             scale: 1
+            z: 3
 
             Behavior on opacity {
                 NumberAnimation {
@@ -217,6 +218,7 @@ Item {
                 onExited: asteroidImage.isHighlighted = false
                 onClicked: {
                     if(context.isChoosingToShoot) destroyComponent();
+                    mouse.accepted = true;
                 }
             }
             Connections {

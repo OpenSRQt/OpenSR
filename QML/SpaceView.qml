@@ -31,6 +31,7 @@ Item {
             context.playerShip.prepareToMove(positionInSpaceNode);
             showTrajectory(context.playerShip);
             WorldManager.startTurn();
+            if(context.objectToShoot) fireProjectile(context.objectToShoot);
             hideTrajectory(context.playerShip);
         }
 
@@ -132,6 +133,24 @@ Item {
             object: null,
             visible: false
         });
+    }
+
+    Projectile {
+        id: factory
+        anchors.fill: parent
+    }
+
+    function fireProjectile(object) {
+        if(object) {
+            let startX = context.playerShip.position.x;
+            let startY = context.playerShip.position.y;
+
+            var projectile = factory.createProjectile(
+                startX,
+                startY,
+                object
+            )
+        }
     }
 
     DebugTooltip {
@@ -427,6 +446,7 @@ Item {
                 return;
             }
             WorldManager.startTurn();
+            if(context.objectToShoot) fireProjectile(context.objectToShoot);
             hideTrajectory(context.playerShip);
         }
     }
