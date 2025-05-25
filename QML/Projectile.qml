@@ -49,7 +49,6 @@ Item {
                     var distance = Math.sqrt(dx*dx + dy*dy);
 
                     if (distance < 10) {
-                        console.log("Collision!");
                         context.damageObject();
                         destroyProjectile();
                         return;
