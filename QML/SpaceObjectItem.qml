@@ -8,8 +8,6 @@ Item {
     property bool positioning: false
     property int mouseDelta: 0
 
-    property bool isDestructible: false;
-
     property real shipAngle: object && object.hasOwnProperty("angle") ? object.angle : 0
 
     signal entered(WorldObject obj)
@@ -32,7 +30,6 @@ Item {
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
                 item.source = object.style.texture;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet") {
-                isDestructible = true;
                 item.planet = object;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
                 item.source = object.style.texture;
@@ -117,7 +114,44 @@ Item {
     }
 
     Component {
-        id: shipComponent
+        id: npcShipComponent
+
+        AnimatedImage {
+            id: npcShipImage;
+            cache: false
+            property Ship ship
+            property int weaponRadius: object.activeWeapon ? object.activeWeapon.style.radius : 100
+            property bool isHighlighted: false
+
+            Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border {
+                    width: 2
+                    color: "blue"
+                }
+                visible: parent.isHighlighted
+            }
+            MouseArea {
+                propagateComposedEvents: true
+                anchors.fill: parent
+                onEntered: npcShipImage.isHighlighted = true
+                onExited: npcShipImage.isHighlighted = false
+                onClicked: {
+                    if(context.isChoosingToShoot) destroyComponent();
+                }
+            }
+            Connections {
+                target: object
+                function onShipDestroyed() {
+                    self.destroy();
+                }
+            }
+        }
+    }
+
+    Component {
+        id: playerShipComponent
 
         AnimatedImage {
             id: shipImage;
@@ -189,9 +223,6 @@ Item {
                     shipImage.scale = 1;
                 }
             }
-            Connections {
-                target: context
-            }
         }
 
     }
@@ -202,15 +233,22 @@ Item {
             id: asteroidImage;
             property bool isHighlighted: false
             cache: false
-
-            MouseArea {
+            Rectangle {
                 anchors.fill: parent
-                hoverEnabled: true
+                color: "transparent"
+                border {
+                    width: 2
+                    color: "blue"
+                }
+                visible: parent.isHighlighted
+            }
+            MouseArea {
+                propagateComposedEvents: true
+                anchors.fill: parent
                 onEntered: asteroidImage.isHighlighted = true
                 onExited: asteroidImage.isHighlighted = false
                 onClicked: {
                     if(context.isChoosingToShoot) destroyComponent();
-                    mouse.accepted = true;
                 }
             }
             Connections {
@@ -245,7 +283,7 @@ Item {
             objectLoader.sourceComponent = defaultComponent;
             positioning = true;
         } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
-            objectLoader.sourceComponent = shipComponent;
+            objectLoader.sourceComponent = object == context.playerShip ? playerShipComponent : npcShipComponent;
             positioning = true;
         }
     }

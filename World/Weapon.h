@@ -77,7 +77,7 @@ class OPENSR_WORLD_API Weapon: public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
-
+    Q_PROPERTY(OpenSR::World::WeaponStyle style READ style WRITE setStyle NOTIFY styleChanged)
 public:
     Q_INVOKABLE Weapon(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Weapon();
@@ -85,8 +85,16 @@ public:
     virtual quint32 typeId() const;
     virtual QString namePrefix() const;
 
+    int hitPoints() const;
+
+    WeaponStyle style() const;
+    void setStyle(const WeaponStyle& style);
+
+signals:
+    void styleChanged(const WeaponStyle& style);
+
 private:
-    WeaponStyle style;
+    WeaponStyle m_style;
 };
 }
 }
