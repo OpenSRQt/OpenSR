@@ -202,15 +202,7 @@ Item {
             id: asteroidImage;
             property bool isHighlighted: false
             cache: false
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border {
-                    width: 2
-                    color: "blue"
-                }
-                visible: parent.isHighlighted
-            }
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
