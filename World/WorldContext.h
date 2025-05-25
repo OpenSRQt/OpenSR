@@ -86,7 +86,7 @@ public:
     Container* container() const;
     void setContainer(Container* i);
     Q_INVOKABLE bool setActiveWeapon(int pos) const;
-
+    void resetActiveWeapon() const;
 public slots:
     void onShipArrived();
 
@@ -102,6 +102,7 @@ signals:
     void enteringPlanet();
     void objectToShootChanged(WorldObject*);
     void isChoosingToShootChanged(bool isChoosingToShoot);
+
 private:
     PlanetarySystem *m_currentSystem{};
     ResourceManager *m_resources{};

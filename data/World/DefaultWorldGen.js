@@ -12,7 +12,6 @@ function weapon(SoundPath, preview, weaponAnim, typeWeapon, radius, hitPoints) {
 
     var weapon = World.Weapon(context);
     weapon.style = style;
-
     return weapon
 }
 function genRace(idName, name, icon, color, sound) {
@@ -188,21 +187,32 @@ function shipStyleByAffiliation(ship) {
     return style
 }
 
-var ship1 = World.Ship(context);
 var container = World.Container(context);
-var weapon1 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/10/ABMap.map_10", "SWeapon/GAI/Bm.Weapon.W02", "energy", 200, 12);
-var weapon2 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/1/ABMap.map_1", "SWeapon/GAI/Bm.Weapon.W02", "fragment", 300, 20);
+var weapon1 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/10/ABMap.map_10", "Weapon/GAI/Bm.Weapon.W02", "energy", 200, 12);
+var weapon2 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/1/ABMap.map_1", "Weapon/GAI/Bm.Weapon.W02", "fragment", 300, 20);
 container.addWeapon(weapon1, 0);
 container.addWeapon(weapon2, 1);
 
+var ship1 = World.Ship(context);
 ship1.position    = Qt.point(-300, -300);
 ship1.affiliation = World.ShipAffiliation.People;
 ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
 ship1.angle       = 0;
+ship1.structure   = 400;
 ship1.activeWeapon = null;
-
 ship1.style.width = 64;
+
+var ship2 = World.Ship(system);
+ship2.affiliation = World.ShipAffiliation.Fei;
+ship2.rank        = World.ShipRank.Pirate;
+ship2.style       = shipStyleByAffiliation(ship2);
+ship2.angle       = 0;
+ship2.structure   = 30;
+ship2.activeWeapon = null;
+ship2.style.width = 64;
+ship2.position    = Qt.point(-300, 300);
+
 context.container = container;
 context.playerShip = ship1;
 context.objectToShoot = null;

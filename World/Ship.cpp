@@ -431,7 +431,7 @@ int Ship::structure() const
 void Ship::setStructure(int structure)
 {
     if(structure == m_structure) return;
-    structure = m_structure;
+    m_structure = structure;
     emit structureChanged(structure);
 }
 
@@ -445,6 +445,18 @@ void Ship::setActiveWeapon(Weapon* weapon)
     if(weapon == m_activeWeapon) return;
     m_activeWeapon = weapon;
     emit activeWeaponChanged(weapon);
+}
+
+void Ship::damageObject(int damage)
+{
+    m_structure -= damage;
+    if(m_structure <= 0) destroyObject();
+    emit shipDamaged(damage);
+}
+
+void Ship::destroyObject()
+{
+    emit shipDestroyed();
 }
 
 

@@ -217,15 +217,23 @@ void WorldContext::prepareToShoot(WorldObject* obj)
 {
     if(obj)
         setObjectToShoot(obj);
-    if(playerShip())
-        qobject_cast<Ship*>(playerShip())->setActiveWeapon(nullptr);
 }
 
 
 void WorldContext::damageObject() 
 {
+    if(!playerShip()) return;
+    auto ship = qobject_cast<Ship*>(playerShip());
+    if(!ship) return;
+    auto weapon = ship->activeWeapon();
+    if(!weapon) return;
     if(auto* allowedChild = qobject_cast<Asteroid*>(objectToShoot()))
-        allowedChild->damageObject();
+    {
+        allowedChild->damageObject(weapon->hitPoints());
+    } else if (auto* allowedChild = qobject_cast<Ship*>(objectToShoot())) {
+        allowedChild->damageObject(weapon->hitPoints());
+    }
+
     setObjectToShoot(nullptr);
 }
 
@@ -243,23 +251,35 @@ void WorldContext::setIsChoosingToShoot(bool isChoosingToShoot)
 
 bool WorldContext::setActiveWeapon(int pos) const
 {
-    if(!playerShip()) return false;
+    if(!playerShip() && !m_container) return false;
     auto weapon = m_container->getWeaponByPos(pos);
     auto ship = qobject_cast<Ship*>(playerShip());
-    if(m_container && ship && weapon && (weapon != ship->activeWeapon()))
+    if(m_container && ship && weapon)
     {
+        if(ship->activeWeapon() && weapon == ship->activeWeapon()) {
+            ship->setActiveWeapon(nullptr);
+            return false;
+        }
         ship->setActiveWeapon(weapon);
         return true;
     }
-    ship->setActiveWeapon(nullptr);
     return false;
 }
 
-Container* WorldContext::container() const {
+void WorldContext::resetActiveWeapon() const
+{
+    if(!playerShip()) return;
+    auto ship = qobject_cast<Ship*>(playerShip());
+    if(ship) ship->setActiveWeapon(nullptr);
+}
+
+Container* WorldContext::container() const
+{
     return m_container;
 }
 
-void WorldContext::setContainer(Container* i) {
+void WorldContext::setContainer(Container* i)
+{
     if(i == m_container) return;
     m_container = i;
 }

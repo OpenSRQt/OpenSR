@@ -100,7 +100,7 @@ public:
     Q_INVOKABLE void damageObject();
     void destroyObject();
 
-    Q_INVOKABLE void damageObject();
+    Q_INVOKABLE void damageObject(int damage);
     void destroyObject();
 
 signals:
@@ -111,7 +111,7 @@ signals:
     void timeChanged();
     void speedChanged();
 
-    void asteroidDamaged();
+    void asteroidDamaged(int);
     void asteroidDestroyed();
 
 private:

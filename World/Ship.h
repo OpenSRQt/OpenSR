@@ -137,7 +137,10 @@ public:
     void calcTrajectory(const QPointF &destination);
     bool checkPlannedActions() const;
 
-signals:
+    Q_INVOKABLE void damageObject(int);
+    void destroyObject();
+
+   signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
     void structureChanged(int);
@@ -151,6 +154,9 @@ signals:
     void enterPlace();
     void exitPlace();
     void activeWeaponChanged(Weapon*);
+
+    void shipDamaged(int);
+    void shipDestroyed();
 
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);

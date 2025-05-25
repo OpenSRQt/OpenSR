@@ -270,7 +270,6 @@ void WorldManager::startTurn()
         connect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
     m_context->setIsChoosingToShoot(false);
-    m_context->setActiveWeapon(-1);
     m_context->startTurn();
 
     m_turnFinished = false;
@@ -292,10 +291,9 @@ void WorldManager::finishTurn()
         disconnect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
 
-    //if(m_context->objectToShoot()) m_context->damageObject();
-
     m_animation->setPrevTime(0);    m_context->finishTurn();
     m_turnFinished = true;
+    m_context->resetActiveWeapon();
 }
 
 bool WorldManager::loadWorld(const QString &path)

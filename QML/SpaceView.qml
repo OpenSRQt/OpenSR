@@ -447,6 +447,7 @@ Item {
             }
             WorldManager.startTurn();
             if(context.objectToShoot) fireProjectile(context.objectToShoot);
+            context.isChoosingToShoot = false;
             hideTrajectory(context.playerShip);
         }
     }

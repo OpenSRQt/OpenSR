@@ -167,5 +167,23 @@ QString Weapon::namePrefix() const
 {
     return tr("Weapon");
 }
+
+WeaponStyle Weapon::style() const
+{
+    return m_style;
+}
+void Weapon::setStyle(const WeaponStyle& style)
+{
+    if(m_style == style)
+        return;
+    m_style = style;
+    emit styleChanged(style);
+}
+
+int Weapon::hitPoints() const
+{
+    return style().hitPoints();
+}
+
 }
 }

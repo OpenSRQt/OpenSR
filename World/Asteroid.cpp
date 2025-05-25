@@ -349,10 +349,10 @@ void Asteroid::finishTurn()
     SpaceObject::finishTurn();
 }
 
-void Asteroid::damageObject()
+void Asteroid::damageObject(int damage)
 {
     destroyObject();
-    emit asteroidDamaged();
+    emit asteroidDamaged(damage);
 }
 
 void Asteroid::destroyObject()
