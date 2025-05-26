@@ -1,9 +1,26 @@
+BUILD ?= build
 ASSETS ?= $(shell realpath ../OpenSRData)
-DATCONVERT=build/tools/DATTools/opensr-dat-convert
-DATJSON=build/tools/DATTools/opensr-dat-json
+DATCONVERT=$(BUILD)/tools/DATTools/opensr-dat-convert
+DATJSON=$(BUILD)/tools/DATTools/opensr-dat-json
 .PHONY: data 
 
-all: data other
+all: data other _build/Engine/imageformats/libQtOpenSRImagePlugin.so libWorld.so
+
+clean:
+	@$(RM) libWorld.so 
+	@$(RM) -f $(BUILD)/tools/ResourceViewer/imageformats $(BUILD)/Engine/imageformats
+
+libWorld.so:
+▸ # To start game from command line
+▸ ln -sf $(BUILD)/World/libworld.so
+
+$(BUILD)/Engine/imageformats/libQtOpenSRImagePlugin.so:
+	mkdir -p $(BUILD)/Engine/imageformats
+	(cd $(BUILD)/Engine/imageformats && ln -s ../../ImagePlugin/libQtOpenSRImagePlugin.so)
+
+$(BUILD)/tools/ResourceViewer/imageformats/libQtOpenSRImagePlugin.so:
+	mkdir -p $(BUILD)/tools/ResourceViewer/imageformats
+	(cd $(BUILD)/tools/ResourceViewer/imageformats && ln -sf ../../../ImagePlugin/libQtOpenSRImagePlugin.so)
 
 data: 
 	(cd data && find $(ASSETS) -iname '*.pkg' -exec ln -sfv {} \;)
@@ -14,13 +31,11 @@ datfiles: $(DATCONVERT) $(DATJSON)
 	$(DATCONVERT) hd $(ASSETS)/CacheData.dat data/CacheData.dat 
 	$(DATCONVERT)  d $(ASSETS)/Rus.dat data/rus.dat 
 	$(DATCONVERT)  d $(ASSETS)/Main.dat data/main.dat 
-	LD_LIBRARY_PATH=build/Ranger $(DATJSON) d2j data/main.dat data/main.json
-	#LD_LIBRARY_PATH=build/Ranger $(DATJSON) d2j data/CacheData.dat data/CacheData.json
-	LD_LIBRARY_PATH=build/Ranger $(DATJSON) d2j data/rus.dat data/rus.json
+	LD_LIBRARY_PATH=$(BUILD)/Ranger $(DATJSON) d2j data/main.dat data/main.json
+	#LD_LIBRARY_PATH=$(BUILD)/Ranger $(DATJSON) d2j data/CacheData.dat data/CacheData.json
+	LD_LIBRARY_PATH=$(BUILD)/Ranger $(DATJSON) d2j data/rus.dat data/rus.json
 
 other:
-	# To start game from command line
-	ln -sf build/World/libworld.so
 	# To allow resource viewer open GAI images
-	(mkdir -p build/tools/ResourceViewer/imageformats && cd build/tools/ResourceViewer/imageformats && ln -sf ../../../ImagePlugin/libQtOpenSRImagePlugin.so)
+	(mkdir -p $(BUILD)/tools/ResourceViewer/imageformats && cd $(BUILD)/tools/ResourceViewer/imageformats && ln -sf ../../../ImagePlugin/libQtOpenSRImagePlugin.so)
 

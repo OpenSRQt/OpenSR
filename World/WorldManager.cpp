@@ -249,6 +249,7 @@ void WorldManager::startTurn()
         m_animation->setTurnDurationLock(true);
         connect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
+    m_context->setIsChoosingToShoot(false);
     m_context->startTurn();
 
     m_turnFinished = false;
@@ -268,9 +269,9 @@ void WorldManager::finishTurn()
         disconnect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
 
-    m_animation->setPrevTime(0);
-    m_context->finishTurn();
+    m_animation->setPrevTime(0);    m_context->finishTurn();
     m_turnFinished = true;
+    m_context->resetActiveWeapon();
 }
 
 bool WorldManager::loadWorld(const QString &path)
@@ -441,6 +442,7 @@ WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, AsteroidStyle)
 WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, PlanetStyle)
 WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, StationStyle)
 WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, InhabitedPlanetStyle)
+WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, WeaponStyle)
 WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(WorldManager, DesertPlanetStyle)
 
 WORLD_JS_DEFAULT_OBJECT_CONSTRUCTOR(WorldManager, Race)

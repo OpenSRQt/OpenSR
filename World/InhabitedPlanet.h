@@ -85,8 +85,6 @@ public:
     virtual quint32 typeId() const override;
     virtual QString namePrefix() const override;
 
-    virtual void prepareSave() override;
-
     InhabitedPlanetStyle style() const;
     virtual int radius() override;
     void setStyle(const InhabitedPlanetStyle &style);

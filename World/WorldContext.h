@@ -20,6 +20,7 @@
 #define OPENSR_WORLD_WORLDCONTEXT_H
 
 #include "WorldObject.h"
+#include "Container.h"
 #include <QPoint>
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
@@ -38,9 +39,13 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
     Q_PROPERTY(WorldObject *playerShip READ playerShip NOTIFY playerShipChanged STORED false WRITE setPlayerShip)
     Q_PROPERTY(WorldObject* planetToEnter READ planetToEnter  
         NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
+    Q_PROPERTY(WorldObject*  objectToShoot READ objectToShoot
+        WRITE setObjectToShoot)    
     Q_PROPERTY(QPointF movementPosition READ movementPosition  
         NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
-    
+    Q_PROPERTY(bool isChoosingToShoot READ isChoosingToShoot WRITE setIsChoosingToShoot NOTIFY isChoosingToShootChanged)
+    Q_PROPERTY(Container* container READ container WRITE setContainer)
+
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = 0, quint32 id = 0);
     virtual ~WorldContext();
@@ -69,6 +74,17 @@ public:
     QPointF movementPosition();
     void setMovementPosition(const QPointF& pos);
 
+    Q_INVOKABLE void prepareToShoot(WorldObject *);
+    Q_INVOKABLE void damageObject();
+    WorldObject* objectToShoot() const;
+    void setObjectToShoot(WorldObject *);
+    bool isChoosingToShoot() const;
+    void setIsChoosingToShoot(bool value);
+
+    Container* container() const;
+    void setContainer(Container* i);
+    Q_INVOKABLE bool setActiveWeapon(int pos) const;
+    void resetActiveWeapon() const;
 public slots:
     void onShipArrived();
 
@@ -83,17 +99,21 @@ signals:
     void movementPositionChanged(const QPointF& pos);
 
     void enteringPlanet();
-    
-    void stillMoving();
+    void objectToShootChanged(WorldObject*);
+    void isChoosingToShootChanged(bool isChoosingToShoot);
 
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
-    WorldObject *m_playerShip;
-    WorldObject* m_planetToEnter;
+    WorldObject *m_playerShip = nullptr;
+    WorldObject* m_planetToEnter = nullptr;
+    WorldObject* m_objectToShoot = nullptr;
     QPointF m_planetPosition;
 
+    Container* m_container = nullptr;
+    
     bool m_shipIsMoving = false;
+    bool m_isChoosingToShoot = false;
 };
 } // namespace World
 } // namespace OpenSR
