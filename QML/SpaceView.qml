@@ -94,6 +94,23 @@ Item {
         }
     }
 
+    Item {
+        id: bottomPanel
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 100
+        Image {
+            source: "res:/DATA/PanelMain2/2BG.gi"
+            // anchors.fill: parent
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.fill: parent
+
+            cache: true
+        }
+    }
+
     onSystemChanged: {
         for (var i in spaceNode.children) {
             spaceNode.children[i].destroy();
@@ -398,6 +415,8 @@ Item {
         }
     }
 
+    // Get Gun, Get Gun 0 and Get Gun 1?
+    // Ideally, this buttons should be on the bottom panel
     Button {
         id: getGunTemporary
         anchors.bottom: parent.bottom
@@ -436,11 +455,29 @@ Item {
         }
     }
 
+
+    // TODO: Put it into right place of bottom panel
+    Button {
+        id: showShipButton
+        anchors.bottom: parent.bottom
+        anchors.right: turnButton.left
+        sounded: false
+        normalImage: "res:/DATA/FormAB2/2ShipN.gi"
+        hoveredImage: "res:/DATA/FormAB2/2ShipA.gi"
+        downImage: "res:/DATA/FormAB2/2ShipD.gi"
+    }
+
     Button {
         id: turnButton
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         text: "Turn"
+        sounded: false
+        // TODO: Adding animations leads to crashes. WTF?
+        // normalImage: "res:/DATA/FormMain2/2ButAboutN.gi"
+        // hoveredImage: "res:/DATA/FormMain2/2ButAboutA.gi"
+        // downImage: "res:/DATA/FormMain2/2ButAboutD.gi"
+
         onClicked: {
             if (!WorldManager.turnFinished) {
                 return;
