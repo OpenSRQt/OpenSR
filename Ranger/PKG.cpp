@@ -17,6 +17,7 @@
 */
 
 #include <OpenSR/libRangerQt.h>
+#include <QIODevice>
 
 namespace OpenSR
 {

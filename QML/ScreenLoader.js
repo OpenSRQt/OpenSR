@@ -16,7 +16,10 @@ function loadComponent(url) {
 function processObjectRequests() {
     var newObjectRequests = []
     for (var i = 0; i < objectRequests.length; i++) {
+        console.log("hey");
         var req = objectRequests[i];
+        console.log("hey");
+        // console.log("object request " + i + ": " + req);
         if (req[0] in components) {
             var obj = components[req[0]].createObject(req[1], req[3]);
             req[1].componentObjectCreated(obj, req[2]);

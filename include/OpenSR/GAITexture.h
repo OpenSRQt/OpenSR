@@ -20,33 +20,35 @@
 #define OPENSR_GAITEXTURE_H
 
 #include <OpenSR/OpenSR.h>
-#include <QSGTexture>
 #include <OpenSR/libRangerQt.h>
-
-class QOpenGLBuffer;
-class QOpenGLFunctions;
+#include <QSGTexture>
+#include <qt/QtQuick/qsgtexture.h>
+#include <rhi/qrhi.h>
 
 namespace OpenSR
 {
-class ENGINE_API GAITexture: public QSGTexture
+class ENGINE_API GAITexture : public QSGTexture
 {
 public:
-    GAITexture(const GAIHeader& header, const QImage& background);
+    GAITexture(const GAIHeader &header, const QImage &background);
     virtual ~GAITexture();
 
-    virtual void bind();
-    virtual bool hasAlphaChannel() const;
-    virtual bool hasMipmaps() const;
-    virtual int textureId() const;
-    virtual QSize textureSize() const;
+    bool hasAlphaChannel() const override;
+    bool hasMipmaps() const override;
+    qint64 comparisonKey() const override;
+    QSize textureSize() const override;
+    QRhiTexture *rhiTexture() const override;
+    void commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates) override;
 
-    void drawNextFrame(const QByteArray& frameData, const QPoint& start);
-    void drawNextFrame(const QImage& frame);
+    void initRhiResources();
+    void drawNextFrame(const QByteArray &frameData, const QPoint &start);
+    void drawNextFrame(const QImage &frame);
     void reset();
 
 private:
-    int m_texID;
-    QOpenGLBuffer *m_pbo;
+    QRhiTexture *m_texture = nullptr;
+    //QRhiBuffer *m_pbo = nullptr;  
+    qint64 m_texID;
     QImage m_bg;
     GAIHeader m_header;
     bool m_needDraw;
@@ -55,6 +57,6 @@ private:
     QByteArray m_nextFrameData;
     QPoint m_decodeStart;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_GAITEXTURE_H

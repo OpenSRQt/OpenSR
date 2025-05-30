@@ -1,24 +1,19 @@
-SET(QM_SOURCES
+add_library(QM SHARED
     QM.cpp
     Parser.cpp
     QuestPlayer.cpp
-)
-
-SET(QM_HEADERS
     ${CMAKE_SOURCE_DIR}/include/OpenSR/QM/QuestPlayer.h
 )
 
-INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/include
-    ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(QM PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-QT5_WRAP_CPP(QM_MOC_SOURCES ${QM_HEADERS})
-ADD_LIBRARY(QM SHARED ${QM_SOURCES} ${QM_MOC_SOURCES})
-SET_TARGET_PROPERTIES(QM PROPERTIES COMPILE_DEFINITIONS "QM_LIBRARY_BUILD")
+target_compile_definitions(QM PRIVATE QM_LIBRARY_BUILD)
 
-IF(WIN32)
-    SET_TARGET_PROPERTIES(QM PROPERTIES PREFIX "")
-ENDIF()
+if(WIN32)
+    set_target_properties(QM PROPERTIES PREFIX "")
+endif()
 
-TARGET_LINK_LIBRARIES(QM Qt5::Core)
+target_link_libraries(QM PRIVATE Qt6::Core)

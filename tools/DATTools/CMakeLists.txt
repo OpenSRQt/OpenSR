@@ -1,23 +1,27 @@
-INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include
-)
-
-SET(DAT_CONVERTER_SRCS
+add_executable(opensr-dat-convert
     crypt.cpp
     convert.cpp
     crc32.cpp
 )
 
-SET(DAT_JSON_SRCS
+add_executable(opensr-dat-json
     json.cpp
 )
 
-ADD_EXECUTABLE(opensr-dat-convert ${DAT_CONVERTER_SRCS})
-TARGET_LINK_LIBRARIES(opensr-dat-convert RangerQt)
+target_include_directories(opensr-dat-convert PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+)
 
-ADD_EXECUTABLE(opensr-dat-json ${DAT_JSON_SRCS})
-TARGET_LINK_LIBRARIES(opensr-dat-json RangerQt Qt5::Core)
+target_include_directories(opensr-dat-json PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+)
 
-INSTALL(TARGETS opensr-dat-convert RUNTIME DESTINATION bin)
-INSTALL(TARGETS opensr-dat-json RUNTIME DESTINATION bin)
+target_link_libraries(opensr-dat-convert PRIVATE RangerQt Qt6::Core Qt6::Gui)
+target_link_libraries(opensr-dat-json PRIVATE RangerQt Qt6::Core Qt6::Gui)
+
+install(TARGETS 
+    opensr-dat-convert 
+    opensr-dat-json
+    RUNTIME DESTINATION bin
+)

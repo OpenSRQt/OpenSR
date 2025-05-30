@@ -1,8 +1,7 @@
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-FIND_PACKAGE(Qt5Quick REQUIRED)
-FIND_PACKAGE(OpenAL REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Quick ShaderTools)
+find_package(OpenAL REQUIRED)
 
-SET(SOURCES
+add_library(engine SHARED
     Engine.cpp
     SoundManager.cpp
     Sound.cpp
@@ -20,9 +19,9 @@ SET(SOURCES
     DATTranslator.cpp
     SpaceMouseArea.cpp
     PlanetDrawer.cpp
-)
+    GAIMaterial.cpp
+    GAIShader.cpp
 
-SET(HEADERS 
     ${CMAKE_SOURCE_DIR}/include/OpenSR/Engine.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/SoundManager.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/Sound.h
@@ -40,38 +39,57 @@ SET(HEADERS
     ${CMAKE_SOURCE_DIR}/include/OpenSR/DATTranslator.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/SpaceMouseArea.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/PlanetDrawer.h
-)
 
-SET(PRIVATE_HEADERS 
+    GAIMaterial.h
+    GAIShader.h
     ResourceManager_p.h
     SoundManager_p.h
     MPG123MusicDecoder.h
     VorbisMusicDecoder.h
 )
 
-INCLUDE_DIRECTORIES(
+qt6_add_shaders(engine "engine-shaders"
+    BATCHABLE
+    PREFIX
+        "/"
+    FILES
+        "shaders/GAIShader.frag"
+        "shaders/GAIShader.vert"
+)
+
+target_include_directories(engine PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+target_include_directories(engine PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     ${OPENGL_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5Quick_INCLUDE_DIRS}
     ${OPENAL_INCLUDE_DIR}
 )
 
-QT5_WRAP_CPP(MOC_SOURCES ${HEADERS} ${PRIVATE_HEADERS})
-QT5_ADD_RESOURCES(QRC_QML_SOURCES ${CMAKE_SOURCE_DIR}/QML/qml.qrc)
+target_link_libraries(engine PRIVATE
+    RangerQt
+    QM
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Quick
+    Qt6::GuiPrivate
+    ${OPENAL_LIBRARY}
+)
 
-ADD_LIBRARY(engine SHARED ${SOURCES} ${MOC_SOURCES})
-TARGET_LINK_LIBRARIES(engine RangerQt QM Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Quick ${OPENAL_LIBRARY})
-SET_TARGET_PROPERTIES(engine PROPERTIES COMPILE_DEFINITIONS "OPENSR_ENGINE_BUILD")
+target_compile_definitions(engine PRIVATE OPENSR_ENGINE_BUILD)
 
-IF(WIN32)
-    SET_TARGET_PROPERTIES(engine PROPERTIES PREFIX "")
-ENDIF()
+if(WIN32)
+    set_target_properties(engine PROPERTIES PREFIX "")
+endif()
 
-ADD_EXECUTABLE(opensr main.cpp ${QRC_QML_SOURCES})
-TARGET_LINK_LIBRARIES(opensr engine)
+add_executable(opensr main.cpp ${CMAKE_SOURCE_DIR}/QML/qml.qrc)
 
-INSTALL(TARGETS opensr RUNTIME DESTINATION bin)
+target_link_libraries(opensr PRIVATE
+    Qt6::Widgets
+    engine
+)
+
+install(TARGETS opensr RUNTIME DESTINATION bin)

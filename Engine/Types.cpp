@@ -18,7 +18,6 @@
 
 #include "OpenSR/Types.h"
 #include <QVariantList>
-#include <QLinkedList>
 #include <QVector2D>
 
 namespace OpenSR
@@ -49,7 +48,7 @@ QVector2D calcBezierPoint(const BezierCurve& curve, float t, QVector2D& d)
 }
 
 void findPoints(const BezierCurve& curve, int minSize, float t0, float t1,
-                QLinkedList<QPointF>& points, QLinkedList<QPointF>::Iterator& i)
+                std::list<QPointF>& points, std::list<QPointF>::iterator& i)
 {
     float tMid = (t0 + t1) / 2;
     QVector2D dl, dr, dc;
@@ -79,16 +78,16 @@ void findPoints(const BezierCurve& curve, int minSize, float t0, float t1,
 
 QList<QPointF> BezierCurve::calcPolyline(int minStep)
 {
-    QLinkedList<QPointF> points;
+    std::list<QPointF> points;
 
     QVector2D dir;
     QVector2D p0 = calcBezierPoint(*this, 0.0f, dir);
     QVector2D p1 = calcBezierPoint(*this, 1.0f, dir);
 
-    points.append(p0.toPointF());
-    points.append(p1.toPointF());
+    points.push_back(p0.toPointF());
+    points.push_back(p1.toPointF());
 
-    QLinkedList<QPointF>::Iterator i = points.begin();
+    std::list<QPointF>::iterator i = points.begin();
     ++i;
 
     findPoints(*this, minStep, 0.0f, 1.0f, points, i);

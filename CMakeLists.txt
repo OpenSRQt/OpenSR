@@ -1,39 +1,44 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
-PROJECT(OpenSR)
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+cmake_minimum_required(VERSION 3.16...3.27)
+project(OpenSR
+    VERSION 0.1.1
+    LANGUAGES CXX
+)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_COMPILER clang++)
 
-SET(MAJOR_VERSION 0)
-SET(MINOR_VERSION 1)
-SET(BUILD_VERSION 1)
-SET(API_VERSION 1)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-FIND_PACKAGE(Qt5Core REQUIRED)
-FIND_PACKAGE(Qt5Gui REQUIRED)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
-# Enable C++11 support.
-IF(NOT MSVC)
-  ADD_DEFINITIONS(-std=c++11)
-ENDIF()
+set(API_VERSION 1)
 
-OPTION(BUILD_ALL_TOOLS "Build tools for DAT files" NO)
-OPTION(BUILD_RESOURCE_VIEWER "Build Resource Viewer tool" NO)
-OPTION(BUILD_PLANET_VIEWER "Build Planet Viewer tool" NO)
-OPTION(BUILD_QUEST_PLAYER "Build Quest Player tool" NO)
-OPTION(BUILD_DAT_TOOLS "Build tools for DAT files" NO)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui) # remove later
 
-IF(BUILD_ALL_TOOLS)
-    SET(BUILD_RESOURCE_VIEWER YES)
-    SET(BUILD_PLANET_VIEWER YES)
-    SET(BUILD_QUEST_PLAYER YES)
-    SET(BUILD_DAT_TOOLS YES)
-ENDIF()
+option(BUILD_ALL_TOOLS "Build all tools (overrides individual tool options)" OFF)
+option(BUILD_RESOURCE_VIEWER "Build Resource Viewer tool" OFF)
+option(BUILD_PLANET_VIEWER "Build Planet Viewer tool" OFF)
+option(BUILD_QUEST_PLAYER "Build Quest Player tool" OFF)
+option(BUILD_DAT_TOOLS "Build tools for DAT files" OFF)
 
-ADD_SUBDIRECTORY(Ranger)
-ADD_SUBDIRECTORY(ImagePlugin)
-ADD_SUBDIRECTORY(QM)
-ADD_SUBDIRECTORY(Engine)
-ADD_SUBDIRECTORY(World)
-#ADD_SUBDIRECTORY(include)
-ADD_SUBDIRECTORY(tools)
+
+if(BUILD_ALL_TOOLS)
+    set(BUILD_RESOURCE_VIEWER ON)
+    set(BUILD_PLANET_VIEWER ON)
+    set(BUILD_QUEST_PLAYER ON)
+    set(BUILD_DAT_TOOLS ON)
+endif()
+
+add_subdirectory(Ranger)
+add_subdirectory(ImagePlugin)
+add_subdirectory(QM)
+add_subdirectory(Engine)
+add_subdirectory(World)
+
+if(BUILD_RESOURCE_VIEWER OR BUILD_PLANET_VIEWER OR BUILD_QUEST_PLAYER OR BUILD_DAT_TOOLS)
+    add_subdirectory(tools)
+endif()

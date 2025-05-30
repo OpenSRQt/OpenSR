@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QExplicitlySharedDataPointer>
 #include <QDebug>
+#include <QVariant>
 
 namespace OpenSR
 {

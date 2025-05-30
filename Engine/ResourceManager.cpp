@@ -284,7 +284,7 @@ QQmlNetworkAccessManagerFactory *ResourceManager::qmlNAMFactory() const
 
 bool ResourceManager::fileExists(const QString& path) const
 {
-    QStringList p = path.split('/', QString::SkipEmptyParts);
+    QStringList p = path.split('/', Qt::SkipEmptyParts);
 
     const ResourceNode *current = &m_root;
 
@@ -300,7 +300,7 @@ bool ResourceManager::fileExists(const QString& path) const
 
 QIODevice *ResourceManager::getIODevice(const QString& path, QObject *parent)
 {
-    QStringList p = path.split('/', QString::SkipEmptyParts);
+    QStringList p = path.split('/', Qt::SkipEmptyParts);
 
     ResourceNode *current = &m_root;
 

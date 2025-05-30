@@ -1,12 +1,10 @@
-SET(IMAGE_PLUGIN_SOURCES
+add_library(QtOpenSRImagePlugin SHARED
     GAIAnimationIO.cpp
     GIImageIO.cpp
     PSDImageIO.cpp
     HAIAnimationIO.cpp
     QtOpenSRImagePlugin.cpp
-)
-
-SET(IMAGE_PLUGIN_HEADERS
+    
     GAIAnimationIO.h
     GIImageIO.h
     PSDImageIO.h
@@ -14,15 +12,15 @@ SET(IMAGE_PLUGIN_HEADERS
     QtOpenSRImagePlugin.h
 )
 
-INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/include
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(QtOpenSRImagePlugin PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-QT5_WRAP_CPP(IMAGE_PLUGIN_MOC_SOURCES ${IMAGE_PLUGIN_HEADERS})
-ADD_LIBRARY(QtOpenSRImagePlugin SHARED ${IMAGE_PLUGIN_SOURCES} ${IMAGE_PLUGIN_MOC_SOURCES})
-TARGET_LINK_LIBRARIES(QtOpenSRImagePlugin RangerQt)
-IF(WIN32)
-    SET_TARGET_PROPERTIES(QtOpenSRImagePlugin PROPERTIES PREFIX "")
-ENDIF()
+if(WIN32)
+    set_target_properties(QtOpenSRImagePlugin PROPERTIES PREFIX "")
+endif()
+
+target_link_libraries(QtOpenSRImagePlugin PRIVATE 
+    RangerQt 
+    Qt6::Gui)

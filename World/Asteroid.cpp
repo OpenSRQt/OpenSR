@@ -38,9 +38,9 @@ const quint32 Asteroid::m_staticTypeId = typeIdFromClassName(Asteroid::staticMet
 template <> void WorldObject::registerType<Asteroid>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<AsteroidStyle>();
-    qRegisterMetaTypeStreamOperators<AsteroidStyle>();
+    //qRegisterMetaTypeStreamOperators<AsteroidStyle>();
     qRegisterMetaType<AsteroidStyle::Data>();
-    qRegisterMetaTypeStreamOperators<AsteroidStyle::Data>();
+    //qRegisterMetaTypeStreamOperators<AsteroidStyle::Data>();
     qmlRegisterType<Asteroid>("OpenSR.World", 1, 0, "Asteroid");
 }
 
