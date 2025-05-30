@@ -20,13 +20,13 @@
 #define OPENSR_GAIANIMATEDIMAGE_H
 
 #include <OpenSR/OpenSR.h>
-#include <QQuickItem>
 #include <QList>
+#include <QQuickItem>
 
 namespace OpenSR
 {
 class GAIAnimatedImagePrivate;
-class ENGINE_API GAIAnimatedImage: public QQuickItem
+class ENGINE_API GAIAnimatedImage : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QList<QUrl> sources READ sources WRITE setSources NOTIFY sourcesChanged)
@@ -39,7 +39,7 @@ class ENGINE_API GAIAnimatedImage: public QQuickItem
     OPENSR_DECLARE_PRIVATE(GAIAnimatedImage)
 
 public:
-    GAIAnimatedImage(QQuickItem * parent = 0);
+    GAIAnimatedImage(QQuickItem *parent = nullptr);
     virtual ~GAIAnimatedImage();
 
     QList<QUrl> sources() const;
@@ -49,12 +49,12 @@ public:
     bool playing() const;
     float speed() const;
 
-    void setSources(const QList<QUrl>& urls);
+    void setSources(const QList<QUrl> &urls);
     void setPaused(bool paused);
     void setPlaying(bool playing);
     void setSpeed(float speed);
 
-Q_SIGNALS:
+signals:
     void sourcesChanged();
     void framesCountChanged();
     void currentFrameChanged();
@@ -64,11 +64,11 @@ Q_SIGNALS:
 
 protected:
     OPENSR_DECLARE_DPOINTER(GAIAnimatedImage);
-    virtual QSGNode *updatePaintNode(QSGNode * oldNode, UpdatePaintNodeData * updatePaintNodeData);
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *updatePaintNodeData) override;
 
-public Q_SLOTS:
+public slots:
     void nextFrame();
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_GAIANIMATEDIMAGE_H

@@ -47,7 +47,7 @@ void Resource::registerResource()
 
 QExplicitlySharedDataPointer<ResourceData> Resource::d_func()
 {
-    if (m_d.data()->ref.load() > 1)
+    if (m_d.data()->ref.loadRelaxed() > 1)
     {
         m_d.detach();
         m_d->id = 0;

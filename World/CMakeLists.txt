@@ -1,8 +1,7 @@
-FIND_PACKAGE(Qt5Core REQUIRED)
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-FIND_PACKAGE(Qt5Quick REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Quick Qml)
+find_package(OpenGL REQUIRED)
 
-SET(SOURCES
+add_library(world SHARED
     Artefact.cpp
     Asteroid.cpp
     CargoHook.cpp
@@ -37,9 +36,7 @@ SET(SOURCES
     WorldBindings.cpp
     ResourceManager.cpp
     Resource.cpp
-)
 
-SET(HEADERS 
     Artefact.h
     Asteroid.h
     CargoHook.h
@@ -76,20 +73,19 @@ SET(HEADERS
     Resource.h
 )
 
-INCLUDE_DIRECTORIES(
-    ${OPENGL_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(world PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-QT5_WRAP_CPP(MOC_SOURCES ${HEADERS})
+target_include_directories(world PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    ${OPENGL_INCLUDE_DIR}
+)
 
-ADD_LIBRARY(world SHARED ${SOURCES} ${MOC_SOURCES})
-TARGET_LINK_LIBRARIES(world engine)
-SET_TARGET_PROPERTIES(world PROPERTIES COMPILE_DEFINITIONS "OPENSR_WORLD_BUILD")
+target_compile_definitions(world PRIVATE OPENSR_WORLD_BUILD)
+
+target_link_libraries(world PRIVATE engine Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick Qt6::Qml)
 
 IF(WIN32)
     SET_TARGET_PROPERTIES(world PROPERTIES PREFIX "")

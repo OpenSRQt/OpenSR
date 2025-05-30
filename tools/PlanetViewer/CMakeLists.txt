@@ -1,25 +1,14 @@
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-FIND_PACKAGE(Qt5Quick REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Quick)
 
-INCLUDE_DIRECTORIES(
+add_executable(opensr-planet-viewer
+    main.cpp
+    PlanetViewer.qrc
+)
+
+target_include_directories(opensr-planet-viewer PRIVATE
     ${OPENGL_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Widgets_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
-    ${Qt5Quick_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 )
 
-SET(PV_QML_SOURCES
-    PlanetViewer.qml
-)
-
-SET(PV_JS_SOURCES
-    PlanetViewer.js
-)
-
-QT5_ADD_RESOURCES(PV_RESOURCES ${CMAKE_SOURCE_DIR}/QML/qml.qrc PlanetViewer.qrc)
-
-ADD_EXECUTABLE(opensr-planet-viewer main.cpp ${PV_RESOURCES})
-TARGET_LINK_LIBRARIES(opensr-planet-viewer engine)
+target_link_libraries(opensr-planet-viewer PRIVATE Qt6::Widgets engine)

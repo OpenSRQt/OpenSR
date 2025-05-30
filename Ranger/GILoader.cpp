@@ -680,7 +680,7 @@ QImage loadGIImageData(const GIFrameHeader& image, const GILayerHeader *layers, 
     case 5:
         return loadFrameType5(image, layers, dev, background, offset);
     default:
-        qWarning() << "Unknown GI frame type: " << image.type << endl;
+        qWarning() << "Unknown GI frame type: " << image.type << Qt::endl;
     }
     return QImage();
 }

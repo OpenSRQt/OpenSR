@@ -213,7 +213,7 @@ QVariant Engine::datValue(const QString& path) const
     if (path.isEmpty())
         return QVariant();
 
-    QList<QString> pathes = path.split('.', QString::SkipEmptyParts);
+    QList<QString> pathes = path.split('.', Qt::SkipEmptyParts);
     QVariantMap current = d->datRoot;
     QVariant result = current;
 

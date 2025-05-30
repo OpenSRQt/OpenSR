@@ -1,4 +1,4 @@
-SET(RANGER_QT_SOURCES
+add_library(RangerQt SHARED
     GAILoader.cpp
     GILoader.cpp
     HAILoader.cpp
@@ -6,25 +6,18 @@ SET(RANGER_QT_SOURCES
     PKG.cpp
     ZLib.cpp
     DAT.cpp
-)
-
-SET(RANGER_QT_HEADERS
     ${CMAKE_SOURCE_DIR}/include/OpenSR/libRangerQt.h
 )
 
-INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/include
-    ${Qt5Gui_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(RangerQt PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
-QT5_WRAP_CPP(RANGER_QT_MOC_SOURCES ${RANGER_QT_HEADERS})
+target_compile_definitions(RangerQt PRIVATE LIBRANGER_LIBRARY)
 
-ADD_LIBRARY(RangerQt SHARED ${RANGER_QT_SOURCES} ${RANGER_QT_MOC_SOURCES})
-SET_TARGET_PROPERTIES(RangerQt PROPERTIES COMPILE_DEFINITIONS "LIBRANGER_LIBRARY")
+if(WIN32)
+    set_target_properties(RangerQt PROPERTIES PREFIX "")
+endif()
 
-IF(WIN32)
-    SET_TARGET_PROPERTIES(RangerQt PROPERTIES PREFIX "")
-ENDIF()
-
-TARGET_LINK_LIBRARIES(RangerQt Qt5::Core Qt5::Gui)
+target_link_libraries(RangerQt PRIVATE Qt6::Core Qt6::Gui)

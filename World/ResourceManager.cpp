@@ -31,7 +31,7 @@ template<>
 void WorldObject::registerType<ResourceManager>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<Resource>();
-    qRegisterMetaTypeStreamOperators<Resource>();
+    //qRegisterMetaTypeStreamOperators<Resource>();
     qmlRegisterType<ResourceManager>("OpenSR.World", 1, 0, "ResourceManager");
 }
 

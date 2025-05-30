@@ -20,7 +20,7 @@
 #include <OpenSR/QM/QuestPlayer.h>
 #include "ui_PlayerWindow.h"
 
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QFileDialog>
 #include <QtGui/QCursor>
 #include <QtGui/QMouseEvent>

@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QUrl>
 #include <OpenSR/OpenSR.h>
+#include "SoundManager.h"
 
 class QQuickView;
 class QQmlEngine;
@@ -32,7 +33,6 @@ class QJSEngine;
 
 namespace OpenSR
 {
-class SoundManager;
 class ResourceManager;
 class ENGINE_API Engine: public QApplication
 {

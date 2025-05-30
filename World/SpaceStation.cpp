@@ -32,9 +32,9 @@ template<>
 void WorldObject::registerType<SpaceStation>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<StationStyle>();
-    qRegisterMetaTypeStreamOperators<StationStyle>();
+    //qRegisterMetaTypeStreamOperators<StationStyle>();
     qRegisterMetaType<StationStyle::Data>();
-    qRegisterMetaTypeStreamOperators<StationStyle::Data>();
+    //qRegisterMetaTypeStreamOperators<StationStyle::Data>();
     bindEnumsToJS<SpaceStation>(script);
     qmlRegisterType<SpaceStation>("OpenSR.World", 1, 0, "SpaceStation");
 }

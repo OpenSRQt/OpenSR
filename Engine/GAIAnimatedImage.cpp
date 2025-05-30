@@ -17,120 +17,23 @@
 */
 
 #include "OpenSR/GAIAnimatedImage.h"
+#include "GAIMaterial.h"
 
-#include <OpenSR/GAITexture.h>
-#include <QSGSimpleMaterialShader>
-#include <QDir>
-#include <QDebug>
-#include <QBuffer>
-#include <QSGSimpleRectNode>
-#include <QTimer>
 #include <OpenSR/Engine.h>
+#include <OpenSR/GAITexture.h>
 #include <OpenSR/ResourceManager.h>
 #include <OpenSR/libRangerQt.h>
+#include <QBuffer>
+#include <QDebug>
+#include <QDir>
 #include <QImageReader>
+#include <QSGSimpleRectNode>
+#include <QTimer>
+#include <qsggeometry.h>
+#include <qsgnode.h>
 
 namespace OpenSR
 {
-namespace
-{
-//TODO: Make loading async.
-static const char gaiFragmentShader[] =
-    "varying highp vec2 qt_TexCoord; \n"
-    "uniform sampler2D qt_Texture; \n"
-    "uniform lowp float qt_Opacity; \n"
-    "void main() { \n"
-    " vec4 color = texture2D(qt_Texture, qt_TexCoord);\n"
-    " color.rgb *= color.a;\n"
-    " color.bgr = color.rgb;\n"
-    " gl_FragColor = color * qt_Opacity; \n"
-    "}";
-
-static const char gaiVertexShader[] =
-    "uniform highp mat4 qt_Matrix; \n"
-    "attribute highp vec4 qt_VertexPosition; \n"
-    "attribute highp vec2 qt_VertexTexCoord; \n"
-    "varying highp vec2 qt_TexCoord; \n"
-    "void main() { \n"
-    " qt_TexCoord = qt_VertexTexCoord; \n"
-    " gl_Position = qt_Matrix * qt_VertexPosition; \n"
-    "}";
-
-struct GAIShaderState
-{
-    GAITexture *t;
-
-    int compare(const GAIShaderState *other) const
-    {
-
-        if (t == other->t)
-        {
-            return 0;
-        }
-        else if (t < other->t)
-        {
-            return -1;
-        }
-        else
-        {
-            return 1;
-        }
-    }
-};
-
-class GAIShader : public QSGSimpleMaterialShader<GAIShaderState>
-{
-    QSG_DECLARE_SIMPLE_COMPARABLE_SHADER(GAIShader, GAIShaderState);
-
-public:
-    const char *vertexShader() const
-    {
-        return gaiVertexShader;
-    }
-
-    const char *fragmentShader() const
-    {
-        return gaiFragmentShader;
-    }
-
-    QList<QByteArray> attributes() const
-    {
-        return QList<QByteArray>() << "qt_VertexPosition" << "qt_VertexTexCoord";
-    }
-
-    void resolveUniforms()
-    {
-        m_texture_id = program()->uniformLocation("qt_Texture");
-    }
-
-    void updateState(const GAIShaderState *state, const GAIShaderState *oldState)
-    {
-        program()->setUniformValue(m_texture_id, 0);
-        if (state->t)
-            state->t->bind();
-    }
-
-private:
-    int m_texture_id;
-};
-
-class GAINode : public QSGGeometryNode
-{
-public:
-    GAINode()
-        : m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4)
-    {
-        setGeometry(&m_geometry);
-
-        QSGSimpleMaterial<GAIShaderState> *material = GAIShader::createMaterial();
-        material->setFlag(QSGMaterial::Blending);
-        setMaterial(material);
-        setFlag(OwnsMaterial);
-    }
-
-    QSGGeometry m_geometry;
-};
-}
 
 class GAIAnimatedImage::GAIAnimatedImagePrivate
 {
@@ -139,8 +42,9 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
 
     GAIAnimatedImagePrivate(GAIAnimatedImage *q);
 
-    void loadGAI(const QUrl& source);
-    void loadGIFrame(QIODevice* dev, int i, const GAIHeader &header, QVector<QByteArray>& frames, QVector<QPoint>& offsets);
+    void loadGAI(const QUrl &source);
+    void loadGIFrame(QIODevice *dev, int i, const GAIHeader &header, QVector<QByteArray> &frames,
+                     QVector<QPoint> &offsets);
 
     QList<QUrl> m_sources;
     bool m_sourceChanged;
@@ -152,27 +56,27 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
     QList<QImage> m_bgs;
     QList<GAIHeader> m_headers;
 
-    QList<QVector<int> > m_gaiTimes;
-    QList<QVector<QByteArray> > m_gaiFrames;
-    QList<QVector<QPoint> > m_gaiOffsets;
+    QList<QVector<int>> m_gaiTimes;
+    QList<QVector<QByteArray>> m_gaiFrames;
+    QList<QVector<QPoint>> m_gaiOffsets;
     QTimer m_timer;
 
-    QList<GAITexture*> m_textures;
+    QList<GAITexture *> m_textures;
     int m_currentFile;
     bool m_fileChanged;
     bool m_playing;
     float m_speed;
 };
 
-GAIAnimatedImage::GAIAnimatedImagePrivate::GAIAnimatedImagePrivate(GAIAnimatedImage *q):
-    m_sourceChanged(false), m_loaded(false), m_currentFrame(0), m_currentFile(0),
-    m_fileChanged(false), m_playing(true), m_speed(1.0f)
+GAIAnimatedImage::GAIAnimatedImagePrivate::GAIAnimatedImagePrivate(GAIAnimatedImage *q)
+    : m_sourceChanged(false), m_loaded(false), m_currentFrame(0), m_currentFile(0), m_fileChanged(false),
+      m_playing(true), m_speed(1.0f)
 {
     q_ptr = q;
 }
 
-GAIAnimatedImage::GAIAnimatedImage(QQuickItem* parent): QQuickItem(parent),
-    d_osr_ptr(new GAIAnimatedImagePrivate(this))
+GAIAnimatedImage::GAIAnimatedImage(QQuickItem *parent)
+    : QQuickItem(parent), d_osr_ptr(new GAIAnimatedImagePrivate(this))
 {
     Q_D(GAIAnimatedImage);
     setFlag(QQuickItem::ItemHasContents);
@@ -186,7 +90,7 @@ GAIAnimatedImage::~GAIAnimatedImage()
         delete t;
 }
 
-void GAIAnimatedImage::setSources(const QList<QUrl>& url)
+void GAIAnimatedImage::setSources(const QList<QUrl> &url)
 {
     Q_D(GAIAnimatedImage);
 
@@ -205,7 +109,7 @@ void GAIAnimatedImage::setSources(const QList<QUrl>& url)
 
     d->m_sources = url;
 
-    for (const QUrl& u : d->m_sources)
+    for (const QUrl &u : d->m_sources)
         d->loadGAI(u);
 
     if (!d->m_headers.isEmpty())
@@ -224,21 +128,40 @@ QList<QUrl> GAIAnimatedImage::sources() const
     return d->m_sources;
 }
 
-QSGNode* GAIAnimatedImage::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
+QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *)
 {
     Q_D(GAIAnimatedImage);
 
-    GAINode *n = dynamic_cast<GAINode*>(oldNode);
+    QSGGeometryNode *node = nullptr;
+    QSGGeometry *geometry = nullptr;
+    GAIMaterial *material = nullptr;
+    qDebug() << "updatePaintNode():138";
 
-    if (!n)
-        n = new GAINode();
+    if (!oldNode)
+    {
+        node = new QSGGeometryNode;
+        geometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4);
+        node->setGeometry(geometry);
+        node->setFlag(QSGNode::OwnsGeometry);
+
+        material = new GAIMaterial;
+        node->setMaterial(material);
+        node->setFlag(QSGNode::OwnsMaterial);
+    }
+    else
+    {
+        node = static_cast<QSGGeometryNode *>(oldNode);
+        geometry = node->geometry();
+        material = static_cast<GAIMaterial *>(node->material());
+    }
 
     if (d->m_sourceChanged)
     {
         if (!d->m_loaded)
         {
+            qDebug() << "updatePaintNode(): was not loaded";
             d->m_sourceChanged = false;
-            return 0;
+            return nullptr;
         }
 
         for (QSGTexture *t : d->m_textures)
@@ -248,24 +171,26 @@ QSGNode* GAIAnimatedImage::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
         for (int i = 0; i < d->m_headers.size(); i++)
         {
             GAITexture *texture = new GAITexture(d->m_headers[i], d->m_bgs[i]);
-            texture->setFiltering(QSGTexture::Linear);
+            //texture->setFiltering(QSGTexture::Linear); // ?
             d->m_textures.push_back(texture);
         }
+        d->m_sourceChanged = false;
     }
 
     if (d->m_fileChanged)
-        static_cast<QSGSimpleMaterial<GAIShaderState>*>(n->material())->state()->t = d->m_textures[d->m_currentFile];
+    {
+        material->setTexture(d->m_textures[d->m_currentFile]);
+        node->markDirty(QSGNode::DirtyMaterial);
+        d->m_fileChanged = false;
+    }
 
-    QSGGeometry::updateTexturedRectGeometry(n->geometry(), boundingRect(), QRectF(0, 0, 1, 1));
-    n->markDirty(QSGNode::DirtyGeometry | QSGNode::DirtyMaterial);
+    QSGGeometry::updateTexturedRectGeometry(geometry, boundingRect(), QRectF(0, 0, 1, 1)); // boundingRect?
+    node->markDirty(QSGNode::DirtyGeometry);
 
-    d->m_sourceChanged = false;
-    d->m_fileChanged = false;
-
-    return n;
+    return node;
 }
 
-void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
+void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
 {
     if (!source.isLocalFile() && source.scheme() != "qrc" && source.scheme() != "res")
     {
@@ -290,7 +215,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
     }
     else
     {
-        dev = ((Engine*)qApp)->resources()->getIODevice(path);
+        dev = ((Engine *)qApp)->resources()->getIODevice(path);
     }
     if (!dev)
         return;
@@ -313,7 +238,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
         background = QImage(bgPath);
     else
     {
-        QIODevice *bgDev = ((Engine*)qApp)->resources()->getIODevice(bgPath);
+        QIODevice *bgDev = ((Engine *)qApp)->resources()->getIODevice(bgPath);
         if (bgDev)
         {
             background = QImageReader(bgDev).read();
@@ -328,7 +253,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
     quint32 *seekSizes = new quint32[header.frameCount * 2];
 
     dev->seek(sizeof(GAIHeader));
-    dev->read((char*)seekSizes, header.frameCount * 2 * sizeof(uint32_t));
+    dev->read((char *)seekSizes, header.frameCount * 2 * sizeof(uint32_t));
 
     for (int i = 0; i < header.frameCount; i++)
     {
@@ -338,7 +263,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
             qint64 giOffset = giSeek;
             uint32_t signature;
             dev->seek(giOffset);
-            dev->peek((char*)&signature, sizeof(uint32_t));
+            dev->peek((char *)&signature, sizeof(uint32_t));
 
             if (signature == ZL01_SIGNATURE || signature == ZL02_SIGNATURE)
             {
@@ -376,8 +301,8 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl& source)
     m_loaded = true;
 }
 
-void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice* dev, int i, const GAIHeader &header,
-        QVector<QByteArray>& frames, QVector<QPoint>& offsets)
+void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice *dev, int i, const GAIHeader &header,
+                                                            QVector<QByteArray> &frames, QVector<QPoint> &offsets)
 {
     GIFrameHeader image;
 
@@ -389,7 +314,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice* dev, int 
     }
 
     qint64 offset = dev->pos();
-    dev->read((char*)&image, sizeof(GIFrameHeader));
+    dev->read((char *)&image, sizeof(GIFrameHeader));
 
     if (image.type != 5)
     {
@@ -402,7 +327,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice* dev, int 
 
     for (int i = 0; i < image.layerCount; i++)
     {
-        dev->read((char*)&layers[i], sizeof(GILayerHeader));
+        dev->read((char *)&layers[i], sizeof(GILayerHeader));
 
         layers[i].startX -= header.startX;
         layers[i].startY -= header.startY;
@@ -427,7 +352,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice* dev, int 
 int GAIAnimatedImage::currentFrame() const
 {
     Q_D(const GAIAnimatedImage);
-    //FIXME: Quite ugly
+    // FIXME: Quite ugly
     int f = 0;
     for (int i = 0; i < d->m_currentFile; i++)
         f += d->m_headers[i].frameCount;
@@ -438,13 +363,12 @@ int GAIAnimatedImage::currentFrame() const
 int GAIAnimatedImage::framesCount() const
 {
     Q_D(const GAIAnimatedImage);
-    //FIXME: Quite ugly
+    // FIXME: Quite ugly
     int f = 0;
     for (int i = 0; i < d->m_headers.count(); i++)
         f += d->m_headers[i].frameCount;
 
     return f;
-
 }
 
 bool GAIAnimatedImage::paused() const
@@ -531,9 +455,9 @@ void GAIAnimatedImage::nextFrame()
 
     if (d->m_textures[d->m_currentFile])
         d->m_textures[d->m_currentFile]->drawNextFrame(d->m_gaiFrames[d->m_currentFile][d->m_currentFrame],
-                d->m_gaiOffsets[d->m_currentFile][d->m_currentFrame]);
+                                                       d->m_gaiOffsets[d->m_currentFile][d->m_currentFrame]);
 
     d->m_timer.start();
-    emit(currentFrameChanged());
+    emit currentFrameChanged();
 }
-}
+} // namespace OpenSR
