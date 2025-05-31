@@ -188,8 +188,8 @@ function shipStyleByAffiliation(ship) {
 }
 
 var container = World.Container(context);
-var weapon1 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/10/ABMap.map_10", "Weapon/GAI/Bm.Weapon.W02", "energy", 200, 12);
-var weapon2 = weapon("Data/PQI/Weapon/0/", "Data/ABMap/1/ABMap.map_1", "Weapon/GAI/Bm.Weapon.W02", "fragment", 300, 20);
+var weapon1 = weapon("DATA/PQI/Weapon/0/", "res:/DATA/Items/2W01", "res:/DATA/AB/2W01", "energy", 200, 12);
+var weapon2 = weapon("Data/PQI/Weapon/0/", "res:/DATA/Items/2W01", "res:/DATA/AB/2W02", "fragment", 300, 20);
 container.addWeapon(weapon1, 0);
 container.addWeapon(weapon2, 1);
 
