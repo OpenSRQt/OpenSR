@@ -47,7 +47,7 @@ public:
 
 private:
     QRhiTexture *m_texture = nullptr;
-    //QRhiBuffer *m_pbo = nullptr;  
+    uchar *imgBuffer = nullptr;  
     qint64 m_texID;
     QImage m_bg;
     GAIHeader m_header;

@@ -22,13 +22,6 @@ bool GAIShader::updateUniformData(RenderState &state, QSGMaterial *newMaterial, 
         changed = true;
     }
 
-    // if (state.isOpacityDirty())
-    // {
-    //     const float opacity = state.opacity();
-    //     memcpy(buf->data() + 64, &opacity, 4);
-    //     changed = true;
-    // }
-
     return changed;
 }
 

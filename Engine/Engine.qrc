@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>shaders/GAIShader.vert.qsb</file>
-        <file>shaders/GAIShader.frag.qsb</file>
-    </qresource>
-</RCC>

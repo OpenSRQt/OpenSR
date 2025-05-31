@@ -39,6 +39,10 @@ GAITexture::~GAITexture()
         m_texture->destroy();
         delete m_texture;
     }
+    if (imgBuffer)
+    {
+        delete[] imgBuffer;
+    }
 }
 
 void GAITexture::drawNextFrame(const QByteArray &frameData, const QPoint &start)
@@ -56,23 +60,12 @@ void GAITexture::reset()
 
 void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates)
 {
-    // QOpenGLFunctions *gl = QOpenGLContext::currentContext()->functions();
-
-    // if (m_texID && !m_needDraw)
-    // {
-    //     gl->glBindTexture(GL_TEXTURE_2D, m_texID);
-    //     updateBindOptions();
-    //     return;
-    // }
-
-    // if (!m_texID)
-    // {
-    //     gl->glGenTextures(1, (GLuint *)&m_texID);
-    //     gl->glBindTexture(GL_TEXTURE_2D, m_texID);
-    //     gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_size.width(), m_size.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-    //     0); updateBindOptions(true);
-    // }
-    //qDebug() << "commitTextureOperations()";
+    QImage prevFrame;
+    
+    if (!imgBuffer)
+    {
+        imgBuffer = new uchar[m_size.width() * m_size.height() * 4];
+    }
 
     if (!m_texture)
     {
@@ -82,27 +75,26 @@ void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *res
 
     if (m_needDraw)
     {
+        QImage img;
         if (m_nextFrameData.isEmpty())
         {
+            // TODO: empty image handle
             if (!m_bg.isNull())
             {
-                //qDebug() << "commitTextureOperations(): bg";
-                resourceUpdates->uploadTexture(m_texture, m_bg);
+                memcpy(imgBuffer, m_bg.constBits(), m_size.width() * m_size.height() * 4);
+                img = QImage(imgBuffer, m_size.width(), m_size.height(), QImage::Format_RGBA8888);
             }
         }
         else
         {
-            //qDebug() << "commitTextureOperations(): texture";
-            QImage img(m_size, QImage::Format_RGBA8888);
+            img = QImage(imgBuffer, m_size.width(), m_size.height(), QImage::Format_RGBA8888);
             QBuffer d(&m_nextFrameData);
             d.open(QIODevice::ReadOnly);
             decodeGAIDeltaFrame(img, m_decodeStart.x(), m_decodeStart.y(), &d);
             d.close();
-
-            resourceUpdates->uploadTexture(m_texture, img);
         }
+        resourceUpdates->uploadTexture(m_texture, img);
         m_needDraw = false;
-        //rhi->finish(); // ?
     }
 }
 

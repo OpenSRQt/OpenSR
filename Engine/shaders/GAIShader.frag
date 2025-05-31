@@ -6,4 +6,5 @@ void main() {
     vec4 color = texture(srcTex, vTexCoord);
     color.rgb *= color.a;
     color.rgb = color.bgr;
+    fragColor = color;
 }
