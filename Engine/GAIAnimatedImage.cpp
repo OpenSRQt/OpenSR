@@ -29,8 +29,6 @@
 #include <QImageReader>
 #include <QSGSimpleRectNode>
 #include <QTimer>
-#include <qsggeometry.h>
-#include <qsgnode.h>
 
 namespace OpenSR
 {
@@ -135,7 +133,6 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
     QSGGeometryNode *node = nullptr;
     QSGGeometry *geometry = nullptr;
     GAIMaterial *material = nullptr;
-    qDebug() << "updatePaintNode():138";
 
     if (!oldNode)
     {
@@ -159,7 +156,6 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
     {
         if (!d->m_loaded)
         {
-            qDebug() << "updatePaintNode(): was not loaded";
             d->m_sourceChanged = false;
             return nullptr;
         }
@@ -171,7 +167,7 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
         for (int i = 0; i < d->m_headers.size(); i++)
         {
             GAITexture *texture = new GAITexture(d->m_headers[i], d->m_bgs[i]);
-            //texture->setFiltering(QSGTexture::Linear); // ?
+            texture->setFiltering(QSGTexture::Linear); // ?
             d->m_textures.push_back(texture);
         }
         d->m_sourceChanged = false;
