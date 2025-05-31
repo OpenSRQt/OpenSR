@@ -44,7 +44,7 @@ public:
     struct Data
     {
         QString SoundPath;
-        QString preview;
+        QString preview; // i.gi/s.gi/a.gi
         QString weaponAnim;
         QString typeWeapon;
         int radius;

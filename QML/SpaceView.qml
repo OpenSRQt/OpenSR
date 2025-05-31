@@ -102,7 +102,6 @@ Item {
         height: 100
         Image {
             source: "res:/DATA/PanelMain2/2BG.gi"
-            // anchors.fill: parent
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.fill: parent

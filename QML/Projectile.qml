@@ -14,20 +14,39 @@ Item {
         Item {
             id: projectile
             z: 2
-            Rectangle {
-                width: 5
-                height: 20
-                color: "yellow"
-                radius: 3
+            AnimatedImage {
+                source: "res:/DATA/ABItem/W03_S.gai";
+                width: 100
+                height: 100
+                cache: true
                 anchors.centerIn: parent
-                rotation: 90
             }
             property real directionAngle: 0
             rotation: directionAngle
-
-            property real speed: 5
+            property real speed: 1
             property WorldObject target
-            property bool active: true
+            property bool active: true;
+
+            Behavior on rotation {
+                SmoothedAnimation {
+                    duration: 100
+                    velocity: 360
+                }
+            }
+            PropertyAnimation on x {
+                id: xAnim
+                duration: 1000
+                easing.type: Easing.Linear
+                to: projectile.target.position.x
+                running: projectile.active
+            }
+            PropertyAnimation on y {
+                id: yAnim
+                duration: 1000
+                easing.type: Easing.Linear
+                to: projectile.target.position.y
+                running: projectile.active
+            }
 
             Timer {
                 id: moveTimer
@@ -40,28 +59,20 @@ Item {
                         destroyProjectile();
                         return;
                     }
-                    var targetPos = target.position;
-                    var projectileCenterX = x + width/2;
-                    var projectileCenterY = y + height/2;
-
-                    var dx = targetPos.x - projectileCenterX;
-                    var dy = targetPos.y - projectileCenterY;
+                    var dx = target.position.x - (x + width/2);
+                    var dy = target.position.y - (y + height/2);
                     var distance = Math.sqrt(dx*dx + dy*dy);
-
                     if (distance < 10) {
                         context.damageObject();
                         destroyProjectile();
                         return;
                     }
                     projectile.directionAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-                    let directionX = dx / distance;
-                    let directionY = dy / distance;
-                    x += directionX * speed;
-                    y += directionY * speed;
                 }
             }
 
             function destroyProjectile() {
+                active = false;
                 moveTimer.stop();
                 destroy();
             }
