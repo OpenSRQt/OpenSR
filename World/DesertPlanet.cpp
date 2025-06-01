@@ -123,9 +123,9 @@ template <>
 void WorldObject::registerType<DesertPlanet>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<DesertPlanetStyle>();
-    qRegisterMetaTypeStreamOperators<DesertPlanetStyle>();
+    //qRegisterMetaTypeStreamOperators<DesertPlanetStyle>();
     qRegisterMetaType<DesertPlanetStyle::Data>();
-    qRegisterMetaTypeStreamOperators<DesertPlanetStyle::Data>();
+    //qRegisterMetaTypeStreamOperators<DesertPlanetStyle::Data>();
     qmlRegisterType<DesertPlanet>("OpenSR.World", 1, 0, "DesertPlanet");
 }
 
