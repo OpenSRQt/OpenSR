@@ -22,7 +22,6 @@
 #include <OpenSR/OpenSR.h>
 #include <OpenSR/libRangerQt.h>
 #include <QSGTexture>
-#include <qt/QtQuick/qsgtexture.h>
 #include <rhi/qrhi.h>
 
 namespace OpenSR
@@ -31,7 +30,7 @@ class ENGINE_API GAITexture : public QSGTexture
 {
 public:
     GAITexture(const GAIHeader &header, const QImage &background);
-    virtual ~GAITexture();
+    ~GAITexture();
 
     bool hasAlphaChannel() const override;
     bool hasMipmaps() const override;
@@ -43,12 +42,10 @@ public:
     void initRhiResources();
     void drawNextFrame(const QByteArray &frameData, const QPoint &start);
     void drawNextFrame(const QImage &frame);
-    void reset();
 
 private:
     QRhiTexture *m_texture = nullptr;
-    uchar *imgBuffer = nullptr;  
-    qint64 m_texID;
+    std::unique_ptr<uchar[]> imgBuffer = nullptr;
     QImage m_bg;
     GAIHeader m_header;
     bool m_needDraw;
