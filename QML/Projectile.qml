@@ -4,8 +4,8 @@ import OpenSR.World 1.0
 
 Item {
     id: projectileFactory
-    width: 40
-    height: 40
+    width: 30
+    height: 30
     visible: true
 
     Component {
@@ -15,15 +15,15 @@ Item {
             id: projectile
             z: 2
             AnimatedImage {
-                source: "res:/DATA/ABItem/W03_S.gai";
-                width: 100
-                height: 100
+                source: "res:/DATA/AB/W01_F.gai";
+                width: 30
+                height: 30
                 cache: true
                 anchors.centerIn: parent
             }
             property real directionAngle: 0
             rotation: directionAngle
-            property real speed: 1
+            property real speed: 2
             property WorldObject target
             property bool active: true;
 

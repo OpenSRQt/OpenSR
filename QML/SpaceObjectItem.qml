@@ -18,6 +18,7 @@ Item {
     rotation: positioning && object ? radToDeg(shipAngle) : 0
 
     property int weaponRadius: 0
+    property var activeExplosions: []
 
     Loader {
         id: objectLoader
@@ -144,7 +145,13 @@ Item {
             Connections {
                 target: object
                 function onShipDestroyed() {
-                    self.destroy();
+                    self.opacity = 0
+                    var boomObj = boom.createObject(spaceNode, {
+                        x: object.position.x,
+                        y: object.position.y,
+                        explosionSource: "res:/DATA/BGObj/HS_1/DES.GAI",
+                        creator: self
+                    });
                 }
             }
         }
@@ -254,7 +261,13 @@ Item {
             Connections {
                 target: object
                 function onAsteroidDestroyed() {
-                    self.destroy();
+                    self.opacity = 0
+                    var boomObj = boom.createObject(spaceNode, {
+                        x: object.position.x,
+                        y: object.position.y,
+                        explosionSource: "res:/DATA/Asteroid/DES.GAI",
+                        creator: self
+                    });
                 }
             }
         }
@@ -300,5 +313,32 @@ Item {
 
     function radToDeg(rad) {
         return rad * (180 / Math.PI) + 90;
+    }
+
+    Component {
+        id: boom
+
+        Item {
+            id: explosionContainer
+            property var creator: null
+            property var explosionSource: ""
+
+            AnimatedImage {
+                id: boomImage
+                anchors.centerIn: parent
+                source: explosionSource
+            }
+
+            Timer {
+                interval: 2000
+                running: true
+                repeat: false
+                onTriggered: {
+                    console.log("Timer triggered after " + interval + " ms")
+                    explosionContainer.destroy()
+                    if (creator) creator.destroy();
+                }
+            }
+        }
     }
 }

@@ -473,10 +473,9 @@ Item {
         text: "Turn"
         sounded: false
         // TODO: Adding animations leads to crashes. WTF?
-        // normalImage: "res:/DATA/FormMain2/2ButAboutN.gi"
-        // hoveredImage: "res:/DATA/FormMain2/2ButAboutA.gi"
-        // downImage: "res:/DATA/FormMain2/2ButAboutD.gi"
-
+        //normalImage: "res:/DATA/PanelMain2/2TurnN.gi"
+        //hoveredImage: "res:/DATA/FormMain2/2TurnA.gi"
+        //downImage: "res:/DATA/FormMain2/2TurnD.gi"
         onClicked: {
             if (!WorldManager.turnFinished) {
                 return;
