@@ -63,7 +63,7 @@ Item {
         source: "res:/DATA/FormPQuest2/2S" + d.currentSkin + ".gi"
         width: implicitWidth + background.width - background.implicitWidth
         height: implicitHeight + background.height - background.implicitHeight
-        
+
         border.left: 30
         border.top: 505
         border.bottom: 35
