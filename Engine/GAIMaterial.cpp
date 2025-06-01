@@ -8,6 +8,14 @@ GAIMaterial::GAIMaterial(GAITexture *texture) : m_texture(texture)
     setFlag(Blending, true);
 }
 
+GAIMaterial::~GAIMaterial()
+{
+    if (m_texture)
+    {
+        delete m_texture;
+    }
+}
+
 QSGMaterialType *GAIMaterial::type() const
 {
     static QSGMaterialType type;
@@ -24,7 +32,8 @@ GAITexture *GAIMaterial::texture() const
     return m_texture;
 }
 
-void GAIMaterial::setTexture(GAITexture *texture) {
+void GAIMaterial::setTexture(GAITexture *texture)
+{
     m_texture = texture;
 }
 

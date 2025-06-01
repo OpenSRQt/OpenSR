@@ -22,14 +22,15 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QImage>
+#include <memory>
 
 namespace OpenSR
 {
 GAITexture::GAITexture(const GAIHeader &header, const QImage &background)
-    : QSGTexture(), m_texID(0), m_header(header), m_needDraw(false), m_bg(background)
+    : m_header(header), m_needDraw(true), m_bg(background),
+      m_size(QSize(m_header.finishX - m_header.startX, m_header.finishY - m_header.startY)),
+      m_nextFrameData(QByteArray())
 {
-    m_size = QSize(m_header.finishX - m_header.startX, m_header.finishY - m_header.startY);
-    reset();
 }
 
 GAITexture::~GAITexture()
@@ -38,10 +39,6 @@ GAITexture::~GAITexture()
     {
         m_texture->destroy();
         delete m_texture;
-    }
-    if (imgBuffer)
-    {
-        delete[] imgBuffer;
     }
 }
 
@@ -52,19 +49,11 @@ void GAITexture::drawNextFrame(const QByteArray &frameData, const QPoint &start)
     m_needDraw = true;
 }
 
-void GAITexture::reset()
-{
-    m_nextFrameData = QByteArray();
-    m_needDraw = true;
-}
-
 void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates)
 {
-    QImage prevFrame;
-    
     if (!imgBuffer)
     {
-        imgBuffer = new uchar[m_size.width() * m_size.height() * 4];
+        imgBuffer = std::make_unique<uchar[]>(m_size.width() * m_size.height() * 4);
     }
 
     if (!m_texture)
@@ -78,16 +67,19 @@ void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *res
         QImage img;
         if (m_nextFrameData.isEmpty())
         {
-            // TODO: empty image handle
             if (!m_bg.isNull())
             {
-                memcpy(imgBuffer, m_bg.constBits(), m_size.width() * m_size.height() * 4);
-                img = QImage(imgBuffer, m_size.width(), m_size.height(), QImage::Format_RGBA8888);
+                memcpy(imgBuffer.get(), m_bg.constBits(), m_size.width() * m_size.height() * 4);
+                img = QImage(imgBuffer.get(), m_size.width(), m_size.height(), QImage::Format_RGBA8888);
+            }
+            else
+            {
+                return;
             }
         }
         else
         {
-            img = QImage(imgBuffer, m_size.width(), m_size.height(), QImage::Format_RGBA8888);
+            img = QImage(imgBuffer.get(), m_size.width(), m_size.height(), QImage::Format_RGBA8888);
             QBuffer d(&m_nextFrameData);
             d.open(QIODevice::ReadOnly);
             decodeGAIDeltaFrame(img, m_decodeStart.x(), m_decodeStart.y(), &d);
