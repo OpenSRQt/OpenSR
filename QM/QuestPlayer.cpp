@@ -276,6 +276,8 @@ bool QuestPlayer::QuestPlayerPrivate::checkCriticalParameters()
             case QM::Parameter::PARAMETER_SUCCESS:
                 emit(q->questCompleted(substituteValues(pr.critText)));
                 break;
+            default:
+                break;
             }
             return false;
         }

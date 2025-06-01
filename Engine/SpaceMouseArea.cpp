@@ -73,8 +73,8 @@ void SpaceMouseArea::mouseReleaseEvent(QMouseEvent *event)
     emit released();
 
     const int threshold = qobject_cast<QApplication*>(qApp)->styleHints()->startDragDistance();
-    const bool isClick = (threshold >= qAbs(event->x() - m_pressPoint.x()) &&
-                          threshold >= qAbs(event->y() - m_pressPoint.y()));
+    const bool isClick = (threshold >= qAbs(event->position().x() - m_pressPoint.x()) &&
+                          threshold >= qAbs(event->position().y() - m_pressPoint.y()));
 
     if (isClick)
         emit clicked();

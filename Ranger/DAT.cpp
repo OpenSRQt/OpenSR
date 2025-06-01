@@ -19,6 +19,7 @@
 #include <OpenSR/libRangerQt.h>
 #include <QBuffer>
 #include <QVariantList>
+#include <qobject.h>
 
 namespace OpenSR
 {
@@ -49,17 +50,17 @@ void writeWideString(QIODevice *dev, const QString& value)
 //TODO: Optimize
 void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
 {
-    if (node.type() == QVariant::Map)
+    if (node.typeId() == QMetaType::QVariantMap)
     {
         QVariantMap m = node.toMap();
         uint32_t count = 0;
         uint8_t isTree = 0;
         for (const QVariant& c : m)
         {
-            if (c.type() == QVariant::Map || c.type() == QVariant::List)
+            if (c.typeId() == QMetaType::QVariantMap || c.typeId() == QMetaType::QVariantList)
             {
                 isTree = 1;
-                if (c.type() == QVariant::List)
+                if (c.typeId() == QMetaType::QVariantList)
                     count += c.toList().count() - 1;
             }
         }
@@ -75,9 +76,9 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
                 uint32_t index = 0;
                 uint32_t arrayCount = 1;
                 uint8_t isText = 1;
-                if (i.value().type() == QVariant::Map || i.value().type() == QVariant::List)
+                if (i.value().typeId() == QMetaType::QVariantMap || i.value().typeId() == QMetaType::QVariantList)
                     isText = 2;
-                if (i.value().type() != QVariant::List)
+                if (i.value().typeId() != QMetaType::QVariantList)
                 {
                     dev->write((char*)&index, 4);
                     dev->write((char*)&arrayCount, 4);
@@ -99,7 +100,7 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
             }
         }
     }
-    else if (node.type() == QVariant::List)
+    else if (node.typeId() == QMetaType::QVariantList)
     {
         QVariantList l = node.toList();
         uint32_t count = l.count();
@@ -111,7 +112,7 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
             uint8_t isText = 1;
             if (i == 0)
                 arrayCount = count;
-            if (c.type() == QVariant::Map || c.type() == QVariant::List)
+            if (c.typeId() == QMetaType::QVariantMap || c.typeId() == QMetaType::QVariantList)
                 isText = 2;
             dev->write((char*)&index, 4);
             dev->write((char*)&arrayCount, 4);

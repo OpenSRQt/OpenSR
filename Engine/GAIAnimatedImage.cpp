@@ -29,6 +29,8 @@
 #include <QImageReader>
 #include <QSGSimpleRectNode>
 #include <QTimer>
+#include <memory>
+#include <vector>
 
 namespace OpenSR
 {
@@ -59,7 +61,7 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
     QList<QVector<QPoint>> m_gaiOffsets;
     QTimer m_timer;
 
-    QList<GAITexture *> m_textures;
+    std::vector<std::unique_ptr<GAITexture>> m_textures;
     int m_currentFile;
     bool m_fileChanged;
     bool m_playing;
@@ -84,8 +86,6 @@ GAIAnimatedImage::GAIAnimatedImage(QQuickItem *parent)
 GAIAnimatedImage::~GAIAnimatedImage()
 {
     Q_D(GAIAnimatedImage);
-    for (QSGTexture *t : d->m_textures)
-        delete t;
 }
 
 void GAIAnimatedImage::setSources(const QList<QUrl> &url)
@@ -160,22 +160,22 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
             return nullptr;
         }
 
-        for (QSGTexture *t : d->m_textures)
-            delete t;
+        // for (QSGTexture *t : d->m_textures)
+        //     delete t;
         d->m_textures.clear();
 
         for (int i = 0; i < d->m_headers.size(); i++)
         {
-            GAITexture *texture = new GAITexture(d->m_headers[i], d->m_bgs[i]);
+            std::unique_ptr<GAITexture> texture(new GAITexture(d->m_headers[i], d->m_bgs[i]));
             texture->setFiltering(QSGTexture::Linear); // ?
-            d->m_textures.push_back(texture);
+            d->m_textures.push_back(std::move(texture));
         }
         d->m_sourceChanged = false;
     }
 
     if (d->m_fileChanged)
     {
-        material->setTexture(d->m_textures[d->m_currentFile]);
+        material->setTexture(d->m_textures[d->m_currentFile].get());
         node->markDirty(QSGNode::DirtyMaterial);
         d->m_fileChanged = false;
     }
@@ -430,7 +430,7 @@ void GAIAnimatedImage::nextFrame()
     if (d->m_currentFile >= d->m_headers.count())
         return;
 
-    if ((d->m_currentFile >= d->m_textures.count()) || (!d->m_textures[d->m_currentFile]))
+    if ((d->m_currentFile >= d->m_textures.size()) || (!d->m_textures[d->m_currentFile]))
     {
         d->m_timer.setInterval(d->m_gaiTimes[d->m_currentFile][d->m_currentFrame] / d->m_speed);
         d->m_timer.start();

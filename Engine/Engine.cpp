@@ -22,7 +22,6 @@
 
 #include "OpenSR/SoundManager.h"
 #include "OpenSR/ResourceManager.h"
-#include "OpenSR/Sound.h"
 #include "OpenSR/PluginInterface.h"
 #include "OpenSR/DATTranslator.h"
 #include "OpenSR/QMLHelper.h"
@@ -40,6 +39,7 @@
 #include <QPluginLoader>
 #include <QString>
 #include <QJSEngine>
+#include <qobject.h>
 
 namespace OpenSR
 {
@@ -226,7 +226,7 @@ QVariant Engine::datValue(const QString& path) const
             return QVariant();
         }
         result = it.value();
-        if (result.type() != QVariant::Map)
+        if (result.typeId() != QMetaType::QVariantMap)
             break;
         current = result.toMap();
     }

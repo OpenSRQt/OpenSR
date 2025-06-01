@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QImage>
 #include <memory>
+#include <qlogging.h>
 
 namespace OpenSR
 {
