@@ -19,7 +19,6 @@
 #include <OpenSR/libRangerQt.h>
 #include <QBuffer>
 #include <QVariantList>
-#include <qobject.h>
 
 namespace OpenSR
 {

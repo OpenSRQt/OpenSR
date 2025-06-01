@@ -89,7 +89,7 @@ signals:
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
-    WorldObject *m_playerShip;
+    WorldObject *m_playerShip = nullptr;
     WorldObject* m_planetToEnter;
     QPointF m_planetPosition;
 

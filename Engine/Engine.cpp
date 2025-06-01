@@ -39,7 +39,6 @@
 #include <QPluginLoader>
 #include <QString>
 #include <QJSEngine>
-#include <qobject.h>
 
 namespace OpenSR
 {
