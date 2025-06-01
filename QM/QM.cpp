@@ -28,7 +28,7 @@ QString readString(QIODevice *dev)
 {
     uint32_t len;
     dev->read((char*)&len, 4);
-    return QString::fromUtf16((ushort*)dev->read(len * 2).constData(), len);
+    return QString::fromUtf16((char16_t *)dev->read(len * 2).constData(), len); // check later
 }
 
 void skipString(QIODevice *dev)
