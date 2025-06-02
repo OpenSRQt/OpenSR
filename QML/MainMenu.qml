@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick
 import OpenSR 1.0
 
 Item {
@@ -40,7 +40,7 @@ Item {
     }
     GAIAnimatedImage {
         id: grid
-        
+
         sources: ["res:/DATA/FormMain2/2AnimMain.gai"]
         speed: 0.75
         anchors.fill: parent
@@ -123,10 +123,7 @@ Item {
             downImage: "res:/DATA/FormMain2/2ButExitD.gi"
             anchors.top: aboutButton.bottom
             anchors.topMargin: 10
-            onClicked: {
-                menu.destroy()
-                Engine.quit()
-            }
+            onClicked: Qt.quit()
         }
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: 100
@@ -160,6 +157,7 @@ Item {
         anchors.bottomMargin: questButtonText.height + 10
         anchors.leftMargin: 200
         onClicked: {
+            console.log("button clicked")
             gameScreen.createObjectFromURL("qrc:/OpenSR/QuestSelectionMenu.qml", menu, "questSelectionRequest")
         }
     }
@@ -189,6 +187,7 @@ Item {
     function componentObjectCreated(object, id)
     {
         if(id === "questSelectionRequest"){
+             console.log("???")
             object.anchors.horizontalCenter = menu.horizontalCenter
             object.anchors.verticalCenter = menu.verticalCenter
             object.questSelected.connect(startQuest)
