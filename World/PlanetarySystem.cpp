@@ -31,9 +31,7 @@ template<>
 void WorldObject::registerType<PlanetarySystem>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<PlanetarySystemStyle::Data>();
-    //qRegisterMetaTypeStreamOperators<PlanetarySystemStyle::Data>();
     qRegisterMetaType<PlanetarySystemStyle>();
-    //qRegisterMetaTypeStreamOperators<PlanetarySystemStyle>();
     qmlRegisterType<PlanetarySystem>("OpenSR.World", 1, 0, "PlanetarySystem");
 }
 

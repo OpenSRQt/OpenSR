@@ -20,6 +20,7 @@
 
 #include "WorldBindings.h"
 
+#include "Planet.h"
 #include <QLine>
 #include <QtMath>
 #include <QtQml/QQmlEngine>
@@ -29,41 +30,37 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Ship::m_staticTypeId =
-    typeIdFromClassName(Ship::staticMetaObject.className());
+const quint32 Ship::m_staticTypeId = typeIdFromClassName(Ship::staticMetaObject.className());
 
-template <>
-void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<ShipStyle>();
-    //qRegisterMetaTypeStreamOperators<ShipStyle>();
     qRegisterMetaType<ShipStyle::Data>();
-    //qRegisterMetaTypeStreamOperators<ShipStyle::Data>();
     bindEnumsToJS<Ship>(script);
     qmlRegisterType<Ship>("OpenSR.World", 1, 0, "Ship");
 }
 
-template <>
-Ship *WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Ship *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Ship(parent, id);
 }
 
-template <>
-quint32 WorldObject::staticTypeId<Ship>()
+template <> quint32 WorldObject::staticTypeId<Ship>()
 {
     return Ship::m_staticTypeId;
 }
 
-template <>
-const QMetaObject *WorldObject::staticTypeMeta<Ship>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Ship>()
 {
     return &Ship::staticMetaObject;
 }
 
 /**************************************************************************************************/
 
-int ShipStyle::width() const { return getData<Data>().width; }
+int ShipStyle::width() const
+{
+    return getData<Data>().width;
+}
 
 void ShipStyle::setWidth(int w)
 {
@@ -72,7 +69,10 @@ void ShipStyle::setWidth(int w)
     setData(d);
 }
 
-QString ShipStyle::texture() const { return getData<Data>().texture; }
+QString ShipStyle::texture() const
+{
+    return getData<Data>().texture;
+}
 
 void ShipStyle::setTexture(const QString &texture)
 {

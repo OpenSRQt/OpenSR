@@ -31,9 +31,7 @@ template<>
 void WorldObject::registerType<Race>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<RaceStyle>();
-    //qRegisterMetaTypeStreamOperators<RaceStyle>();
     qRegisterMetaType<RaceStyle::Data>();
-    //qRegisterMetaTypeStreamOperators<RaceStyle::Data>();
     qmlRegisterType<Race>("OpenSR.World", 1, 0, "Race");
 }
 

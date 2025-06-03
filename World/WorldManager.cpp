@@ -147,7 +147,7 @@ void countObjects(QList<WorldObject *> &objects, WorldObject *current)
 }
 } // namespace
 
-WorldManager *WorldManager::m_staticInstance = 0;
+WorldManager *WorldManager::m_staticInstance = nullptr;
 quint32 WorldManager::m_idPool = 0;
 
 WorldManager::WorldManager(QObject *parent) : QObject(parent), m_context(0)
@@ -211,9 +211,7 @@ QString WorldManager::typeName(quint32 type) const
 
 WorldManager::~WorldManager()
 {
-    if (m_context)
-        delete m_context;
-    WorldManager::m_staticInstance = 0;
+    WorldManager::m_staticInstance = nullptr;
 }
 
 WorldContext *WorldManager::context() const
@@ -424,7 +422,7 @@ void WorldManager::generateWorld(const QString &genScriptUrl)
     if (m_context)
     {
         delete m_context;
-        m_context = 0;
+        m_context = nullptr;
     }
 
     m_context = new WorldContext();

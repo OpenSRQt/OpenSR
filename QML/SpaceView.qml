@@ -25,7 +25,7 @@ Item {
 
         propagateComposedEvents: true
 
-        onDoubleClicked: {
+        onDoubleClicked: mouse => {
             if (!WorldManager.turnFinished) {
                 return;
             }
@@ -37,7 +37,7 @@ Item {
             hideTrajectory(context.playerShip);
         }
 
-        onClicked: {
+        onClicked: mouse => {
             if (!WorldManager.turnFinished) {
                 return;
             }
@@ -117,11 +117,6 @@ Item {
                 object: system.children[c]
             });
 
-            if(system.children[c] == WorldManager.context.playerShip){
-                playerShipItem = o;
-                console.log("Player ship item initialized:", playerShipItem);
-            }
-
             o.entered.connect(showDebugTooltip);
             o.exited.connect(hideDebugTooltip);
             o.entered.connect(showTrajectory);
@@ -149,21 +144,26 @@ Item {
 
     function showTrajectory(object) {
         trajectoryView.visibleRect = spaceNode.mapFromItem(view, 0, 0, view.width, view.height);
-        if (trajectoryView.object !== object)
+        if (trajectoryView.object !== object) {
             trajectoryView.object = object;
+        }
         trajectoryView.visible = true;
     }
-    function hideTrajectory() {
-        trajectoryView.visible = false;
+    function hideTrajectory(object) {
+        if (trajectoryView.object === object) {
+            trajectoryView.visible = false;
+        }
     }
 
     function showDebugTooltip(object) {
         debug.object = object;
         debug.visible = true;
     }
-    function hideDebugTooltip() {
-        debug.object = null;
-        debug.visible = false;
+    function hideDebugTooltip(object) {
+        if (object === debug.object) {
+            debug.object = null;
+            debug.visible = false;
+        }
     }
 
     ParallelAnimation {

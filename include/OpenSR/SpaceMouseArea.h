@@ -21,6 +21,7 @@
 
 #include <OpenSR/OpenSR.h>
 #include <QQuickItem>
+#include <QTimer>
 
 namespace OpenSR
 {
@@ -32,7 +33,7 @@ class SpaceMouseArea : public QQuickItem
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
 
 public:
-    SpaceMouseArea(QQuickItem *parent = 0);
+    SpaceMouseArea(QQuickItem *parent = nullptr);
 
     bool contains(const QPointF &point) const;
 
@@ -68,6 +69,7 @@ private:
     QPointF m_pressPoint;
     bool m_containsMouse;
     qreal m_radius;
+    QTimer m_enterTimer;
 };
 }
 
