@@ -89,7 +89,7 @@ static QObject* osrSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine
 void QMLHelper::registerQMLTypes(const char* uri)
 {
     using namespace OpenSR;
-    qmlRegisterSingletonType<Engine>(uri, 1, 0, "Engine", engineSingletonProvider);
+    //qmlRegisterSingletonType<Engine>(uri, 1, 0, "Engine", engineSingletonProvider);
     qmlRegisterSingletonType<OpenSR::QML::QMLHelper>(uri, 1, 0, "OSR", osrSingletonProvider);
     qmlRegisterUncreatableType<ResourceManager>(uri, 1, 0, "ResourceManager", "ResourceManager is not instantiable");
     qmlRegisterType<Sound>(uri, 1, 0, "Sound");

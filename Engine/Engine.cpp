@@ -39,6 +39,8 @@
 #include <QPluginLoader>
 #include <QString>
 #include <QJSEngine>
+#include <qlogging.h>
+#include <qscopedpointer.h>
 
 namespace OpenSR
 {
@@ -62,22 +64,16 @@ class Engine::EnginePrivate
 public:
     EnginePrivate()
     {
-        qmlEngine = nullptr;
-        scriptEngine = nullptr;
-        sound = nullptr;
-        resources = nullptr;
-        running = false;
     }
 
-    QQmlApplicationEngine *qmlEngine;
-    QJSEngine *scriptEngine;
-    SoundManager *sound;
-    ResourceManager *resources;
+    QScopedPointer<QQmlApplicationEngine> qmlEngine;
+    SoundManager *sound = nullptr;
+    ResourceManager *resources = nullptr;
     QVariantMap datRoot;
     QString dataDir;
     QUrl startupScript;
     QUrl mainQML;
-    bool running;
+    bool running = false;
 };
 
 Engine::Engine(int& argc, char** argv): QApplication(argc, argv),
@@ -90,17 +86,18 @@ Engine::Engine(int& argc, char** argv): QApplication(argc, argv),
     d->sound = new SoundManager(this);
     d->resources = new ResourceManager(this);
 
-    d->qmlEngine = new QQmlApplicationEngine();
+    d->qmlEngine.reset(new QQmlApplicationEngine());
 
     QML::QMLHelper::registerQMLTypes("OpenSR");
     d->qmlEngine->setNetworkAccessManagerFactory(d->resources->qmlNAMFactory());
 
-    d->scriptEngine = d->qmlEngine;
-    d->scriptEngine->globalObject().setProperty("Engine", d->scriptEngine->newQObject(this));
+    d->qmlEngine->globalObject().setProperty("Engine", d->qmlEngine->newQObject(this));
+    d->qmlEngine->setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 Engine::~Engine()
 {
+    Q_D(Engine);
 }
 
 int Engine::run()
@@ -147,7 +144,7 @@ int Engine::run()
     if (!d->mainQML.isEmpty())
     {
         d->qmlEngine->load(d->mainQML);
-        connect(d->qmlEngine, &QQmlApplicationEngine::objectCreated, scriptExec);
+        connect(d->qmlEngine.get(), &QQmlApplicationEngine::objectCreated, scriptExec);
     }
     else
         scriptExec();
@@ -185,23 +182,22 @@ ResourceManager* Engine::resources() const
 QQmlEngine* Engine::qmlEngine() const
 {
     Q_D(const Engine);
-    return d->qmlEngine;
+    return d->qmlEngine.get();
 }
 
 QJSEngine* Engine::scriptEngine() const
 {
     Q_D(const Engine);
-    return d->scriptEngine;
+    return d->qmlEngine.get();
 }
 
 void Engine::addDATFile(const QString& url, bool isCache)
 {
     Q_D(Engine);
-    QIODevice *dev = d->resources->getIODevice(QUrl(url));
+    QScopedPointer<QIODevice> dev(d->resources->getIODevice(QUrl(url)));
     if (!dev || !dev->isOpen())
         return;
-    QVariantMap dat = loadDAT(dev, isCache);
-    delete dev;
+    QVariantMap dat = loadDAT(dev.get(), isCache);
     mergeMap(d->datRoot, dat);
 }
 
@@ -261,7 +257,7 @@ void Engine::execScript(const QUrl& url)
 {
     Q_D(Engine);
 
-    QIODevice *dev = resources()->getIODevice(url);
+    QScopedPointer<QIODevice> dev(resources()->getIODevice(url));
     if (!dev)
     {
         qWarning().noquote() << QString("Cannot exec script %1: file not found.").arg(url.toString());
@@ -270,9 +266,8 @@ void Engine::execScript(const QUrl& url)
 
     QString script = QString::fromUtf8(dev->readAll());
     dev->close();
-    delete dev;
 
-    QJSValue result = d->scriptEngine->evaluate(script, url.toString());
+    QJSValue result = d->qmlEngine->evaluate(script, url.toString());
     if (result.isError())
     {
         qWarning().noquote() << QString("%1:%2: %3").arg(url.toString(),

@@ -40,7 +40,6 @@ Item {
     }
     GAIAnimatedImage {
         id: grid
-
         sources: ["res:/DATA/FormMain2/2AnimMain.gai"]
         speed: 0.75
         anchors.fill: parent
@@ -157,7 +156,6 @@ Item {
         anchors.bottomMargin: questButtonText.height + 10
         anchors.leftMargin: 200
         onClicked: {
-            console.log("button clicked")
             gameScreen.createObjectFromURL("qrc:/OpenSR/QuestSelectionMenu.qml", menu, "questSelectionRequest")
         }
     }
@@ -187,7 +185,6 @@ Item {
     function componentObjectCreated(object, id)
     {
         if(id === "questSelectionRequest"){
-             console.log("???")
             object.anchors.horizontalCenter = menu.horizontalCenter
             object.anchors.verticalCenter = menu.verticalCenter
             object.questSelected.connect(startQuest)

@@ -160,14 +160,11 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
             return nullptr;
         }
 
-        // for (QSGTexture *t : d->m_textures)
-        //     delete t;
         d->m_textures.clear();
 
         for (int i = 0; i < d->m_headers.size(); i++)
         {
             std::unique_ptr<GAITexture> texture(new GAITexture(d->m_headers[i], d->m_bgs[i]));
-            texture->setFiltering(QSGTexture::Linear); // ?
             d->m_textures.push_back(std::move(texture));
         }
         d->m_sourceChanged = false;
@@ -180,7 +177,7 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
         d->m_fileChanged = false;
     }
 
-    QSGGeometry::updateTexturedRectGeometry(geometry, boundingRect(), QRectF(0, 0, 1, 1)); // boundingRect?
+    QSGGeometry::updateTexturedRectGeometry(geometry, boundingRect(), QRectF(0, 0, 1, 1));
     node->markDirty(QSGNode::DirtyGeometry);
 
     return node;

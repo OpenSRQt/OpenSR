@@ -11,7 +11,7 @@ Item {
     property real shipAngle: object && object.hasOwnProperty("angle") ? object.angle : 0
 
     signal entered(WorldObject obj)
-    signal exited
+    signal exited(WorldObject obj)
 
     x: positioning && object ? object.position.x : 0
     y: positioning && object ? object.position.y : 0
@@ -41,7 +41,7 @@ Item {
             id: mouse
             anchors.fill: parent
             radius: Math.min(width / 2, height / 2) - mouseDelta
-            onEntered: mouseEntered(object)
+            onEntered: mouseEntered()
             onExited: mouseExited()
         }
     }
@@ -51,7 +51,7 @@ Item {
         AnimatedImage {
             cache: false
             MouseArea {
-                id: item
+                id: item // ?
                 anchors.fill: parent
                 propagateComposedEvents: true
             }
@@ -67,7 +67,7 @@ Item {
             MouseArea {
                 propagateComposedEvents: true
                 anchors.fill: parent
-                onDoubleClicked: {
+                onDoubleClicked: (mouse) => {
                     mouse.accepted = false;
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
@@ -156,8 +156,9 @@ Item {
     }
 
     function mouseEntered() {
-        if (object)
+        if (object) {
             entered(object);
+        }
     }
 
     function mouseExited() {

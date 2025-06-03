@@ -75,7 +75,7 @@ class OPENSR_WORLD_API WorldManager : public QObject
     Q_PROPERTY(bool turnFinished READ turnFinished NOTIFY turnFinishedChanged)
 
 public:
-    WorldManager(QObject *parent = 0);
+    WorldManager(QObject *parent = nullptr);
     virtual ~WorldManager();
 
     quint32 getNextId() const;
