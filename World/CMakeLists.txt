@@ -1,5 +1,4 @@
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Quick Qml)
-find_package(OpenGL REQUIRED)
 
 add_library(world SHARED
     Artefact.cpp
@@ -78,14 +77,16 @@ target_include_directories(world PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_include_directories(world PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    ${OPENGL_INCLUDE_DIR}
-)
-
 target_compile_definitions(world PRIVATE OPENSR_WORLD_BUILD)
 
-target_link_libraries(world PRIVATE engine Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Quick Qt6::Qml)
+target_link_libraries(world PRIVATE 
+    engine 
+    Qt6::Core 
+    Qt6::Gui 
+    Qt6::Widgets 
+    Qt6::Quick 
+    Qt6::Qml
+)
 
 IF(WIN32)
     SET_TARGET_PROPERTIES(world PROPERTIES PREFIX "")
