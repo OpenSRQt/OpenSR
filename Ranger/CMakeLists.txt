@@ -16,8 +16,11 @@ target_include_directories(RangerQt PUBLIC
 
 target_compile_definitions(RangerQt PRIVATE LIBRANGER_LIBRARY)
 
+target_link_libraries(RangerQt PRIVATE
+    Qt6::Core 
+    Qt6::Gui
+)
+
 if(WIN32)
     set_target_properties(RangerQt PROPERTIES PREFIX "")
 endif()
-
-target_link_libraries(RangerQt PRIVATE Qt6::Core Qt6::Gui)

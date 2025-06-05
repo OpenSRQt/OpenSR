@@ -12,8 +12,8 @@ target_include_directories(QM PUBLIC
 
 target_compile_definitions(QM PRIVATE QM_LIBRARY_BUILD)
 
+target_link_libraries(QM PRIVATE Qt6::Core)
+
 if(WIN32)
     set_target_properties(QM PROPERTIES PREFIX "")
 endif()
-
-target_link_libraries(QM PRIVATE Qt6::Core)

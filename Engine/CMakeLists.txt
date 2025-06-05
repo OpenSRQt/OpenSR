@@ -81,15 +81,15 @@ target_link_libraries(engine PRIVATE
 
 target_compile_definitions(engine PRIVATE OPENSR_ENGINE_BUILD)
 
-if(WIN32)
-    set_target_properties(engine PROPERTIES PREFIX "")
-endif()
-
 add_executable(opensr main.cpp ${CMAKE_SOURCE_DIR}/QML/qml.qrc)
 
 target_link_libraries(opensr PRIVATE
     Qt6::Widgets
     engine
 )
+
+if(WIN32)
+    set_target_properties(engine PROPERTIES PREFIX "")
+endif()
 
 install(TARGETS opensr RUNTIME DESTINATION bin)

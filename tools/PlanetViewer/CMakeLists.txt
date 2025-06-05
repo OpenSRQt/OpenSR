@@ -11,4 +11,7 @@ target_include_directories(opensr-planet-viewer PRIVATE
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 )
 
-target_link_libraries(opensr-planet-viewer PRIVATE Qt6::Widgets engine)
+target_link_libraries(opensr-planet-viewer PRIVATE 
+    Qt6::Widgets 
+    engine
+)
