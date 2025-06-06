@@ -39,8 +39,6 @@
 #include <QPluginLoader>
 #include <QString>
 #include <QJSEngine>
-#include <qlogging.h>
-#include <qscopedpointer.h>
 
 namespace OpenSR
 {

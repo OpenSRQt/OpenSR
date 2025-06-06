@@ -22,7 +22,7 @@
 #include <OpenSR/OpenSR.h>
 #include <OpenSR/libRangerQt.h>
 #include <QSGTexture>
-#include <rhi/qrhi.h>
+#include <QtGui/private/qrhi_p.h>
 
 namespace OpenSR
 {

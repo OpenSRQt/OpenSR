@@ -29,7 +29,7 @@
 #include <QOpenGLTexture>
 #include <QImage>
 #include <QImageReader>
-#include <qdebug.h>
+#include <QtCore/QDebug>
 
 namespace OpenSR
 {

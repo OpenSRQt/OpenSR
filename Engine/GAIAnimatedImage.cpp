@@ -27,10 +27,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QImageReader>
-#include <QSGSimpleRectNode>
 #include <QTimer>
-#include <memory>
-#include <vector>
 
 namespace OpenSR
 {
