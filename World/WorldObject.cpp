@@ -27,32 +27,27 @@ namespace World
 {
 const quint32 WorldObject::m_staticTypeId = typeIdFromClassName(WorldObject::staticMetaObject.className());
 
-template<>
-void WorldObject::registerType<WorldObject>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<WorldObject>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<WorldObject>("OpenSR.World", 1, 0, "WorldObject");
 }
 
-template<>
-WorldObject* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> WorldObject *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new WorldObject(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<WorldObject>()
+template <> quint32 WorldObject::staticTypeId<WorldObject>()
 {
     return WorldObject::m_staticTypeId;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<WorldObject>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<WorldObject>()
 {
     return &WorldObject::staticMetaObject;
 }
 
-WorldObject::WorldObject(WorldObject *parent, quint32 id): QObject(parent),
-    m_id(id)
+WorldObject::WorldObject(WorldObject *parent, quint32 id) : QObject(parent), m_id(id)
 {
     if (!m_id)
         m_id = WorldManager::instance()->getNextId();
@@ -82,7 +77,7 @@ QString WorldObject::namePrefix() const
     return tr("Object");
 }
 
-void WorldObject::setName(const QString& name)
+void WorldObject::setName(const QString &name)
 {
     if (m_name != name)
     {
@@ -91,19 +86,19 @@ void WorldObject::setName(const QString& name)
     }
 }
 
-static QObject* childrenAtF(QQmlListProperty<QObject> *property, int index)
+static QObject *childrenAtF(QQmlListProperty<QObject> *property, qsizetype index)
 {
     return property->object->children().at(index);
 }
 
-static int childrenCountF(QQmlListProperty<QObject> *property)
+static qsizetype childrenCountF(QQmlListProperty<QObject> *property)
 {
     return property->object->children().count();
 }
 
 QQmlListProperty<QObject> WorldObject::getChildren()
 {
-    return QQmlListProperty<QObject>(this, 0, childrenCountF, childrenAtF);
+    return QQmlListProperty<QObject>(this, nullptr, &childrenCountF, &childrenAtF);
 }
 
 void WorldObject::prepareSave()
@@ -115,7 +110,7 @@ bool WorldObject::save(QDataStream &stream) const
     return true;
 }
 
-bool WorldObject::load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects)
+bool WorldObject::load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects)
 {
     return true;
 }
@@ -130,7 +125,7 @@ void WorldObject::startTurn()
 {
     for (auto o : children())
     {
-        WorldObject *wo = qobject_cast<WorldObject*>(o);
+        WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
             wo->startTurn();
     }
@@ -148,7 +143,7 @@ void WorldObject::processTurn(float time)
 {
     for (auto o : children())
     {
-        WorldObject *wo = qobject_cast<WorldObject*>(o);
+        WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
             wo->processTurn(time);
     }
@@ -163,7 +158,7 @@ void WorldObject::finishTurn()
 {
     for (auto o : children())
     {
-        WorldObject *wo = qobject_cast<WorldObject*>(o);
+        WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
             wo->finishTurn();
     }
@@ -174,7 +169,7 @@ void WorldObject::finishTurn()
  * \param className class name (usually, metaObject()->className)
  * \return type ID for class
  */
-quint32 WorldObject::typeIdFromClassName(const QString& className)
+quint32 WorldObject::typeIdFromClassName(const QString &className)
 {
     quint32 h = 0;
     int n = className.length();
@@ -187,5 +182,5 @@ quint32 WorldObject::typeIdFromClassName(const QString& className)
     }
     return h;
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

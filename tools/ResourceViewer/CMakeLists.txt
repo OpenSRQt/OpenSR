@@ -1,34 +1,25 @@
-FIND_PACKAGE(Qt5Widgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-SET(RV_SOURCES
+add_executable(opensr-resourceviewer
     main.cpp
     MainWindow.cpp
     FileModel.cpp
     ExtractDialog.cpp
-)
-
-SET(RV_HEADERS
     MainWindow.h
     FileModel.h
     ExtractDialog.h
-)
-
-SET(RV_UI
     MainWindow.ui
     ExtractDialog.ui
 )
 
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/include
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(opensr-resourceviewer PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
 
-QT5_WRAP_CPP(RV_MOC_SOURCES ${RV_HEADERS})
-QT5_WRAP_UI(RV_UI_SOURCES ${RV_UI})
+target_link_libraries(opensr-resourceviewer PRIVATE
+    RangerQt
+    Qt6::Core
+    Qt6::Widgets
+)
 
-ADD_EXECUTABLE(opensr-resourceviewer ${RV_SOURCES} ${RV_UI_SOURCES} ${RV_MOC_SOURCES})
-
-TARGET_LINK_LIBRARIES(opensr-resourceviewer RangerQt Qt5::Core Qt5::Widgets)
-
-INSTALL(TARGETS opensr-resourceviewer RUNTIME DESTINATION bin)
+install(TARGETS opensr-resourceviewer RUNTIME DESTINATION bin)

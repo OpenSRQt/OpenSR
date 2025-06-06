@@ -1,26 +1,18 @@
-FIND_PACKAGE(Qt5Widgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-SET(QP_SOURCES
+add_executable(opensr-questplayer
     main.cpp
     PlayerWindow.cpp
-)
-
-SET(QP_HEADERS
     PlayerWindow.h
-)
-
-SET(QP_UI
     PlayerWindow.ui
 )
 
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/include
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${Qt5Core_INCLUDE_DIRS}
+target_include_directories(opensr-questplayer PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
 
-QT5_WRAP_UI(QP_UI_SOURCES ${QP_UI})
-QT5_WRAP_CPP(QP_MOC_SOURCES ${QP_HEADERS})
-
-ADD_EXECUTABLE(opensr-questplayer ${QP_SOURCES} ${QP_UI_SOURCES} ${QP_MOC_SOURCES})
-TARGET_LINK_LIBRARIES(opensr-questplayer QM Qt5::Core Qt5::Widgets)
+target_link_libraries(opensr-questplayer PRIVATE
+    QM
+    Qt6::Core
+    Qt6::Widgets
+)

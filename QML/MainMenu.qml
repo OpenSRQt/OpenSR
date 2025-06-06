@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick
 import OpenSR 1.0
 
 Item {
@@ -40,7 +40,6 @@ Item {
     }
     GAIAnimatedImage {
         id: grid
-        
         sources: ["res:/DATA/FormMain2/2AnimMain.gai"]
         speed: 0.75
         anchors.fill: parent
@@ -123,10 +122,7 @@ Item {
             downImage: "res:/DATA/FormMain2/2ButExitD.gi"
             anchors.top: aboutButton.bottom
             anchors.topMargin: 10
-            onClicked: {
-                menu.destroy()
-                Engine.quit()
-            }
+            onClicked: Qt.quit()
         }
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: 100

@@ -334,7 +334,7 @@ QImage loadPSDFrame(QIODevice *dev)
     }
 
     if (pallete)
-        delete pallete;
+        delete[] pallete;
 
     return image;
 }

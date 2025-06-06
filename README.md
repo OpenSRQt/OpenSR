@@ -26,6 +26,7 @@ Copy following .pkg files (game resources) from install ISO to data/ folder:
     SR2/DATA/2captain.pkg
     SR2/DATA/2gov.pkg
     SR2/DATA/2Items.pkg
+    SR2/DATA/1main.pkg
     SR2/DATA/2main.pkg
     SR2/DATA/common.pkg
     SR2/DATA/ShipFull.pkg

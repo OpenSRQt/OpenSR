@@ -46,7 +46,7 @@ QImageIOPlugin::Capabilities QtOpenSRImagePlugin::capabilities(QIODevice * devic
                 sig == HAI_SIGNATURE || sig == PSD_SIGNATURE)
             return QImageIOPlugin::CanRead;
     }
-    return 0;
+    return QImageIOPlugin::Capabilities();
 }
 
 QImageIOHandler* QtOpenSRImagePlugin::create(QIODevice * device, const QByteArray & format) const

@@ -276,6 +276,8 @@ bool QuestPlayer::QuestPlayerPrivate::checkCriticalParameters()
             case QM::Parameter::PARAMETER_SUCCESS:
                 emit(q->questCompleted(substituteValues(pr.critText)));
                 break;
+            default:
+                break;
             }
             return false;
         }
@@ -401,7 +403,7 @@ QList<QuestPlayer::TransitionItem> QuestPlayer::visibleTransitions() const
         r.append(item);
     }
 
-    qSort(r.begin(), r.end(),
+    std::sort(r.begin(), r.end(),
           [&](const TransitionItem & a, const TransitionItem & b) -> bool
     {
         return d->m_currentLocation.transitions[a.id].position < d->m_currentLocation.transitions[b.id].position;

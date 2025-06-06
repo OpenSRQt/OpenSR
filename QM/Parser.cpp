@@ -169,7 +169,7 @@ int32_t getInt(int &pos, QString& exp)
         s++;
         offset++;
     }
-    int32_t res = exp.midRef(pos, offset).toInt();
+    int32_t res = exp.sliced(pos, offset).toInt();
     pos += offset;
     return res;
 }
@@ -186,7 +186,7 @@ float getFloat(int &pos, const QString& exp)
         s++;
         offset++;
     }
-    int32_t res = exp.midRef(pos, offset).toFloat();
+    int32_t res = exp.sliced(pos, offset).toInt();
     pos += offset;
     return res;
 }
@@ -341,37 +341,37 @@ QList<Token> tokenize(const QString& expression)
                 return QList<Token>();
             }
         }
-        else if (exp.midRef(pos, 3) == "mod")
+        else if (exp.sliced(pos, 3) == "mod")
         {
             t.type = Token::TOKEN_OP_MOD;
             pos += 3;
         }
-        else if (exp.midRef(pos, 3) == "div")
+        else if (exp.sliced(pos, 3) == "div")
         {
             t.type = Token::TOKEN_OP_INT_DIV;
             pos += 3;
         }
-        else if (exp.midRef(pos, 3) == "and")
+        else if (exp.sliced(pos, 3) == "and")
         {
             t.type = Token::TOKEN_AND;
             pos += 3;
         }
-        else if (exp.midRef(pos, 3) == "not")
+        else if (exp.sliced(pos, 3) == "not")
         {
             t.type = Token::TOKEN_NOT;
             pos += 3;
         }
-        else if (exp.midRef(pos, 2) == "or")
+        else if (exp.sliced(pos, 2) == "or")
         {
             t.type = Token::TOKEN_OR;
             pos += 2;
         }
-        else if (exp.midRef(pos, 2) == "to")
+        else if (exp.sliced(pos, 2) == "to")
         {
             t.type = Token::TOKEN_TO;
             pos += 2;
         }
-        else if (exp.midRef(pos, 2) == "in")
+        else if (exp.sliced(pos, 2) == "in")
         {
             t.type = Token::TOKEN_IN;
             pos += 2;

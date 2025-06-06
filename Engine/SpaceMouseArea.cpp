@@ -23,9 +23,7 @@
 
 namespace OpenSR
 {
-SpaceMouseArea::SpaceMouseArea(QQuickItem *parent): QQuickItem(parent),
-    m_pressed(false),
-    m_containsMouse(false)
+SpaceMouseArea::SpaceMouseArea(QQuickItem *parent) : QQuickItem(parent), m_pressed(false), m_containsMouse(false)
 {
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
@@ -72,9 +70,9 @@ void SpaceMouseArea::mouseReleaseEvent(QMouseEvent *event)
     setPressed(false);
     emit released();
 
-    const int threshold = qobject_cast<QApplication*>(qApp)->styleHints()->startDragDistance();
-    const bool isClick = (threshold >= qAbs(event->x() - m_pressPoint.x()) &&
-                          threshold >= qAbs(event->y() - m_pressPoint.y()));
+    const int threshold = qobject_cast<QApplication *>(qApp)->styleHints()->startDragDistance();
+    const bool isClick = (threshold >= qAbs(event->position().x() - m_pressPoint.x()) &&
+                          threshold >= qAbs(event->position().y() - m_pressPoint.y()));
 
     if (isClick)
         emit clicked();
@@ -90,14 +88,14 @@ void SpaceMouseArea::hoverEnterEvent(QHoverEvent *event)
 {
     Q_UNUSED(event);
     setContainsMouse(true);
-    emit(entered());
+    emit entered();
 }
 
 void SpaceMouseArea::hoverLeaveEvent(QHoverEvent *event)
 {
     Q_UNUSED(event);
     setContainsMouse(false);
-    emit(exited());
+    emit exited();
 }
 
 bool SpaceMouseArea::isPressed() const
@@ -123,4 +121,4 @@ void SpaceMouseArea::setRadius(qreal radius)
         emit(radiusChanged());
     }
 }
-}
+} // namespace OpenSR

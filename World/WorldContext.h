@@ -42,7 +42,7 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
         NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
     
 public:
-    Q_INVOKABLE WorldContext(WorldObject *parent = 0, quint32 id = 0);
+    Q_INVOKABLE WorldContext(WorldObject *parent = nullptr, quint32 id = 0);
     virtual ~WorldContext();
 
     PlanetarySystem *currentSystem() const;
@@ -89,7 +89,7 @@ signals:
 private:
     PlanetarySystem *m_currentSystem;
     ResourceManager *m_resources;
-    WorldObject *m_playerShip;
+    WorldObject *m_playerShip = nullptr;
     WorldObject* m_planetToEnter;
     QPointF m_planetPosition;
 

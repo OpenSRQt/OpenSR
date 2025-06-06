@@ -1,6 +1,5 @@
-import QtQuick 2.3
-import QtQuick.Controls 1.3
-import QtGraphicalEffects 1.0
+import QtQuick
+import QtQuick.Controls
 import OpenSR 1.0
 
 Item {    
@@ -34,11 +33,11 @@ Item {
         visible: false
     }
 
-    OpacityMask {
-        anchors.fill: questImageBG
-        source: questImage
-        maskSource: questImageBG
-    }
+    // OpacityMask {
+    //     anchors.fill: questImageBG
+    //     source: questImage
+    //     maskSource: questImageBG
+    // }
     
     Image {
         id: questSelectionBG
@@ -108,7 +107,7 @@ Item {
         implicitWidth: 546
         implicitHeight: 460
         
-        style: Qt.createComponent("res:/ORC/PlanetQuest/ScrollBarS1.qml")
+        //style: Qt.createComponent("res:/ORC/PlanetQuest/ScrollBarS1.qml")
         
         ListView {
             id: questList
@@ -183,7 +182,7 @@ Item {
         implicitWidth: 300
         implicitHeight: 240
         
-        style: Qt.createComponent("res:/ORC/PlanetQuest/ScrollBarS4.qml")
+        //style: Qt.createComponent("res:/ORC/PlanetQuest/ScrollBarS4.qml")
         
         Text {
             id: questDescription

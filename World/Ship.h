@@ -23,10 +23,11 @@
 #include "Resource.h"
 #include "World.h"
 #include <QPoint>
-#include "Planet.h"
 
-namespace OpenSR {
-namespace World {
+namespace OpenSR
+{
+namespace World
+{
 
 class OPENSR_WORLD_API ShipStyle : public Resource
 {
@@ -94,7 +95,7 @@ public:
     };
     Q_ENUM(ShipRank)
 
-    Q_INVOKABLE Ship(WorldObject* parent = 0, quint32 id = 0);
+    Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
     virtual ~Ship();
 
     virtual quint32 typeId() const override;
@@ -113,7 +114,7 @@ public:
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(WorldObject* planetToEnter);
+    void checkPlanetProximity(WorldObject *planetToEnter);
     void setIsMoving(bool isMoving);
 
     static const float normalLinearSpeed;
@@ -126,7 +127,7 @@ public:
     void calcTrajectory(const QPointF &destination);
     bool checkPlannedActions() const;
 
-   signals:
+signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
     void timeChanged();
@@ -169,4 +170,4 @@ private:
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle)
 Q_DECLARE_METATYPE(OpenSR::World::ShipStyle::Data)
 
-#endif  // OPENSR_WORLD_SHIP_H
+#endif // OPENSR_WORLD_SHIP_H

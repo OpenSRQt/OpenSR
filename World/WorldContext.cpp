@@ -19,6 +19,7 @@
 #include "WorldContext.h"
 
 #include "Ship.h"
+#include "WorldObject.h"
 #include <QDataStream>
 #include <QMap>
 #include <QtQml>
@@ -127,14 +128,16 @@ void WorldContext::setPlayerShip(WorldObject *ship)
     if (m_playerShip == ship)
         return;
 
-    if (m_playerShip)
-        disconnect(qobject_cast<Ship *>(m_playerShip), &Ship::shipArrived, this, &WorldContext::onShipArrived);
+    Ship *oldPlayerShip = qobject_cast<Ship *>(m_playerShip);
+    if (oldPlayerShip)
+        disconnect(oldPlayerShip, &Ship::shipArrived, this, &WorldContext::onShipArrived);
 
     m_playerShip = ship;
     emit playerShipChanged(ship);
 
-    if (m_playerShip)
-        connect(qobject_cast<Ship *>(m_playerShip), &Ship::shipArrived, this, &WorldContext::onShipArrived);
+    Ship *newPlayerShip = qobject_cast<Ship *>(m_playerShip);
+    if (newPlayerShip)
+        connect(newPlayerShip, &Ship::shipArrived, this, &WorldContext::onShipArrived);
 }
 
 bool WorldContext::checkPlannedActions() const
@@ -161,31 +164,31 @@ void WorldContext::onShipArrived()
     emit plannedActionsCompleted();
 }
 
-WorldObject* WorldContext::planetToEnter() const
+WorldObject *WorldContext::planetToEnter() const
 {
     return m_planetToEnter;
 }
 
-void WorldContext::setPlanetToEnter(WorldObject * planet)
+void WorldContext::setPlanetToEnter(WorldObject *planet)
 {
-    if(m_planetToEnter == planet) 
+    if (m_planetToEnter == planet)
         return;
     m_planetToEnter = planet;
     emit planetToEnterChanged(planet);
 }
 
-QPointF WorldContext::movementPosition() 
+QPointF WorldContext::movementPosition()
 {
     return m_planetPosition;
 }
 
-void WorldContext::setMovementPosition(const QPointF& pos) 
+void WorldContext::setMovementPosition(const QPointF &pos)
 {
-    if(m_planetPosition == pos) 
+    if (m_planetPosition == pos)
         return;
     m_planetPosition = pos;
     emit movementPositionChanged(pos);
 }
 
-}
-}
+} // namespace World
+} // namespace OpenSR

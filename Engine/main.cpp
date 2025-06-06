@@ -28,6 +28,7 @@ static const QString MAIN_QML = "res:/OpenSR/GameWindow.qml";
 
 int main(int argc, char **argv)
 {
+    //qputenv("QSG_RHI_BACKEND", "vulkan");
     OpenSR::Engine engine(argc, argv);
 
     QApplication::setOrganizationName(SETTINGS_ORGANIZATION);
