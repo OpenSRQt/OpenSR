@@ -21,9 +21,6 @@
 #include <OpenSR/libRangerQt.h>
 #include <QBuffer>
 #include <QDebug>
-#include <QImage>
-#include <memory>
-#include <qlogging.h>
 
 namespace OpenSR
 {
