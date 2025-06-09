@@ -30,7 +30,7 @@ class ENGINE_API GAITexture : public QSGTexture
 {
 public:
     GAITexture(const GAIHeader &header, const QImage &background);
-    ~GAITexture();
+    ~GAITexture() override;
 
     bool hasAlphaChannel() const override;
     bool hasMipmaps() const override;
@@ -39,7 +39,6 @@ public:
     QRhiTexture *rhiTexture() const override;
     void commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates) override;
 
-    void initRhiResources();
     void drawNextFrame(const QByteArray &frameData, const QPoint &start);
     void drawNextFrame(const QImage &frame);
 

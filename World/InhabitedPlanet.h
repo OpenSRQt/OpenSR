@@ -19,8 +19,8 @@
 #ifndef OPENSR_WORLD_INHABITEDPLANET_H
 #define OPENSR_WORLD_INHABITEDPLANET_H
 
-#include "World.h"
 #include "Planet.h"
+#include "World.h"
 #include <QGraphicsItem>
 
 namespace OpenSR
@@ -33,10 +33,10 @@ class OPENSR_WORLD_API InhabitedPlanetStyle : public Resource
     Q_GADGET
 
     Q_PROPERTY(QString surface READ surface WRITE setSurface)
-    Q_PROPERTY(QString cloud0  READ cloud0  WRITE setCloud0 )
-    Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
-    Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
-    Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString cloud0 READ cloud0 WRITE setCloud0)
+    Q_PROPERTY(QString cloud1 READ cloud1 WRITE setCloud1)
+    Q_PROPERTY(int radius READ radius WRITE setRadius)
+    Q_PROPERTY(QColor atmosphere READ atmosphere WRITE setAtmosphere)
     Q_PROPERTY(QString background READ background WRITE setBackground)
     Q_PROPERTY(QString affiliation READ affiliation WRITE setAffiliation)
 
@@ -54,11 +54,11 @@ public:
     QColor atmosphere() const;
     QString background() const;
 
-    void setSurface(const QString&);
-    void setCloud0(const QString&);
-    void setCloud1(const QString&);
+    void setSurface(const QString &);
+    void setCloud0(const QString &);
+    void setCloud1(const QString &);
     void setRadius(int);
-    void setAtmosphere(const QColor&);
+    void setAtmosphere(const QColor &);
     void setBackground(const QString &);
 
     QString affiliation() const;
@@ -80,15 +80,15 @@ class OPENSR_WORLD_API InhabitedPlanet : public Planet
     Q_PROPERTY(OpenSR::World::InhabitedPlanetStyle style READ style WRITE setStyle NOTIFY styleChanged)
 public:
     Q_INVOKABLE InhabitedPlanet(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~InhabitedPlanet();
+    ~InhabitedPlanet() override;
 
-    virtual quint32 typeId() const override;
-    virtual QString namePrefix() const override;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
-    virtual void prepareSave() override;
+    void prepareSave() override;
 
     InhabitedPlanetStyle style() const;
-    virtual int radius() override;
+    int radius() override;
     void setStyle(const InhabitedPlanetStyle &style);
 
 Q_SIGNALS:
@@ -97,8 +97,8 @@ Q_SIGNALS:
 private:
     InhabitedPlanetStyle m_style;
 };
-} //namespace World
-} //namespace OpenSR
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle::Data)
 Q_DECLARE_METATYPE(OpenSR::World::InhabitedPlanetStyle)

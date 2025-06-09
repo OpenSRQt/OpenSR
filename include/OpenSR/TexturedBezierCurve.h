@@ -20,12 +20,12 @@
 #define OPENSR_TEXTUREDBEZIERCURVE_H
 
 #include <OpenSR/OpenSR.h>
-#include <OpenSR/Types.h>
 #include <OpenSR/TexturedPolyline.h>
+#include <OpenSR/Types.h>
 
 namespace OpenSR
 {
-class ENGINE_API TexturedBezierCurve: public TexturedPolyline
+class ENGINE_API TexturedBezierCurve : public TexturedPolyline
 {
     Q_OBJECT
     OPENSR_DECLARE_PRIVATE(TexturedBezierCurve)
@@ -34,13 +34,13 @@ class ENGINE_API TexturedBezierCurve: public TexturedPolyline
     Q_PROPERTY(int minStep READ minStep WRITE setMinStep NOTIFY minStepChanged)
 
 public:
-    TexturedBezierCurve(QQuickItem * parent = 0);
-    virtual ~TexturedBezierCurve();
+    TexturedBezierCurve(QQuickItem *parent = 0);
+    ~TexturedBezierCurve() override;
 
     BezierCurve curve() const;
     int minStep() const;
 
-    void setCurve(const BezierCurve& curve);
+    void setCurve(const BezierCurve &curve);
     void setMinStep(int minStep);
 
 Q_SIGNALS:
@@ -50,6 +50,6 @@ Q_SIGNALS:
 protected:
     OPENSR_DECLARE_DPOINTER(TexturedBezierCurve)
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_TEXTUREDBEZIERCURVE_H

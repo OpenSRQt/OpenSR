@@ -22,29 +22,34 @@
 #include <QtGlobal>
 
 #ifdef OPENSR_ENGINE_BUILD
-# ifdef Q_CC_MSVC
-#  define ENGINE_API __declspec(dllexport)
-# else
-#  define ENGINE_API
-# endif
+#ifdef Q_CC_MSVC
+#define ENGINE_API __declspec(dllexport)
 #else
-# ifdef Q_CC_MSVC
-#  define ENGINE_API __declspec(dllimport)
-# else
-#  define ENGINE_API
-# endif
+#define ENGINE_API
+#endif
+#else
+#ifdef Q_CC_MSVC
+#define ENGINE_API __declspec(dllimport)
+#else
+#define ENGINE_API
+#endif
 #endif
 
-#define OPENSR_DECLARE_PRIVATE(Class) \
-    protected: \
-        class Class##Private; \
-    private: \
-        inline Class##Private* d_func() { return reinterpret_cast<Class##Private *>(qGetPtrHelper(d_osr_ptr)); } \
-        inline const Class##Private* d_func() const { return reinterpret_cast<const Class##Private *>(qGetPtrHelper(d_osr_ptr)); } \
-        friend class Class##Private;
+#define OPENSR_DECLARE_PRIVATE(Class)                                                                                  \
+protected:                                                                                                             \
+    class Class##Private;                                                                                              \
+                                                                                                                       \
+private:                                                                                                               \
+    inline Class##Private *d_func()                                                                                    \
+    {                                                                                                                  \
+        return reinterpret_cast<Class##Private *>(qGetPtrHelper(d_osr_ptr));                                           \
+    }                                                                                                                  \
+    inline const Class##Private *d_func() const                                                                        \
+    {                                                                                                                  \
+        return reinterpret_cast<const Class##Private *>(qGetPtrHelper(d_osr_ptr));                                     \
+    }                                                                                                                  \
+    friend class Class##Private;
 
-#define OPENSR_DECLARE_DPOINTER(Class) \
-    QScopedPointer<Class##Private> d_osr_ptr;
-
+#define OPENSR_DECLARE_DPOINTER(Class) QScopedPointer<Class##Private> d_osr_ptr;
 
 #endif // OPENSR_H

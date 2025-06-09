@@ -30,7 +30,7 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API WorldObject: public QObject
+class OPENSR_WORLD_API WorldObject : public QObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -39,13 +39,15 @@ class OPENSR_WORLD_API WorldObject: public QObject
     Q_PROPERTY(quint32 typeId READ typeId STORED false)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString namePrefix READ namePrefix STORED false)
-    //TODO: Use WorldObject instead of QObject
+    // TODO: Use WorldObject instead of QObject
     Q_PROPERTY(QQmlListProperty<QObject> children READ getChildren STORED false)
 
-public: static const quint32 m_StationKindStaticTypeId;
+public:
+    static const quint32 m_StationKindStaticTypeId;
+
 public:
     Q_INVOKABLE WorldObject(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~WorldObject();
+    ~WorldObject() override;
 
     quint32 id() const;
     virtual quint32 typeId() const;
@@ -54,14 +56,14 @@ public:
 
     QQmlListProperty<QObject> getChildren();
 
-    void setName(const QString& name);
+    void setName(const QString &name);
 
     /*! This function called before world saving */
     virtual void prepareSave();
     /*! This function called during world save after all storable properties saved */
     virtual bool save(QDataStream &stream) const;
     /*! This function called during world load after all storable properties loaded */
-    virtual bool load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects);
+    virtual bool load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects);
 
     /*! This function is called when new turn started */
     virtual void startTurn();
@@ -70,35 +72,31 @@ public:
     /*! This function is called when turn finished */
     virtual void finishTurn();
 
-    static quint32 typeIdFromClassName(const QString& className);
+    static quint32 typeIdFromClassName(const QString &className);
 
     /*!
      * @brief Function to register class in meta & QML systems.
      * @note All subclasses should provide specialized version of this function.
      */
-    template<class T>
-    static void registerType(QQmlEngine *qml, QJSEngine *script);
+    template <class T> static void registerType(QQmlEngine *qml, QJSEngine *script);
     /*!
      * @brief Function to create object of class T.
      * Used in object factory for JavaScript & QML.
      * @note All subclasses should provide specialized version of this function.
      */
-    template<class T>
-    static T* createObject(WorldObject* parent = 0, quint32 id = 0);
+    template <class T> static T *createObject(WorldObject *parent = 0, quint32 id = 0);
     /*!
      * @brief Function to get type id
      * Used in world serialization.
      * @note All subclasses should provide specialized version of this function.
      */
-    template<class T>
-    static quint32 staticTypeId();
+    template <class T> static quint32 staticTypeId();
     /*!
      * @brief Function to get type meta object
      * Used in world serialization.
      * @note All subclasses should provide specialized version of this function.
      */
-    template<class T>
-    static const QMetaObject* staticTypeMeta();
+    template <class T> static const QMetaObject *staticTypeMeta();
 
 Q_SIGNALS:
     void nameChanged();
@@ -107,7 +105,7 @@ private:
     quint32 m_id;
     QString m_name;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_WORLDOBJECT_H

@@ -18,14 +18,14 @@
 
 #include "WorldPlugin.h"
 
-#include "WorldManager.h"
 #include "WorldBindings.h"
+#include "WorldManager.h"
 
 namespace OpenSR
 {
 namespace World
 {
-bool WorldPlugin::initPlugin(OpenSR::Engine* engine)
+bool WorldPlugin::initPlugin(OpenSR::Engine *engine)
 {
     WorldManager *manager = new WorldManager(engine);
 
@@ -33,5 +33,5 @@ bool WorldPlugin::initPlugin(OpenSR::Engine* engine)
 
     return true;
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

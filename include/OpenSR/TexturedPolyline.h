@@ -20,13 +20,13 @@
 #define OPENSR_TEXTUREDPOLYLINE_H
 
 #include <OpenSR/OpenSR.h>
-#include <QQuickItem>
 #include <QList>
+#include <QQuickItem>
 #include <QVariantList>
 
 namespace OpenSR
 {
-class ENGINE_API TexturedPolyline: public QQuickItem
+class ENGINE_API TexturedPolyline : public QQuickItem
 {
     Q_OBJECT
     OPENSR_DECLARE_PRIVATE(TexturedPolyline)
@@ -35,14 +35,14 @@ class ENGINE_API TexturedPolyline: public QQuickItem
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:
-    TexturedPolyline(QQuickItem * parent = 0);
-    virtual ~TexturedPolyline();
+    TexturedPolyline(QQuickItem *parent = 0);
+    ~TexturedPolyline() override;
 
     QVariantList points() const;
-    void setPoints(const QVariantList& points);
+    void setPoints(const QVariantList &points);
 
     QUrl source() const;
-    void setSource(const QUrl& source);
+    void setSource(const QUrl &source);
 
 Q_SIGNALS:
     void pointsChanged();
@@ -50,8 +50,8 @@ Q_SIGNALS:
 
 protected:
     OPENSR_DECLARE_DPOINTER(TexturedPolyline)
-    virtual QSGNode *updatePaintNode(QSGNode * oldNode, UpdatePaintNodeData *updatePaintNodeData);
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *updatePaintNodeData) override;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_TEXTUREDPOLYLINE_H

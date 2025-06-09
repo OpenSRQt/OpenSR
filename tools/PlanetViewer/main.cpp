@@ -24,7 +24,7 @@ namespace
 static const QString SETTINGS_ORGANIZATION = "OpenSR";
 static const QString SETTINGS_APPLICATION = "PlanetViewer";
 static const QString MAIN_QML = "res:/PlanetViewer/PlanetViewer.qml";
-}
+} // namespace
 
 int main(int argc, char **argv)
 {

@@ -18,8 +18,8 @@
 
 #include "VorbisMusicDecoder.h"
 
-#include <QIODevice>
 #include <QDebug>
+#include <QIODevice>
 #include <QLibrary>
 
 namespace OpenSR
@@ -35,19 +35,24 @@ static const QString VORBISFILE_NAME = "vorbisfile";
 size_t iodevRead(void *buf, size_t size, size_t nmemb, void *datasource)
 {
     if (!datasource)
+    {
         return 0;
+    }
 
+    const auto lenBuf = size * nmemb;
     QIODevice *dev = static_cast<QIODevice *>(datasource);
-    return dev->read((char*)buf, size * nmemb) / size;
+    return dev->read((char *)buf, static_cast<qint64>(lenBuf)) / size;
 }
 
 int iodevSeek(void *datasource, ogg_int64_t offset, int whence)
 {
     if (!datasource)
+    {
         return -1;
+    }
 
     QIODevice *dev = static_cast<QIODevice *>(datasource);
-    bool result;
+    bool result{};
     switch (whence)
     {
     case SEEK_CUR:
@@ -59,14 +64,18 @@ int iodevSeek(void *datasource, ogg_int64_t offset, int whence)
     case SEEK_END:
         result = dev->seek(dev->size() + offset);
         break;
+    default:
+        return -1;
     }
-    return result ? dev->pos() : -1;
+    return result ? static_cast<int>(dev->pos()) : -1;
 }
 
 long iodevTell(void *datasource)
 {
     if (!datasource)
+    {
         return -1;
+    }
 
     QIODevice *dev = static_cast<QIODevice *>(datasource);
     return dev->pos();
@@ -74,23 +83,25 @@ long iodevTell(void *datasource)
 
 ov_callbacks iodevCallbacks = {iodevRead, iodevSeek, 0, iodevTell};
 
-typedef int (*ov_open_callbacks_f)(void *datasource, OggVorbis_File *vf, const char *initial, long ibytes, ov_callbacks callbacks);
+typedef int (*ov_open_callbacks_f)(void *datasource, OggVorbis_File *vf, const char *initial, long ibytes,
+                                   ov_callbacks callbacks);
 typedef int (*ov_clear_f)(OggVorbis_File *vf);
-typedef vorbis_info* (*ov_info_f)(OggVorbis_File *vf, int link);
+typedef vorbis_info *(*ov_info_f)(OggVorbis_File *vf, int link);
 typedef ogg_int64_t (*ov_pcm_total_f)(OggVorbis_File *vf, int i);
-typedef long (*ov_read_f)(OggVorbis_File *vf, char *buffer, int length, int bigendianp, int word, int sgned, int *bitstream);
+typedef long (*ov_read_f)(OggVorbis_File *vf, char *buffer, int length, int bigendianp, int word, int sgned,
+                          int *bitstream);
 
 ov_open_callbacks_f ov_open_callbacks = 0;
 ov_clear_f ov_clear = 0;
 ov_info_f ov_info = 0;
 ov_pcm_total_f ov_pcm_total = 0;
 ov_read_f ov_read = 0;
-}
+} // namespace
 bool VorbisMusicDecoder::m_vfInited = false;
 bool VorbisMusicDecoder::m_vfInitFailed = false;
 
-VorbisMusicDecoder::VorbisMusicDecoder(QIODevice* dev, QObject *parent): MusicDecoder(parent),
-    m_device(dev), m_vfFile(0), m_vfInfo(0), m_done(false)
+VorbisMusicDecoder::VorbisMusicDecoder(QIODevice *dev, QObject *parent)
+    : MusicDecoder(parent), m_device(dev), m_vfFile(0), m_vfInfo(0), m_done(false)
 {
     if (!ov_open_callbacks && !m_vfInitFailed)
     {
@@ -110,7 +121,6 @@ VorbisMusicDecoder::VorbisMusicDecoder(QIODevice* dev, QObject *parent): MusicDe
         }
     }
 
-
     if (m_device)
     {
         m_device->setParent(this);
@@ -124,7 +134,7 @@ VorbisMusicDecoder::VorbisMusicDecoder(QIODevice* dev, QObject *parent): MusicDe
         else
         {
             m_vfInfo = ov_info(m_vfFile, -1);
-            m_length = ov_pcm_total(m_vfFile, -1);
+            m_length = static_cast<int>(ov_pcm_total(m_vfFile, -1));
         }
     }
 }
@@ -151,7 +161,9 @@ int VorbisMusicDecoder::bps() const
 int VorbisMusicDecoder::channels() const
 {
     if (!m_vfInfo)
+    {
         return 0;
+    }
     return m_vfInfo->channels;
 }
 
@@ -163,21 +175,25 @@ bool VorbisMusicDecoder::valid() const
 QByteArray VorbisMusicDecoder::decode(int ms)
 {
     if (!m_vfFile || !m_vfInfo)
+    {
         return QByteArray();
+    }
 
-    int needed = 2 * (quint64)m_vfInfo->rate * m_vfInfo->channels * ms / 1000;
+    int needed = 2 * static_cast<int>((quint64)m_vfInfo->rate * m_vfInfo->channels * ms / 1000);
 
     QByteArray result(needed, 0);
 
     while (needed > 0)
     {
-        int current_section;
+        int current_section{};
         long res = ov_read(m_vfFile, result.data() + (result.size() - needed), needed, 0, 2, 1, &current_section);
 
         if (res < 0)
+        {
             break;
+        }
 
-        needed -= res;
+        needed -= static_cast<int>(res);
 
         if (res == 0)
         {
@@ -187,15 +203,19 @@ QByteArray VorbisMusicDecoder::decode(int ms)
     }
 
     if (needed)
+    {
         result.resize(result.size() - needed);
+    }
 
     return result;
 }
 
-int VorbisMusicDecoder::sampleRate() const
+long VorbisMusicDecoder::sampleRate() const
 {
     if (!m_vfInfo)
+    {
         return 0;
+    }
     return m_vfInfo->rate;
 }
 
@@ -209,4 +229,4 @@ bool VorbisMusicDecoder::done() const
     return m_done;
 }
 
-}
+} // namespace OpenSR

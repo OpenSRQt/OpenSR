@@ -19,10 +19,10 @@
 #ifndef OPENSR_ENGINE_H
 #define OPENSR_ENGINE_H
 
+#include "SoundManager.h"
+#include <OpenSR/OpenSR.h>
 #include <QApplication>
 #include <QUrl>
-#include <OpenSR/OpenSR.h>
-#include "SoundManager.h"
 
 class QQuickView;
 class QQmlEngine;
@@ -34,7 +34,7 @@ class QJSEngine;
 namespace OpenSR
 {
 class ResourceManager;
-class ENGINE_API Engine: public QApplication
+class ENGINE_API Engine : public QApplication
 {
     Q_OBJECT
     OPENSR_DECLARE_PRIVATE(Engine)
@@ -42,12 +42,12 @@ class ENGINE_API Engine: public QApplication
     Q_PROPERTY(QString dataDir READ dataDir WRITE setDataDir NOTIFY dataDirChanged)
     Q_PROPERTY(QUrl startupScript READ startupScript WRITE setStartupScript NOTIFY startupScriptChanged)
     Q_PROPERTY(QUrl mainQML READ mainQML WRITE setMainQML NOTIFY mainQMLChanged)
-    Q_PROPERTY(OpenSR::ResourceManager* resources READ resources)
-    Q_PROPERTY(OpenSR::SoundManager* sound READ sound)
+    Q_PROPERTY(OpenSR::ResourceManager *resources READ resources)
+    Q_PROPERTY(OpenSR::SoundManager *sound READ sound)
 
 public:
-    Engine(int& argc, char **argv);
-    virtual ~Engine();
+    Engine(int &argc, char **argv);
+    ~Engine() override;
 
     int run();
 
@@ -57,23 +57,23 @@ public:
     QQmlEngine *qmlEngine() const;
     QJSEngine *scriptEngine() const;
 
-    Q_INVOKABLE QVariant datValue(const QString& path) const;
+    Q_INVOKABLE QVariant datValue(const QString &path) const;
 
-    Q_INVOKABLE void execScript(const QUrl& url);
+    Q_INVOKABLE void execScript(const QUrl &url);
 
     QString dataDir() const;
     QUrl startupScript() const;
     QUrl mainQML() const;
 
-    void setDataDir(const QString& dir);
-    void setStartupScript(const QUrl& script);
-    void setMainQML(const QUrl& qml);
+    void setDataDir(const QString &dir);
+    void setStartupScript(const QUrl &script);
+    void setMainQML(const QUrl &qml);
 
 public Q_SLOTS:
-    void addRCCArchive(const QString& source);
-    void showQMLComponent(const QString& url);
-    void addDATFile(const QString& url, bool isCache = false);
-    void loadPlugin(const QString& name);
+    void addRCCArchive(const QString &source);
+    void showQMLComponent(const QString &url);
+    void addDATFile(const QString &url, bool isCache = false);
+    void loadPlugin(const QString &name);
 
 Q_SIGNALS:
     void dataDirChanged();
@@ -85,6 +85,6 @@ private:
     Q_DISABLE_COPY(Engine)
 };
 
-}
+} // namespace OpenSR
 
 #endif

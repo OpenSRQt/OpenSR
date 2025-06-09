@@ -25,7 +25,7 @@ namespace OpenSR
 {
 namespace World
 {
-Resource::Resource(): m_d(new ResourceData())
+Resource::Resource() : m_d(new ResourceData())
 {
     m_d->id = 0;
 }
@@ -38,8 +38,10 @@ quint32 Resource::id() const
 void Resource::registerResource()
 {
     ResourceManager *m = ResourceManager::instance();
-    if(!m)
+    if (!m)
+    {
         return;
+    }
 
     quint32 id = m->registerResource(*this);
     m_d->id = id;
@@ -60,17 +62,16 @@ const QExplicitlySharedDataPointer<ResourceData> Resource::d_func_const() const
     return m_d;
 }
 
-
-QDataStream& operator<<(QDataStream & stream, const Resource& res)
+QDataStream &operator<<(QDataStream &stream, const Resource &res)
 {
     auto d = res.d_func_const();
     return stream << d->id << d->data;
 }
 
-QDataStream& operator>>(QDataStream & stream, Resource& res)
+QDataStream &operator>>(QDataStream &stream, Resource &res)
 {
     auto d = res.d_func();
     return stream >> d->id >> d->data;
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

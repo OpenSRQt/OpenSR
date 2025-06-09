@@ -19,12 +19,12 @@
 #ifndef OPENSR_RV_MAINWINDOW_H
 #define OPENSR_RV_MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QGraphicsScene>
-#include <QGraphicsPixmapItem>
-#include <QTimer>
-#include <QLabel>
 #include "FileModel.h"
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include <QLabel>
+#include <QMainWindow>
+#include <QTimer>
 
 namespace Ui
 {
@@ -40,13 +40,13 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    void closeEvent(QCloseEvent *event);
+    ~MainWindow() override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene scene;
-    QGraphicsProxyWidget *widget;
+    QGraphicsProxyWidget *widget{};
     QGraphicsPixmapItem item;
     QTimer timer;
 
@@ -57,7 +57,7 @@ private:
     int currentFrame;
     double speed;
 
-    void loadFile(const QString& fileName);
+    void loadFile(const QString &fileName);
     FileModel model;
 
     ExtractDialog *extractDialog;
@@ -71,12 +71,12 @@ private Q_SLOTS:
     void openFile();
     void nextFrame();
     void speedChanged(double value);
-    void treeDoubleClicked(const QModelIndex& index);
-    void openContextMenu(const QPoint & pos);
+    void treeDoubleClicked(const QModelIndex &index);
+    void openContextMenu(const QPoint &pos);
     void stopAnimation();
     void startAnimation();
     void resetAnimation();
     void setFrame(int frame);
 };
-}
+} // namespace OpenSR
 #endif // OPENSR_RV_MAINWINDOW_H

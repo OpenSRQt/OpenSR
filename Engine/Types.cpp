@@ -26,7 +26,7 @@ namespace
 {
 const float ANGLE_TRESHOLD = 0.9999f;
 
-QVector2D calcBezierPoint(const BezierCurve& curve, float t, QVector2D& d)
+QVector2D calcBezierPoint(const BezierCurve &curve, float t, QVector2D &d)
 {
     float u = 1 - t;
     float tt = t * t;
@@ -34,28 +34,24 @@ QVector2D calcBezierPoint(const BezierCurve& curve, float t, QVector2D& d)
     float uuu = uu * u;
     float ttt = tt * t;
 
-    d = (- 3 * tt + 6 * t - 3) * QVector2D(curve.p0) +
-        (9 * tt - 12 * t + 3) * QVector2D(curve.p1) +
-        (-9 * tt + 6 * t) * QVector2D(curve.p2) +
-        3 * tt * QVector2D(curve.p3);
+    d = (-3 * tt + 6 * t - 3) * QVector2D(curve.p0) + (9 * tt - 12 * t + 3) * QVector2D(curve.p1) +
+        (-9 * tt + 6 * t) * QVector2D(curve.p2) + 3 * tt * QVector2D(curve.p3);
 
-    QVector2D p = uuu * QVector2D(curve.p0) +
-                  3 * uu * t * QVector2D(curve.p1) +
-                  3 * u * tt * QVector2D(curve.p2) +
+    QVector2D p = uuu * QVector2D(curve.p0) + 3 * uu * t * QVector2D(curve.p1) + 3 * u * tt * QVector2D(curve.p2) +
                   ttt * QVector2D(curve.p3);
 
     return p;
 }
 
-void findPoints(const BezierCurve& curve, int minSize, float t0, float t1,
-                std::list<QPointF>& points, std::list<QPointF>::iterator& i)
+void findPoints(const BezierCurve &curve, int minSize, float t0, float t1, std::list<QPointF> &points,
+                std::list<QPointF>::iterator &i)
 {
     float tMid = (t0 + t1) / 2;
     QVector2D dl, dr, dc;
     QVector2D p0 = calcBezierPoint(curve, t0, dl);
     QVector2D p1 = calcBezierPoint(curve, t1, dr);
 
-    if ((p0 - p1).length() < minSize)
+    if ((p0 - p1).length() < static_cast<float>(minSize))
     {
         return;
     }
@@ -66,15 +62,19 @@ void findPoints(const BezierCurve& curve, int minSize, float t0, float t1,
     dc.normalize();
 
     if (qAbs(QVector2D::dotProduct(dl, dc)) < ANGLE_TRESHOLD)
+    {
         findPoints(curve, minSize, t0, tMid, points, i);
+    }
 
     i = points.insert(i, pMid.toPointF());
     ++i;
 
     if (qAbs(QVector2D::dotProduct(dr, dc)) < ANGLE_TRESHOLD)
+    {
         findPoints(curve, minSize, tMid, t1, points, i);
+    }
 }
-}
+} // namespace
 
 QList<QPointF> BezierCurve::calcPolyline(int minStep)
 {
@@ -94,9 +94,11 @@ QList<QPointF> BezierCurve::calcPolyline(int minStep)
 
     QList<QPointF> result;
 
-    for (const QPointF& p : points)
+    for (const QPointF &p : points)
+    {
         result.append(p);
+    }
 
     return result;
 }
-}
+} // namespace OpenSR

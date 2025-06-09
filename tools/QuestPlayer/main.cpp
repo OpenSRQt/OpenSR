@@ -1,5 +1,5 @@
-#include <QApplication>
 #include "PlayerWindow.h"
+#include <QApplication>
 #include <ctime>
 
 int main(int argc, char *argv[])

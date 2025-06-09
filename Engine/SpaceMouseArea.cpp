@@ -23,7 +23,8 @@
 
 namespace OpenSR
 {
-SpaceMouseArea::SpaceMouseArea(QQuickItem *parent) : QQuickItem(parent), m_pressed(false), m_containsMouse(false)
+SpaceMouseArea::SpaceMouseArea(QQuickItem *parent)
+    : QQuickItem(parent), m_pressed(false), m_containsMouse(false), m_radius(0.0)
 {
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
@@ -50,7 +51,9 @@ void SpaceMouseArea::setContainsMouse(bool containsMouse)
 bool SpaceMouseArea::contains(const QPointF &point) const
 {
     if (!QQuickItem::contains(point))
+    {
         return false;
+    }
 
     qreal x = point.x() - width() / 2.0f;
     qreal y = point.y() - height() / 2.0f;
@@ -75,7 +78,9 @@ void SpaceMouseArea::mouseReleaseEvent(QMouseEvent *event)
                           threshold >= qAbs(event->position().y() - m_pressPoint.y()));
 
     if (isClick)
+    {
         emit clicked();
+    }
 }
 
 void SpaceMouseArea::mouseUngrabEvent()

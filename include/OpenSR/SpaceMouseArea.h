@@ -35,7 +35,7 @@ class SpaceMouseArea : public QQuickItem
 public:
     SpaceMouseArea(QQuickItem *parent = nullptr);
 
-    bool contains(const QPointF &point) const;
+    bool contains(const QPointF &point) const override;
 
     bool isPressed() const;
     bool containsMouse() const;
@@ -58,11 +58,11 @@ signals:
 protected:
     void setPressed(bool pressed);
     void setContainsMouse(bool containsMouse);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void hoverEnterEvent(QHoverEvent *event);
-    void hoverLeaveEvent(QHoverEvent *event);
-    void mouseUngrabEvent();
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void hoverEnterEvent(QHoverEvent *event) override;
+    void hoverLeaveEvent(QHoverEvent *event) override;
+    void mouseUngrabEvent() override;
 
 private:
     bool m_pressed;
@@ -71,6 +71,6 @@ private:
     qreal m_radius;
     QTimer m_enterTimer;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_SPACEMOUSEAREA_H

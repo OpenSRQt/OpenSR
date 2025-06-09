@@ -99,7 +99,7 @@ QDataStream &operator<<(QDataStream &stream, const DesertPlanetStyle &style)
 
 QDataStream &operator>>(QDataStream &stream, DesertPlanetStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -117,30 +117,25 @@ QDataStream &operator>>(QDataStream &stream, DesertPlanetStyle::Data &)
     return stream;
 }
 
-const quint32 DesertPlanet::m_staticTypeId = typeIdFromClassName(DesertPlanet::staticMetaObject.className());
-
-template <>
-void WorldObject::registerType<DesertPlanet>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<DesertPlanet>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<DesertPlanetStyle>();
     qRegisterMetaType<DesertPlanetStyle::Data>();
     qmlRegisterType<DesertPlanet>("OpenSR.World", 1, 0, "DesertPlanet");
 }
 
-template <>
-DesertPlanet *WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> DesertPlanet *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new DesertPlanet(parent, id);
 }
 
-template <>
-quint32 WorldObject::staticTypeId<DesertPlanet>()
+template <> quint32 WorldObject::staticTypeId<DesertPlanet>()
 {
-    return DesertPlanet::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(DesertPlanet::staticMetaObject.className());
+    return id;
 }
 
-template <>
-const QMetaObject *WorldObject::staticTypeMeta<DesertPlanet>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<DesertPlanet>()
 {
     return &DesertPlanet::staticMetaObject;
 }
@@ -155,7 +150,7 @@ DesertPlanet::~DesertPlanet()
 
 quint32 DesertPlanet::typeId() const
 {
-    return DesertPlanet::m_staticTypeId;
+    return staticTypeId<DesertPlanet>();
 }
 
 QString DesertPlanet::namePrefix() const
@@ -171,13 +166,16 @@ DesertPlanetStyle DesertPlanet::style() const
 void DesertPlanet::setStyle(const DesertPlanetStyle &style)
 {
     if (m_style == style)
+    {
         return;
+    }
 
     m_style = style;
     emit styleChanged();
 }
 
-int DesertPlanet::radius() {
+int DesertPlanet::radius()
+{
     return style().radius();
 }
 } // namespace World

@@ -13,10 +13,10 @@ class OPENSR_WORLD_API TurnAnimation : public QAbstractAnimation
     Q_OBJECT
 public:
     TurnAnimation(QObject *parent = nullptr);
-    virtual ~TurnAnimation() = default;
+    ~TurnAnimation() override = default;
 
-    virtual int duration() const override;
-    virtual void updateCurrentTime(int currentTime) override;
+    int duration() const override;
+    void updateCurrentTime(int currentTime) override;
     void setPrevTime(int prevTime);
     void setTurnDurationLock(bool turnDurationLock);
 

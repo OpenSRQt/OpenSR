@@ -24,11 +24,9 @@
 
 namespace OpenSR
 {
-PSDImageIO::PSDImageIO() :
-    QImageIOHandler()
+PSDImageIO::PSDImageIO() : QImageIOHandler()
 {
 }
-
 
 PSDImageIO::~PSDImageIO()
 {
@@ -37,7 +35,9 @@ PSDImageIO::~PSDImageIO()
 bool PSDImageIO::supportsOption(ImageOption option) const
 {
     if (option == QImageIOHandler::Size || option == QImageIOHandler::ImageFormat)
+    {
         return true;
+    }
 
     return false;
 }
@@ -45,13 +45,15 @@ bool PSDImageIO::supportsOption(ImageOption option) const
 QVariant PSDImageIO::option(ImageOption option) const
 {
     if (!checkPSDHeader(device()))
+    {
         return QVariant();
+    }
 
     PSDHeader header = peekPSDHeader(device());
 
     if (option == QImageIOHandler::Size)
     {
-        return QSize(header.width, header.height);
+        return QSize(static_cast<int>(header.width), static_cast<int>(header.height));
     }
 
     if (option == QImageIOHandler::ImageFormat)
@@ -71,4 +73,4 @@ bool PSDImageIO::read(QImage *image)
     *image = loadPSDFrame(device());
     return true;
 }
-}
+} // namespace OpenSR

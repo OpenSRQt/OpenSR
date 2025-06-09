@@ -33,10 +33,10 @@ class OPENSR_WORLD_API DefenceGenerator: public Equipment
 
 public:
     Q_INVOKABLE DefenceGenerator(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~DefenceGenerator();
+    ~DefenceGenerator() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 };
 }
 }

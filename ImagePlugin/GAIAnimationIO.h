@@ -32,21 +32,21 @@ class GAIAnimationIO : public QImageIOHandler
 {
 public:
     GAIAnimationIO();
-    ~GAIAnimationIO();
+    ~GAIAnimationIO() override;
 
-    virtual bool canRead() const;
-    virtual bool read(QImage *image);
+    bool canRead() const override;
+    bool read(QImage *image) override;
 
-    virtual bool supportsOption(ImageOption option) const;
-    virtual QVariant option(ImageOption option) const;
+    bool supportsOption(ImageOption option) const override;
+    QVariant option(ImageOption option) const override;
 
-    int imageCount() const;
-    int loopCount() const;
-    int nextImageDelay() const;
-    int currentImageNumber() const;
+    int imageCount() const override;
+    int loopCount() const override;
+    int nextImageDelay() const override;
+    int currentImageNumber() const override; 
 
 private:
-    GAIHeader m_header;
+    GAIHeader m_header{};
     int m_currentFrame;
     QVector<int> m_times;
     QImage m_prev;

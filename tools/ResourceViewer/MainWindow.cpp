@@ -17,35 +17,28 @@
 */
 
 #include "MainWindow.h"
+#include "ExtractDialog.h"
 #include "ui_MainWindow.h"
+#include <OpenSR/libRangerQt.h>
+#include <QBuffer>
+#include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QSettings>
-#include <QDebug>
-#include <QMessageBox>
-#include <fstream>
-#include <OpenSR/libRangerQt.h>
-#include <QProgressDialog>
-#include <QBuffer>
-#include <QMovie>
 #include <QGraphicsProxyWidget>
-#include "ExtractDialog.h"
+#include <QMessageBox>
+#include <QMovie>
+#include <QProgressDialog>
+#include <QSettings>
 
 namespace OpenSR
 {
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    animLoaded(false),
-    currentFrame(0),
-    animStarted(false),
-    speed(1.0)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), animLoaded(false), currentFrame(0), animStarted(false), speed(1.0),
+      extractDialog(new ExtractDialog(this))
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(&scene);
     ui->graphicsView->setInteractive(true);
-
-    extractDialog = new ExtractDialog(this);
 
     scene.setBackgroundBrush(QBrush(Qt::black));
     scene.addItem(&item);
@@ -58,8 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openFile()));
     connect(&timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
     connect(ui->speedSpinBox, SIGNAL(valueChanged(double)), this, SLOT(speedChanged(double)));
-    connect(ui->fileTreeView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(openContextMenu(const QPoint&)));
-    connect(ui->fileTreeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(treeDoubleClicked(const QModelIndex&)));
+    connect(ui->fileTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this,
+            SLOT(openContextMenu(const QPoint &)));
+    connect(ui->fileTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this,
+            SLOT(treeDoubleClicked(const QModelIndex &)));
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startAnimation()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stopAnimation()));
     connect(ui->resetButton, SIGNAL(clicked()), this, SLOT(resetAnimation()));
@@ -75,7 +70,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->horizSplitter->restoreState(settings.value("mainWindow/horizSplitterState").toByteArray());
 
     if (qApp->arguments().count() > 1)
+    {
         loadFile(qApp->arguments().at(1));
+    }
 }
 
 MainWindow::~MainWindow()
@@ -87,19 +84,23 @@ MainWindow::~MainWindow()
 void MainWindow::nextFrame()
 {
     if (!animLoaded || !animStarted)
+    {
         return;
+    }
 
-    currentFrame = (currentFrame + 1) % frames.size();
+    currentFrame = static_cast<int>((currentFrame + 1) % frames.size());
 
     setFrame(currentFrame);
-    timer.setInterval(times[currentFrame] / speed);
+    timer.setInterval(static_cast<int>(times[currentFrame] / speed));
     timer.start();
 }
 
 void MainWindow::setFrame(int frame)
 {
     if ((frame >= frames.count()) || (frame < 0))
+    {
         return;
+    }
 
     currentFrame = frame;
     item.setPixmap(frames.at(frame));
@@ -107,11 +108,13 @@ void MainWindow::setFrame(int frame)
     ui->frameSlider->setValue(frame);
 }
 
-void MainWindow::loadFile(const QString& fileName)
+void MainWindow::loadFile(const QString &fileName)
 {
     QFileInfo fileInfo(fileName);
     if (!fileInfo.exists())
+    {
         return;
+    }
 
     if (fileInfo.suffix().toLower() == "pkg")
     {
@@ -126,11 +129,13 @@ void MainWindow::loadFile(const QString& fileName)
 void MainWindow::openFile()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open file"), QString(),
-                            tr("All suported files (*.gai *.hai *.gi *.pkg)"));
+                                                          tr("All suported files (*.gai *.hai *.gi *.pkg)"));
     if (fileNames.isEmpty())
+    {
         return;
+    }
 
-    foreach(QString fileName, fileNames)
+    foreach (QString fileName, fileNames)
     {
         loadFile(fileName);
     }
@@ -151,7 +156,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::speedChanged(double value)
 {
     if (speed < 0.01)
+    {
         return;
+    }
 
     speed = value;
 }
@@ -171,7 +178,8 @@ void MainWindow::loadResource(FileNode *node)
     const auto format = fileInfo.suffix().toLower().toLatin1();
     QImageReader reader(&dev, format);
 
-    if (!reader.canRead()) {
+    if (!reader.canRead())
+    {
         qWarning() << "can't read from file " << fileName;
         qWarning() << "Maybe image format " << format << " is not supported (missing path to plugin?)";
         return;
@@ -209,14 +217,16 @@ void MainWindow::loadResource(FileNode *node)
 void MainWindow::animationLoaded()
 {
     if (!frames.count())
+    {
         return;
+    }
 
     animLoaded = true;
 
     scene.setSceneRect(0, 0, item.pixmap().width(), item.pixmap().height());
     scene.invalidate();
 
-    ui->frameSlider->setMaximum(frames.count() - 1);
+    ui->frameSlider->setMaximum(static_cast<int>(frames.count() - 1));
     ui->frameSlider->setMinimum(0);
     ui->frameSlider->setSingleStep(1);
 
@@ -242,8 +252,7 @@ void MainWindow::imageLoaded()
     ui->frameSlider->setMinimum(0);
 }
 
-
-void MainWindow::treeDoubleClicked(const QModelIndex& index)
+void MainWindow::treeDoubleClicked(const QModelIndex &index)
 {
     qDebug() << Q_FUNC_INFO;
     FileNode *node = static_cast<FileNode *>(index.internalPointer());
@@ -252,39 +261,49 @@ void MainWindow::treeDoubleClicked(const QModelIndex& index)
 
 namespace
 {
-void addFileToList(QList<FileNode*>& files, FileNode* node)
+void addFileToList(QList<FileNode *> &files, FileNode *node)
 {
-    //FIXME: Possible errors
+    // FIXME: Possible errors
     if ((node->parent) && (node->parent->parent))
+    {
         files.append(node);
-    foreach(FileNode * child, node->childs)
+    }
+    foreach (FileNode *child, node->childs)
     {
         addFileToList(files, child);
     }
 }
-}
+} // namespace
 
-void MainWindow::openContextMenu(const QPoint & pos)
+void MainWindow::openContextMenu(const QPoint &pos)
 {
     FileNode *node = static_cast<FileNode *>(ui->fileTreeView->indexAt(pos).internalPointer());
     if (!node)
+    {
         return;
+    }
     if (node->type == NODE_PKG)
     {
         QMenu menu(ui->fileTreeView);
         menu.addAction(tr("Extract..."));
         QAction *selectedAction = menu.exec(ui->fileTreeView->mapToGlobal(pos));
         if (!selectedAction)
+        {
             return;
-        QList<FileNode*> files;
+        }
+        QList<FileNode *> files;
         addFileToList(files, node);
         QString baseDir = QFileInfo(node->fullName).dir().path();
 
         if (extractDialog->exec() != QDialog::Accepted)
+        {
             return;
+        }
         QDir outDir(extractDialog->directory());
         if (!outDir.exists())
+        {
             QMessageBox::critical(this, tr("Error extracting"), tr("Invalid extraction directory"));
+        }
         bool createQRC = extractDialog->createQRC();
         QFileInfo qrcFileInfo;
         QFile *qrcFile = 0;
@@ -292,28 +311,38 @@ void MainWindow::openContextMenu(const QPoint & pos)
         {
             QString fn = extractDialog->qrcName();
             if (!fn.isEmpty())
+            {
                 fn = "resources.qrc";
+            }
             qrcFileInfo = QFileInfo(outDir.canonicalPath() + '/' + extractDialog->qrcName());
             if (qrcFileInfo.suffix().isEmpty())
+            {
                 qrcFileInfo = QFileInfo(outDir.canonicalPath() + '/' + extractDialog->qrcName() + ".qrc");
+            }
             qrcFile = new QFile(qrcFileInfo.absoluteFilePath());
             qrcFile->open(QIODevice::WriteOnly);
         }
         QTextStream qrc(qrcFile);
         if (createQRC)
+        {
             qrc << "<!DOCTYPE RCC><RCC version=\"1.0\"><qresource>\n";
+        }
 
-        QProgressDialog progress(tr("Extracting files..."), tr("Cancel"), 0, files.count(), this);
+        QProgressDialog progress(tr("Extracting files..."), tr("Cancel"), 0, static_cast<int>(files.count()), this);
         progress.setWindowModality(Qt::WindowModal);
         int value = 0;
-        foreach(FileNode * child, files)
+        foreach (FileNode *child, files)
         {
             if (progress.wasCanceled())
+            {
                 break;
+            }
             QString fullName = child->fullName;
             QString fullNameWithoutBase = fullName;
             if ((!baseDir.isNull()) && (baseDir != ".") && (fullName.startsWith(baseDir)))
+            {
                 fullNameWithoutBase = fullName.right(fullName.length() - baseDir.length() - 1);
+            }
             progress.setValue(value);
             progress.setLabelText(fullNameWithoutBase);
             if (child->childs.count())
@@ -321,7 +350,9 @@ void MainWindow::openContextMenu(const QPoint & pos)
                 if (!outDir.mkpath(fullNameWithoutBase))
                 {
                     qCritical() << "Cannot create out dir:" << outDir.canonicalPath() + "/" + fullNameWithoutBase;
-                    QMessageBox::critical(this, tr("Error extracting files"), tr("Cannot create out dir: %1").arg(outDir.canonicalPath() + "/" + fullNameWithoutBase));
+                    QMessageBox::critical(
+                        this, tr("Error extracting files"),
+                        tr("Cannot create out dir: %1").arg(outDir.canonicalPath() + "/" + fullNameWithoutBase));
                     return;
                 }
             }
@@ -330,15 +361,20 @@ void MainWindow::openContextMenu(const QPoint & pos)
                 QFile out(outDir.canonicalPath() + "/" + fullNameWithoutBase);
                 if (!out.open(QIODevice::WriteOnly))
                 {
-                    qCritical() << "Cannot open file " << outDir.canonicalPath() + "/" + fullNameWithoutBase << ":" << out.errorString();
-                    QMessageBox::critical(this, tr("Error extracting files"),
-                                          tr("Cannot open file %1: %2").arg(outDir.canonicalPath() + "/" + fullNameWithoutBase, out.errorString()));
+                    qCritical() << "Cannot open file " << outDir.canonicalPath() + "/" + fullNameWithoutBase << ":"
+                                << out.errorString();
+                    QMessageBox::critical(
+                        this, tr("Error extracting files"),
+                        tr("Cannot open file %1: %2")
+                            .arg(outDir.canonicalPath() + "/" + fullNameWithoutBase, out.errorString()));
                     return;
                 }
                 out.write(model.getData(child));
                 out.close();
                 if (createQRC)
+                {
                     qrc << "<file>" << fullNameWithoutBase << "</file>\n";
+                }
             }
             value++;
         }
@@ -351,21 +387,23 @@ void MainWindow::openContextMenu(const QPoint & pos)
                 delete qrcFile;
             }
         }
-        progress.setValue(files.count());
+        progress.setValue(static_cast<int>(files.count()));
     }
 }
 
 void MainWindow::startAnimation()
 {
     if (!animLoaded || !frames.count())
+    {
         return;
+    }
 
     animStarted = true;
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(true);
     ui->resetButton->setEnabled(true);
 
-    timer.setInterval(times[currentFrame] / speed);
+    timer.setInterval(static_cast<int>(times[currentFrame] / speed));
     timer.start();
 }
 
@@ -383,7 +421,9 @@ void MainWindow::stopAnimation()
 void MainWindow::resetAnimation()
 {
     if (!frames.count())
+    {
         return;
+    }
 
     stopAnimation();
     setFrame(0);
@@ -392,4 +432,4 @@ void MainWindow::resetAnimation()
     ui->stopButton->setEnabled(false);
     ui->resetButton->setEnabled(true);
 }
-}
+} // namespace OpenSR

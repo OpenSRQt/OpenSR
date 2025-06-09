@@ -49,7 +49,7 @@ QVariant HAIAnimationIO::option(ImageOption option) const
         return true;
 
     if (option == QImageIOHandler::Size)
-        return QSize(header.width, header.height);
+        return QSize(static_cast<int>(header.width), static_cast<int>(header.height));
 
     return QVariant();
 }
@@ -110,7 +110,7 @@ int HAIAnimationIO::imageCount() const
     {
         header = peekHAIHeader(device());
     }
-    return header.count;
+    return static_cast<int>(header.count);
 }
 
 int HAIAnimationIO::nextImageDelay() const

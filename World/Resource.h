@@ -21,16 +21,16 @@
 
 #include "World.h"
 
-#include <QObject>
-#include <QExplicitlySharedDataPointer>
 #include <QDebug>
+#include <QExplicitlySharedDataPointer>
+#include <QObject>
 #include <QVariant>
 
 namespace OpenSR
 {
 namespace World
 {
-struct OPENSR_WORLD_API ResourceData: public QSharedData
+struct OPENSR_WORLD_API ResourceData : public QSharedData
 {
 public:
     quint32 id;
@@ -55,22 +55,19 @@ public:
     //! Makes resource known by ResourceManager.
     void registerResource();
 
-    template<class T>
-    T getData() const
+    template <class T> T getData() const
     {
         auto d = d_func_const();
         return qvariant_cast<T>(d->data);
     }
 
-    template<class T>
-    void setData(const T& data)
+    template <class T> void setData(const T &data)
     {
         auto d = d_func();
         d->data = QVariant::fromValue(data);
     }
 
-    template<class T>
-    static void replaceData(T& target, const Resource& source)
+    template <class T> static void replaceData(T &target, const Resource &source)
     {
         target.m_d = source.m_d;
     }
@@ -83,14 +80,14 @@ protected:
 
 private:
     QExplicitlySharedDataPointer<ResourceData> m_d;
-    friend QDataStream& operator<<(QDataStream & stream, const Resource& res);
-    friend QDataStream& operator>>(QDataStream & stream, Resource& res);
+    friend QDataStream &operator<<(QDataStream &stream, const Resource &res);
+    friend QDataStream &operator>>(QDataStream &stream, Resource &res);
 };
 
-QDataStream& operator<<(QDataStream & stream, const Resource& res);
-QDataStream& operator>>(QDataStream & stream, Resource& res);
-}
-}
+QDataStream &operator<<(QDataStream &stream, const Resource &res);
+QDataStream &operator>>(QDataStream &stream, Resource &res);
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::Resource)
 

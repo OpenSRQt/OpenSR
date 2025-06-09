@@ -25,34 +25,29 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 ResourceManager::m_staticTypeId = typeIdFromClassName(ResourceManager::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<ResourceManager>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<ResourceManager>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<Resource>();
     qmlRegisterType<ResourceManager>("OpenSR.World", 1, 0, "ResourceManager");
 }
 
-template<>
-ResourceManager* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> ResourceManager *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new ResourceManager(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<ResourceManager>()
+template <> quint32 WorldObject::staticTypeId<ResourceManager>()
 {
-    return ResourceManager::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(ResourceManager::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<ResourceManager>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<ResourceManager>()
 {
     return &ResourceManager::staticMetaObject;
 }
 
-ResourceManager::ResourceManager(WorldObject *parent, quint32 id): WorldObject(parent, id), m_idPool(0)
+ResourceManager::ResourceManager(WorldObject *parent, quint32 id) : WorldObject(parent, id), m_idPool(0)
 {
 }
 
@@ -62,7 +57,7 @@ ResourceManager::~ResourceManager()
 
 quint32 ResourceManager::typeId() const
 {
-    return ResourceManager::m_staticTypeId;
+    return staticTypeId<ResourceManager>();
 }
 
 QString ResourceManager::namePrefix() const
@@ -75,23 +70,26 @@ quint32 ResourceManager::getNextId()
     return ++m_idPool;
 }
 
-
-ResourceManager* ResourceManager::instance()
+ResourceManager *ResourceManager::instance()
 {
     if (WorldManager::instance() && WorldManager::instance()->context())
+    {
         return WorldManager::instance()->context()->resources();
+    }
 
     return 0;
 }
 
-quint32 ResourceManager::registerResource(const Resource& resource)
+quint32 ResourceManager::registerResource(const Resource &resource)
 {
     quint32 id = resource.id();
     if (id)
     {
         auto it = m_resources.find(id);
         if (it == m_resources.end())
+        {
             m_resources[id] = resource;
+        }
         return id;
     }
 
@@ -116,27 +114,33 @@ void ResourceManager::prepareSave()
 bool ResourceManager::save(QDataStream &stream) const
 {
     if (!WorldObject::save(stream))
+    {
         return false;
+    }
 
     stream << m_resources.count();
     for (auto r : m_resources)
     {
         stream << r;
         if (stream.status() != QDataStream::Ok)
+        {
             return false;
+        }
     }
 
     return stream.status() == QDataStream::Ok;
 }
 
-bool ResourceManager::load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects)
+bool ResourceManager::load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects)
 {
     if (!WorldObject::load(stream, objects))
+    {
         return false;
+    }
 
     m_resources.clear();
 
-    int count;
+    int count{};
     stream >> count;
 
     for (int i = 0; i < count; i++)
@@ -145,7 +149,9 @@ bool ResourceManager::load(QDataStream &stream, const QMap<quint32, WorldObject*
         stream >> res;
 
         if (stream.status() != QDataStream::Ok)
+        {
             return false;
+        }
 
         registerResource(res);
     }
@@ -157,9 +163,11 @@ Resource ResourceManager::getResource(quint32 id) const
 {
     auto it = m_resources.find(id);
     if (it == m_resources.end())
+    {
         return Resource();
+    }
 
     return it.value();
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

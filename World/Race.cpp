@@ -25,30 +25,25 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Race::m_staticTypeId = typeIdFromClassName(Race::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Race>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Race>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<RaceStyle>();
     qRegisterMetaType<RaceStyle::Data>();
     qmlRegisterType<Race>("OpenSR.World", 1, 0, "Race");
 }
 
-template<>
-Race* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Race *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Race(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Race>()
+template <> quint32 WorldObject::staticTypeId<Race>()
 {
-    return Race::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Race::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Race>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Race>()
 {
     return &Race::staticMetaObject;
 }
@@ -68,28 +63,28 @@ QString RaceStyle::sound() const
     return getData<Data>().sound;
 }
 
-void RaceStyle::setIcon(const QString& icon)
+void RaceStyle::setIcon(const QString &icon)
 {
     auto d = getData<Data>();
     d.icon = icon;
     setData(d);
 }
 
-void RaceStyle::setColor(const QColor& color)
+void RaceStyle::setColor(const QColor &color)
 {
     auto d = getData<Data>();
     d.color = color;
     setData(d);
 }
 
-void RaceStyle::setSound(QString& sound)
+void RaceStyle::setSound(QString &sound)
 {
     auto d = getData<Data>();
     d.sound = sound;
     setData(d);
 }
 
-Race::Race(WorldObject *parent, quint32 id): WorldObject(parent, id)
+Race::Race(WorldObject *parent, quint32 id) : WorldObject(parent, id)
 {
 }
 
@@ -99,7 +94,7 @@ Race::~Race()
 
 quint32 Race::typeId() const
 {
-    return Race::m_staticTypeId;
+    return staticTypeId<Race>();
 }
 
 QString Race::namePrefix() const
@@ -107,7 +102,7 @@ QString Race::namePrefix() const
     return tr("Race");
 }
 
-void Race::setStyle(const RaceStyle& style)
+void Race::setStyle(const RaceStyle &style)
 {
     m_style = style;
     emit(styleChanged());
@@ -123,14 +118,14 @@ void Race::prepareSave()
     m_style.registerResource();
 }
 
-QDataStream& operator<<(QDataStream & stream, const RaceStyle& style)
+QDataStream &operator<<(QDataStream &stream, const RaceStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, RaceStyle& style)
+QDataStream &operator>>(QDataStream &stream, RaceStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -138,14 +133,14 @@ QDataStream& operator>>(QDataStream & stream, RaceStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const RaceStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const RaceStyle::Data &data)
 {
     return stream << data.color << data.icon << data.sound;
 }
 
-QDataStream& operator>>(QDataStream & stream, RaceStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, RaceStyle::Data &data)
 {
     return stream >> data.color >> data.icon >> data.sound;
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

@@ -26,7 +26,7 @@
 
 namespace OpenSR
 {
-class ENGINE_API Sound: public QObject
+class ENGINE_API Sound : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
@@ -34,12 +34,12 @@ class ENGINE_API Sound: public QObject
 
 public:
     Sound(QObject *parent = 0);
-    virtual ~Sound();
+    ~Sound() override;
 
     QUrl source() const;
     float volume() const;
 
-    void setSource(const QUrl& source);
+    void setSource(const QUrl &source);
     void setVolume(float volume);
 
 public Q_SLOTS:
@@ -55,6 +55,6 @@ private:
     ALuint m_alSource;
     float m_volume;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_SOUND_H

@@ -38,7 +38,7 @@ public:
     Q_PROPERTY(bool createQRC READ createQRC)
 
     explicit ExtractDialog(QWidget *parent = 0);
-    ~ExtractDialog();
+    ~ExtractDialog() override;
 
     bool createQRC();
     QString qrcName();
@@ -49,14 +49,13 @@ private:
 
     QString m_dir;
     QString m_qrcName;
-    bool m_createQRC;
+    bool m_createQRC{};
 
 private Q_SLOTS:
     void saveValues();
     void selectDir();
     void updateQRCForm(bool enabled);
 };
-}
-
+} // namespace OpenSR
 
 #endif // OPENSR_RV_EXTRACTDIALOG_H

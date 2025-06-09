@@ -23,10 +23,7 @@
 
 namespace OpenSR
 {
-ExtractDialog::ExtractDialog(QWidget *parent) :
-    QDialog(parent),
-    m_ui(new Ui::ExtractDialog),
-    m_qrcName("resource.qrc")
+ExtractDialog::ExtractDialog(QWidget *parent) : QDialog(parent), m_ui(new Ui::ExtractDialog), m_qrcName("resource.qrc")
 {
     m_ui->setupUi(this);
     m_ui->qrcNameEdit->setText(m_qrcName);
@@ -54,7 +51,9 @@ void ExtractDialog::selectDir()
 {
     QString d = QFileDialog::getExistingDirectory(this, tr("Select dir to extract"));
     if (d.isEmpty())
+    {
         return;
+    }
     m_ui->dirEdit->setText(d);
 }
 
@@ -78,4 +77,4 @@ void ExtractDialog::updateQRCForm(bool enabled)
     m_ui->qrcNameEdit->setEnabled(enabled);
     m_ui->qrcLabel->setEnabled(enabled);
 }
-}
+} // namespace OpenSR

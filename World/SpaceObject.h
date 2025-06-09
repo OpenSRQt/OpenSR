@@ -30,7 +30,7 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API SpaceObject: public WorldObject
+class OPENSR_WORLD_API SpaceObject : public WorldObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -40,20 +40,20 @@ class OPENSR_WORLD_API SpaceObject: public WorldObject
 
 public:
     Q_INVOKABLE SpaceObject(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~SpaceObject();
+    ~SpaceObject() override;
 
     QPointF position() const;
     QVariantList trajectory() const;
 
-    void setPosition(const QPointF& pos);
+    void setPosition(const QPointF &pos);
 
     virtual void updateTrajectory();
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
 protected:
-    void setTrajectory(const QList<BezierCurve>& trajectory);
+    void setTrajectory(const QList<BezierCurve> &trajectory);
 
 Q_SIGNALS:
     void positionChanged();
@@ -63,7 +63,7 @@ private:
     QPointF m_position;
     QList<BezierCurve> m_trajectory;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_SPACEOBJECT_H

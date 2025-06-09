@@ -44,11 +44,11 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
                      QVector<QPoint> &offsets);
 
     QList<QUrl> m_sources;
-    bool m_sourceChanged;
+    bool m_sourceChanged = false;
 
-    int m_currentFrame;
+    int m_currentFrame = 0;
 
-    bool m_loaded;
+    bool m_loaded = false;
 
     QList<QImage> m_bgs;
     QList<GAIHeader> m_headers;
@@ -59,17 +59,14 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
     QTimer m_timer;
 
     std::vector<std::unique_ptr<GAITexture>> m_textures;
-    int m_currentFile;
-    bool m_fileChanged;
-    bool m_playing;
-    float m_speed;
+    long long m_currentFile = 0;
+    bool m_fileChanged = false;
+    bool m_playing = true;
+    float m_speed = 1.0f;
 };
 
-GAIAnimatedImage::GAIAnimatedImagePrivate::GAIAnimatedImagePrivate(GAIAnimatedImage *q)
-    : m_sourceChanged(false), m_loaded(false), m_currentFrame(0), m_currentFile(0), m_fileChanged(false),
-      m_playing(true), m_speed(1.0f)
+GAIAnimatedImage::GAIAnimatedImagePrivate::GAIAnimatedImagePrivate(GAIAnimatedImage *q) : q_ptr(q)
 {
-    q_ptr = q;
 }
 
 GAIAnimatedImage::GAIAnimatedImage(QQuickItem *parent)
@@ -105,7 +102,9 @@ void GAIAnimatedImage::setSources(const QList<QUrl> &url)
     d->m_sources = url;
 
     for (const QUrl &u : d->m_sources)
+    {
         d->loadGAI(u);
+    }
 
     if (!d->m_headers.isEmpty())
     {
@@ -144,9 +143,9 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
     }
     else
     {
-        node = static_cast<QSGGeometryNode *>(oldNode);
+        node = dynamic_cast<QSGGeometryNode *>(oldNode);
         geometry = node->geometry();
-        material = static_cast<GAIMaterial *>(node->material());
+        material = dynamic_cast<GAIMaterial *>(node->material());
     }
 
     if (d->m_sourceChanged)
@@ -190,13 +189,19 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
 
     QString path;
     if (source.scheme() == "res")
+    {
         path = source.path();
+    }
     else if (source.scheme() == "qrc")
+    {
         path = ":/" + source.path();
+    }
     else
+    {
         path = source.toLocalFile();
+    }
 
-    QIODevice *dev = 0;
+    QIODevice *dev = nullptr;
 
     if (source.isLocalFile() || source.scheme() == "qrc")
     {
@@ -205,10 +210,12 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
     }
     else
     {
-        dev = ((Engine *)qApp)->resources()->getIODevice(path);
+        dev = (dynamic_cast<Engine *> qApp)->resources()->getIODevice(path);
     }
     if (!dev)
+    {
         return;
+    }
 
     if (!checkGAIHeader(dev))
     {
@@ -225,10 +232,12 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
 
     QImage background;
     if (source.isLocalFile() || source.scheme() == "qrc")
+    {
         background = QImage(bgPath);
+    }
     else
     {
-        QIODevice *bgDev = ((Engine *)qApp)->resources()->getIODevice(bgPath);
+        QIODevice *bgDev = (dynamic_cast<Engine *> qApp)->resources()->getIODevice(bgPath);
         if (bgDev)
         {
             background = QImageReader(bgDev).read();
@@ -240,22 +249,30 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
     QVector<QByteArray> frames(header.frameCount);
     QVector<QPoint> offsets(header.frameCount);
 
-    quint32 *seekSizes = new quint32[header.frameCount * 2];
+    char *seekSizes = new char[static_cast<unsigned long>(header.frameCount * 2) * sizeof(quint32)];
 
     dev->seek(sizeof(GAIHeader));
-    dev->read((char *)seekSizes, header.frameCount * 2 * sizeof(uint32_t));
+    const auto totalBytes = static_cast<uint64_t>(header.frameCount) * 2 * sizeof(uint32_t);
+    dev->read(seekSizes, static_cast<qint64>(totalBytes));
 
     for (int i = 0; i < header.frameCount; i++)
     {
-        quint32 giSeek = seekSizes[i * 2], giSize = seekSizes[i * 2 + 1];
+        quint32 giSeek{};
+        std::memcpy(&giSeek, seekSizes + static_cast<unsigned long>(i * 2) * sizeof(quint32), sizeof(quint32));
+        quint32 giSize{};
+        std::memcpy(&giSize, seekSizes + (i * 2 + 1) * sizeof(quint32), sizeof(quint32));
         if (giSeek && giSize)
         {
             qint64 giOffset = giSeek;
-            uint32_t signature;
+            std::array<char, sizeof(uint32_t)> signatureBuffer{};
             dev->seek(giOffset);
-            dev->peek((char *)&signature, sizeof(uint32_t));
+            dev->peek(signatureBuffer.data(), sizeof(uint32_t));
 
-            if (signature == ZL01_SIGNATURE || signature == ZL02_SIGNATURE)
+            uint32_t signature{};
+            memcpy(&signature, signatureBuffer.data(), sizeof(uint32_t));
+
+            if (static_cast<uint32_t>(signature) == ZL01_SIGNATURE ||
+                static_cast<uint32_t>(signature) == ZL02_SIGNATURE)
             {
                 QByteArray zlibData = dev->read(giSize);
                 QByteArray data = unpackZL(zlibData);
@@ -285,7 +302,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
     m_gaiOffsets.push_back(offsets);
 
     m_timer.setSingleShot(true);
-    m_timer.setInterval(m_gaiTimes[m_currentFile][m_currentFrame] / m_speed);
+    m_timer.setInterval(static_cast<int>(static_cast<float>(m_gaiTimes[m_currentFile][m_currentFrame]) / m_speed));
     m_timer.start();
 
     m_loaded = true;
@@ -294,7 +311,7 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGAI(const QUrl &source)
 void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice *dev, int i, const GAIHeader &header,
                                                             QVector<QByteArray> &frames, QVector<QPoint> &offsets)
 {
-    GIFrameHeader image;
+    GIFrameHeader image{};
 
     if (!checkGIHeader(dev))
     {
@@ -303,8 +320,10 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice *dev, int 
         return;
     }
 
+    std::array<char, sizeof(GIFrameHeader)> headerBytes{};
     qint64 offset = dev->pos();
-    dev->read((char *)&image, sizeof(GIFrameHeader));
+    dev->read(headerBytes.data(), sizeof(GIFrameHeader));
+    image = std::bit_cast<GIFrameHeader>(headerBytes);
 
     if (image.type != 5)
     {
@@ -317,15 +336,19 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice *dev, int 
 
     for (int i = 0; i < image.layerCount; i++)
     {
-        dev->read((char *)&layers[i], sizeof(GILayerHeader));
+        std::array<char, sizeof(GILayerHeader)> layerBuffer{};
+        dev->read(layerBuffer.data(), sizeof(GILayerHeader));
 
+        layers[i] = std::bit_cast<GILayerHeader>(layerBuffer);
         layers[i].startX -= header.startX;
         layers[i].startY -= header.startY;
         layers[i].finishX -= header.startX;
         layers[i].finishY -= header.startY;
     }
 
-    offsets[i] = QPoint(layers[0].startX, layers[0].startY);
+    const auto layerZeroX = layers[0].startX;
+    const auto layerZeroY = layers[0].startY;
+    offsets[i] = QPoint(static_cast<int>(layerZeroX), static_cast<int>(layerZeroY));
 
     if (layers[0].size)
     {
@@ -339,24 +362,28 @@ void GAIAnimatedImage::GAIAnimatedImagePrivate::loadGIFrame(QIODevice *dev, int 
     delete[] layers;
 }
 
-int GAIAnimatedImage::currentFrame() const
+unsigned int GAIAnimatedImage::currentFrame() const
 {
     Q_D(const GAIAnimatedImage);
     // FIXME: Quite ugly
-    int f = 0;
+    unsigned int f = 0;
     for (int i = 0; i < d->m_currentFile; i++)
+    {
         f += d->m_headers[i].frameCount;
+    }
 
     return f + d->m_currentFrame;
 }
 
-int GAIAnimatedImage::framesCount() const
+unsigned int GAIAnimatedImage::framesCount() const
 {
     Q_D(const GAIAnimatedImage);
     // FIXME: Quite ugly
-    int f = 0;
+    unsigned int f = 0;
     for (int i = 0; i < d->m_headers.count(); i++)
+    {
         f += d->m_headers[i].frameCount;
+    }
 
     return f;
 }
@@ -377,10 +404,14 @@ void GAIAnimatedImage::setPlaying(bool playing)
 {
     Q_D(GAIAnimatedImage);
     if (!d->m_playing && playing)
+    {
         d->m_timer.start();
+    }
 
     if (d->m_playing && !playing)
+    {
         d->m_timer.stop();
+    }
 
     d->m_playing = playing;
     emit(playingChanged());
@@ -391,10 +422,14 @@ void GAIAnimatedImage::setPaused(bool paused)
 {
     Q_D(GAIAnimatedImage);
     if (d->m_playing && paused)
+    {
         d->m_timer.stop();
+    }
 
     if (!d->m_playing && !paused)
+    {
         d->m_timer.start();
+    }
 
     d->m_playing = !paused;
     emit(playingChanged());
@@ -419,14 +454,19 @@ void GAIAnimatedImage::nextFrame()
     Q_D(GAIAnimatedImage);
 
     if (!d->m_loaded)
+    {
         return;
+    }
 
     if (d->m_currentFile >= d->m_headers.count())
+    {
         return;
+    }
 
     if ((d->m_currentFile >= d->m_textures.size()) || (!d->m_textures[d->m_currentFile]))
     {
-        d->m_timer.setInterval(d->m_gaiTimes[d->m_currentFile][d->m_currentFrame] / d->m_speed);
+        d->m_timer.setInterval(
+            static_cast<int>(static_cast<float>(d->m_gaiTimes[d->m_currentFile][d->m_currentFrame]) / d->m_speed));
         d->m_timer.start();
         return;
     }
@@ -441,11 +481,14 @@ void GAIAnimatedImage::nextFrame()
         d->m_fileChanged = true;
     }
 
-    d->m_timer.setInterval(d->m_gaiTimes[d->m_currentFile][d->m_currentFrame] / d->m_speed);
+    d->m_timer.setInterval(
+        static_cast<int>(static_cast<float>(d->m_gaiTimes[d->m_currentFile][d->m_currentFrame]) / d->m_speed));
 
     if (d->m_textures[d->m_currentFile])
+    {
         d->m_textures[d->m_currentFile]->drawNextFrame(d->m_gaiFrames[d->m_currentFile][d->m_currentFrame],
                                                        d->m_gaiOffsets[d->m_currentFile][d->m_currentFrame]);
+    }
 
     d->m_timer.start();
     emit currentFrameChanged();

@@ -50,7 +50,7 @@ class Ship;
 class SpaceStation;
 class ResourceManager;
 
-static QObject* managerSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+static QObject *managerSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
     QQmlEngine::setObjectOwnership(WorldManager::instance(), QQmlEngine::CppOwnership);
     return WorldManager::instance();
@@ -91,5 +91,5 @@ void bindWorldTypes(QJSEngine *script, QQmlEngine *qml)
     WorldObject::registerType<SpaceStation>(qml, script);
     WorldObject::registerType<ResourceManager>(qml, script);
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

@@ -8,7 +8,7 @@ class GAIShader : public QSGMaterialShader
 {
 public:
     GAIShader();
-    ~GAIShader() = default;
+    ~GAIShader() override = default;
 
     bool updateUniformData(RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override;
     void updateSampledImage(RenderState &state, int binding, QSGTexture **texture, QSGMaterial *newMaterial,

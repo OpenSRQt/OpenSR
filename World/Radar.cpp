@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Radar::m_staticTypeId = typeIdFromClassName(Radar::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Radar>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Radar>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Radar>("OpenSR.World", 1, 0, "Radar");
 }
 
-template<>
-Radar* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Radar *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Radar(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Radar>()
+template <> quint32 WorldObject::staticTypeId<Radar>()
 {
-    return Radar::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Radar::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Radar>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Radar>()
 {
     return &Radar::staticMetaObject;
 }
 
-Radar::Radar(WorldObject *parent, quint32 id): Equipment(parent, id)
+Radar::Radar(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Radar::~Radar()
 
 quint32 Radar::typeId() const
 {
-    return Radar::m_staticTypeId;
+    return staticTypeId<Radar>();
 }
 
 QString Radar::namePrefix() const
 {
     return tr("Radar");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

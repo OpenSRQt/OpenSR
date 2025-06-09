@@ -19,10 +19,10 @@
 #ifndef OPENSR_WORLD_WORLDCONTEXT_H
 #define OPENSR_WORLD_WORLDCONTEXT_H
 
-#include "WorldObject.h"
-#include <QPoint>
 #include "PlanetarySystem.h"
 #include "ResourceManager.h"
+#include "WorldObject.h"
+#include <QPoint>
 namespace OpenSR
 {
 namespace World
@@ -36,14 +36,14 @@ class OPENSR_WORLD_API WorldContext : public WorldObject
                    STORED false)
     Q_PROPERTY(ResourceManager *resources READ resources NOTIFY resourcesChanged STORED false)
     Q_PROPERTY(WorldObject *playerShip READ playerShip NOTIFY playerShipChanged STORED false WRITE setPlayerShip)
-    Q_PROPERTY(WorldObject* planetToEnter READ planetToEnter  
-        NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
-    Q_PROPERTY(QPointF movementPosition READ movementPosition  
-        NOTIFY movementPositionChanged STORED false WRITE setMovementPosition)
-    
+    Q_PROPERTY(
+        WorldObject *planetToEnter READ planetToEnter NOTIFY planetToEnterChanged STORED false WRITE setPlanetToEnter)
+    Q_PROPERTY(QPointF movementPosition READ movementPosition NOTIFY movementPositionChanged
+                   STORED false WRITE setMovementPosition)
+
 public:
     Q_INVOKABLE WorldContext(WorldObject *parent = nullptr, quint32 id = 0);
-    virtual ~WorldContext();
+    ~WorldContext() override;
 
     PlanetarySystem *currentSystem() const;
     ResourceManager *resources() const;
@@ -52,22 +52,22 @@ public:
 
     void setCurrentSystem(PlanetarySystem *system);
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
-    virtual bool save(QDataStream &stream) const;
-    virtual bool load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects);
+    bool save(QDataStream &stream) const override;
+    bool load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects) override;
 
     WorldObject *playerShip() const;
     void setPlayerShip(WorldObject *);
 
     bool checkPlannedActions() const;
 
-    WorldObject* planetToEnter() const;
+    WorldObject *planetToEnter() const;
     void setPlanetToEnter(WorldObject *);
 
     QPointF movementPosition();
-    void setMovementPosition(const QPointF& pos);
+    void setMovementPosition(const QPointF &pos);
 
 public slots:
     void onShipArrived();
@@ -79,21 +79,21 @@ signals:
     void playerShipChanged(WorldObject *playerShip);
     void plannedActionsCompleted();
 
-    void planetToEnterChanged(WorldObject* playerShip);
-    void movementPositionChanged(const QPointF& pos);
+    void planetToEnterChanged(WorldObject *playerShip);
+    void movementPositionChanged(const QPointF &pos);
 
     void enteringPlanet();
-    
+
     void stillMoving();
 
 private:
-    PlanetarySystem *m_currentSystem;
-    ResourceManager *m_resources;
-    WorldObject *m_playerShip = nullptr;
-    WorldObject* m_planetToEnter;
-    QPointF m_planetPosition;
+    PlanetarySystem *m_currentSystem{};
+    ResourceManager *m_resources{};
+    WorldObject *m_playerShip{};
+    WorldObject *m_planetToEnter{};
+    QPointF m_planetPosition{};
 
-    bool m_shipIsMoving = false;
+    bool m_shipIsMoving{};
 };
 } // namespace World
 } // namespace OpenSR

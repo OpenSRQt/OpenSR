@@ -19,11 +19,11 @@
 #include "OpenSR/TexturedBezierCurve.h"
 
 #include <OpenSR/Engine.h>
-#include <OpenSR/ResourceManager.h>
 #include <OpenSR/QMLHelper.h>
+#include <OpenSR/ResourceManager.h>
 #include <QImageReader>
-#include <QSGSimpleTextureNode>
 #include <QQuickWindow>
+#include <QSGSimpleTextureNode>
 
 namespace OpenSR
 {
@@ -35,23 +35,21 @@ class TexturedBezierCurve::TexturedBezierCurvePrivate
     TexturedBezierCurvePrivate(TexturedBezierCurve *q);
 
     BezierCurve curve;
-    int minStep;
+    int minStep{};
 };
 
 TexturedBezierCurve::TexturedBezierCurvePrivate::TexturedBezierCurvePrivate(TexturedBezierCurve *q)
+    : q_ptr(q), minStep(1)
 {
-    q_ptr = q;
 
     curve.p0 = QPointF(0.0f, 0.0f);
     curve.p1 = QPointF(0.0f, 0.0f);
     curve.p2 = QPointF(0.0f, 0.0f);
     curve.p3 = QPointF(0.0f, 0.0f);
-
-    minStep = 1;
 }
 
-TexturedBezierCurve::TexturedBezierCurve(QQuickItem* parent): TexturedPolyline(parent),
-    d_osr_ptr(new TexturedBezierCurvePrivate(this))
+TexturedBezierCurve::TexturedBezierCurve(QQuickItem *parent)
+    : TexturedPolyline(parent), d_osr_ptr(new TexturedBezierCurvePrivate(this))
 {
     Q_D(TexturedBezierCurve);
 }
@@ -67,7 +65,7 @@ BezierCurve TexturedBezierCurve::curve() const
     return d->curve;
 }
 
-void TexturedBezierCurve::setCurve(const BezierCurve& curve)
+void TexturedBezierCurve::setCurve(const BezierCurve &curve)
 {
     Q_D(TexturedBezierCurve);
 
@@ -76,8 +74,10 @@ void TexturedBezierCurve::setCurve(const BezierCurve& curve)
     QList<QPointF> points = d->curve.calcPolyline(d->minStep);
     QVariantList vpoints;
 
-    for (const QPointF& p : points)
+    for (const QPointF &p : points)
+    {
         vpoints.append(QVariant(p));
+    }
 
     setPoints(vpoints);
     emit(curveChanged());
@@ -97,4 +97,4 @@ void TexturedBezierCurve::setMinStep(int minStep)
 
     setCurve(d->curve);
 }
-}
+} // namespace OpenSR

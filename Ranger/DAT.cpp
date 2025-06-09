@@ -29,43 +29,51 @@ QString readWideString(QIODevice *dev)
     wchar_t c = 0;
     QString result;
 
-    do
+    dev->read((char *)&c, 2);
+    if (c != 0)
     {
-        dev->read((char*)&c, 2);
-        if (c != 0)
-            result.append(QChar(c));
+        result.append(QChar(c));
     }
-    while (c != 0);
+    while (c != 0)
+    {
+        dev->read((char *)&c, 2);
+        if (c != 0)
+        {
+            result.append(QChar(c));
+        }
+    }
 
     return result;
 }
 
-void writeWideString(QIODevice *dev, const QString& value)
+void writeWideString(QIODevice *dev, const QString &value)
 {
-    dev->write((char*)value.utf16(), (value.length() + 1) * 2);
+    dev->write((char *)value.utf16(), (value.length() + 1) * 2);
 }
-}
+} // namespace
 
-//TODO: Optimize
-void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
+// TODO: Optimize
+void writeDATTree(QIODevice *dev, const QVariant &node, const QString &name)
 {
     if (node.typeId() == QMetaType::QVariantMap)
     {
         QVariantMap m = node.toMap();
         uint32_t count = 0;
         uint8_t isTree = 0;
-        for (const QVariant& c : m)
+        for (const QVariant &c : m)
         {
             if (c.typeId() == QMetaType::QVariantMap || c.typeId() == QMetaType::QVariantList)
             {
                 isTree = 1;
                 if (c.typeId() == QMetaType::QVariantList)
+                {
                     count += c.toList().count() - 1;
+                }
             }
         }
         count += m.count();
-        dev->write((char*)&isTree, 1);
-        dev->write((char*)&count, 4);
+        dev->write((char *)&isTree, 1);
+        dev->write((char *)&count, 4);
 
         if (isTree)
         {
@@ -76,12 +84,14 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
                 uint32_t arrayCount = 1;
                 uint8_t isText = 1;
                 if (i.value().typeId() == QMetaType::QVariantMap || i.value().typeId() == QMetaType::QVariantList)
+                {
                     isText = 2;
+                }
                 if (i.value().typeId() != QMetaType::QVariantList)
                 {
-                    dev->write((char*)&index, 4);
-                    dev->write((char*)&arrayCount, 4);
-                    dev->write((char*)&isText, 1);
+                    dev->write((char *)&index, 4);
+                    dev->write((char *)&arrayCount, 4);
+                    dev->write((char *)&isText, 1);
                     writeWideString(dev, i.key());
                 }
                 writeDATTree(dev, i.value(), i.key());
@@ -93,7 +103,7 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
             for (QVariantMap::const_iterator i = m.begin(); i != end; ++i)
             {
                 uint8_t isText = 1;
-                dev->write((char*)&isText, 1);
+                dev->write((char *)&isText, 1);
                 writeWideString(dev, i.key());
                 writeDATTree(dev, i.value(), i.key());
             }
@@ -104,20 +114,24 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
         QVariantList l = node.toList();
         uint32_t count = l.count();
         uint32_t i = 0;
-        for (const QVariant& c : l)
+        for (const QVariant &c : l)
         {
             uint32_t index = i;
             uint32_t arrayCount = 0;
             uint8_t isText = 1;
             if (i == 0)
+            {
                 arrayCount = count;
+            }
             if (c.typeId() == QMetaType::QVariantMap || c.typeId() == QMetaType::QVariantList)
+            {
                 isText = 2;
-            dev->write((char*)&index, 4);
-            dev->write((char*)&arrayCount, 4);
-            dev->write((char*)&isText, 1);
+            }
+            dev->write((char *)&index, 4);
+            dev->write((char *)&arrayCount, 4);
+            dev->write((char *)&isText, 1);
             writeWideString(dev, name);
-            //FIXME: Possible bug here, in case of array of array
+            // FIXME: Possible bug here, in case of array of array
             writeDATTree(dev, c, name);
             i++;
         }
@@ -128,14 +142,16 @@ void writeDATTree(QIODevice *dev, const QVariant& node, const QString& name)
     }
 }
 
-void readDATTree(QIODevice *dev, QVariantMap* parent, bool isCache)
+void readDATTree(QIODevice *dev, QVariantMap *parent, bool isCache)
 {
     uint8_t isTree = 0;
-    uint32_t count;
+    uint32_t count{};
 
     if (!isCache)
-        dev->read((char*)&isTree, 1);
-    dev->read((char*)&count, 4);
+    {
+        dev->read((char *)&isTree, 1);
+    }
+    dev->read((char *)&count, 4);
 
     if (isTree)
     {
@@ -144,12 +160,12 @@ void readDATTree(QIODevice *dev, QVariantMap* parent, bool isCache)
         uint32_t currentCount = 0;
         for (int i = 0; i < count; i++)
         {
-            uint32_t index, arrayCount;
-            uint8_t isText;
+            uint32_t index{}, arrayCount{};
+            uint8_t isText{};
 
-            dev->read((char*)&index, 4);
-            dev->read((char*)&arrayCount, 4);
-            dev->read((char*)&isText, 1);
+            dev->read((char *)&index, 4);
+            dev->read((char *)&arrayCount, 4);
+            dev->read((char *)&isText, 1);
             QString name = readWideString(dev);
             QVariant value;
 
@@ -194,7 +210,7 @@ void readDATTree(QIODevice *dev, QVariantMap* parent, bool isCache)
         for (int i = 0; i < count; i++)
         {
             uint8_t isText = 0;
-            dev->read((char*)&isText, 1);
+            dev->read((char *)&isText, 1);
 
             QString name = readWideString(dev);
             QVariant value;
@@ -217,7 +233,7 @@ void readDATTree(QIODevice *dev, QVariantMap* parent, bool isCache)
 QVariantMap loadDAT(QIODevice *dev, bool isCache)
 {
     QVariantMap root;
-    uint32_t sig;
+    uint32_t sig{};
     dev->peek((char *)&sig, 4);
 
     if (sig == 0x31304c5a)
@@ -230,13 +246,15 @@ QVariantMap loadDAT(QIODevice *dev, bool isCache)
         dat.close();
     }
     else
+    {
         readDATTree(dev, &root, isCache);
+    }
 
     return root;
 }
 
-void saveDAT(QIODevice *dev, const QVariant& root)
+void saveDAT(QIODevice *dev, const QVariant &root)
 {
     writeDATTree(dev, root, QString());
 }
-}
+} // namespace OpenSR

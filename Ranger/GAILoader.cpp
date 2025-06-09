@@ -23,38 +23,44 @@ namespace OpenSR
 {
 bool checkGAIHeader(QIODevice *dev)
 {
-    quint32 sig;
-    qint64 size = dev->peek((char*)&sig, sizeof(quint32));
+    quint32 sig{};
+    qint64 size = dev->peek((char *)&sig, sizeof(quint32));
 
     if (size != sizeof(quint32) || sig != GAI_SIGNATURE)
+    {
         return false;
+    }
 
     return true;
 }
 
-QVector<int> loadGAITimes(QIODevice *dev, const GAIHeader& header)
+QVector<int> loadGAITimes(QIODevice *dev, const GAIHeader &header)
 {
     QVector<int> times(header.frameCount);
 
     if (!header.waitSize)
+    {
         return times;
+    }
 
     uint8_t *waitData = new uint8_t[header.waitSize];
     dev->seek(header.waitSeek);
-    dev->read((char*)waitData, header.waitSize);
+    dev->read((char *)waitData, header.waitSize);
 
-    uint32_t timeBlockCount = *((uint32_t*)waitData);
-    uint8_t *p = waitData + 4 + timeBlockCount * 8 + 2;
+    uint32_t timeBlockCount = *((uint32_t *)waitData);
+    uint8_t *p = waitData + 4 + static_cast<size_t>(timeBlockCount * 8) + 2;
 
     for (int i = 0; i < timeBlockCount; i++)
     {
         uint32_t blockFrameCount = *((uint32_t *)p);
         for (int j = 0; j < blockFrameCount; j++)
         {
-            uint32_t frame = *((uint32_t *)(p + 4 + j * 8));
-            uint32_t time = *((uint32_t *)(p + 4 + j * 8 + 4));
+            uint32_t frame = *((uint32_t *)(p + 4 + static_cast<ptrdiff_t>(j * 8)));
+            uint32_t time = *((uint32_t *)(p + 4 + static_cast<ptrdiff_t>(j * 8) + 4));
             if (frame < header.frameCount)
-                times[frame] = time;
+            {
+                times[frame] = static_cast<int>(time);
+            }
         }
         p += blockFrameCount * 8 + 4 + 2;
     }
@@ -63,23 +69,26 @@ QVector<int> loadGAITimes(QIODevice *dev, const GAIHeader& header)
     return times;
 }
 
-QImage loadGAIFrame(QIODevice *dev, const GAIHeader& header, int i, const QImage &background)
+QImage loadGAIFrame(QIODevice *dev, const GAIHeader &header, int i, const QImage &background)
 {
     if (i >= header.frameCount)
+    {
         return QImage();
+    }
 
     QImage result;
-    uint32_t giSeek, giSize;
-    dev->seek(sizeof(GAIHeader) + i * 2 * sizeof(uint32_t));
-    dev->read((char*)&giSeek, sizeof(uint32_t));
-    dev->read((char*)&giSize, sizeof(uint32_t));
+    uint32_t giSeek{}, giSize{};
+    dev->seek(static_cast<qint64>(sizeof(GAIHeader)) +
+              static_cast<qint64>(i) * 2 * static_cast<qint64>(sizeof(uint32_t)));
+    dev->read((char *)&giSeek, sizeof(uint32_t));
+    dev->read((char *)&giSize, sizeof(uint32_t));
 
     if (giSeek && giSize)
     {
         qint64 giOffset = giSeek;
-        uint32_t signature;
+        uint32_t signature{};
         dev->seek(giOffset);
-        dev->peek((char*)&signature, sizeof(uint32_t));
+        dev->peek((char *)&signature, sizeof(uint32_t));
 
         if (signature == ZL01_SIGNATURE || signature == ZL02_SIGNATURE)
         {
@@ -88,19 +97,28 @@ QImage loadGAIFrame(QIODevice *dev, const GAIHeader& header, int i, const QImage
 
             QBuffer bufdev(&data);
             bufdev.open(QIODevice::ReadOnly);
-            result = loadGIFrame(&bufdev, true, background, header.startX, header.startY, header.finishX, header.finishY);
+            result =
+                loadGIFrame(&bufdev, true, background, static_cast<int>(header.startX), static_cast<int>(header.startY),
+                            static_cast<int>(header.finishX), static_cast<int>(header.finishY));
         }
         else
         {
-            result = loadGIFrame(dev, true, background, header.startX, header.startY, header.finishX, header.finishY);
+            result =
+                loadGIFrame(dev, true, background, static_cast<int>(header.startX), static_cast<int>(header.startY),
+                            static_cast<int>(header.finishX), static_cast<int>(header.finishY));
         }
     }
     else
     {
         if (!background.isNull())
+        {
             result = background;
+        }
         else
-            result = QImage(header.finishX - header.startX, header.finishY - header.startY, QImage::Format_ARGB32);
+        {
+            result = QImage(static_cast<int>(header.finishX - header.startX),
+                            static_cast<int>(header.finishY - header.startY), QImage::Format_ARGB32);
+        }
     }
     return result;
 }
@@ -108,7 +126,9 @@ QImage loadGAIFrame(QIODevice *dev, const GAIHeader& header, int i, const QImage
 Animation loadGAIAnimation(QIODevice *dev, const QImage &background)
 {
     if (!checkGAIHeader(dev))
+    {
         return Animation();
+    }
 
     GAIHeader header = readGAIHeader(dev);
     QImage bg = background;
@@ -128,16 +148,16 @@ Animation loadGAIAnimation(QIODevice *dev, const QImage &background)
 
 GAIHeader peekGAIHeader(QIODevice *dev)
 {
-    GAIHeader result;
-    dev->peek((char*)&result, sizeof(GAIHeader));
+    GAIHeader result{};
+    dev->peek((char *)&result, sizeof(GAIHeader));
     return result;
 }
 
 GAIHeader readGAIHeader(QIODevice *dev)
 {
-    GAIHeader result;
-    dev->read((char*)&result, sizeof(GAIHeader));
+    GAIHeader result{};
+    dev->read((char *)&result, sizeof(GAIHeader));
     return result;
 }
 
-}
+} // namespace OpenSR

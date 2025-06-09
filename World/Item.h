@@ -26,19 +26,19 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Item: public WorldObject
+class OPENSR_WORLD_API Item : public WorldObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
 public:
     Q_INVOKABLE Item(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Item();
+    ~Item() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_ITEM_H

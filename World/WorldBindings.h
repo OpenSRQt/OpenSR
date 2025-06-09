@@ -21,22 +21,24 @@
 
 #include "WorldObject.h"
 
-#include <QtCore/QMetaObject>
 #include <QtCore/QMetaEnum>
+#include <QtCore/QMetaObject>
 #include <QtQml/QJSEngine>
 
 class QQmlEngine;
 
-#define WORLD_JS_DEFAULT_OBJECT_CONSTRUCTOR(Factory, Class)\
-    OpenSR::World::Class* Factory::Class(WorldObject *parent) {\
-        OpenSR::World::Class *obj = WorldObject::createObject<World::Class>(parent);\
-        QQmlEngine::setObjectOwnership((QObject*)obj, QQmlEngine::JavaScriptOwnership);\
-        return obj;\
+#define WORLD_JS_DEFAULT_OBJECT_CONSTRUCTOR(Factory, Class)                                                            \
+    OpenSR::World::Class *Factory::Class(WorldObject *parent)                                                          \
+    {                                                                                                                  \
+        OpenSR::World::Class *obj = WorldObject::createObject<World::Class>(parent);                                   \
+        QQmlEngine::setObjectOwnership((QObject *)obj, QQmlEngine::JavaScriptOwnership);                               \
+        return obj;                                                                                                    \
     }
 
-#define WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(Factory, Class)\
-    Class Factory::Class() {\
-        return World::Class();\
+#define WORLD_JS_DEFAULT_GADGET_CONSTRUCTOR(Factory, Class)                                                            \
+    Class Factory::Class()                                                                                             \
+    {                                                                                                                  \
+        return World::Class();                                                                                         \
     }
 
 namespace OpenSR
@@ -45,21 +47,24 @@ namespace World
 {
 void bindWorldTypes(QJSEngine *script, QQmlEngine *qml);
 
-template<class T>
-static void bindEnumsToJS(QJSEngine *script)
+template <class T> static void bindEnumsToJS(QJSEngine *script)
 {
     QJSValue world = script->globalObject().property("World");
 
     if (world.isUndefined())
+    {
         return;
-    
+    }
+
     const QMetaObject *obj = &T::staticMetaObject;
 
-    for (int i = 0; i < obj->enumeratorCount(); ++i) {
+    for (int i = 0; i < obj->enumeratorCount(); ++i)
+    {
         QMetaEnum metaEnum = obj->enumerator(i);
         QJSValue enumObj = script->newObject();
 
-        for (int j = 0; j < metaEnum.keyCount(); ++j) {
+        for (int j = 0; j < metaEnum.keyCount(); ++j)
+        {
             enumObj.setProperty(metaEnum.key(j), metaEnum.value(j));
         }
 
@@ -67,7 +72,7 @@ static void bindEnumsToJS(QJSEngine *script)
     }
 }
 
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_WORLDBINDINGS_H

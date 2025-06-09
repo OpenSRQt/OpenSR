@@ -99,11 +99,9 @@ void InhabitedPlanetStyle::setAffiliation(const QString &texture)
     setData(d);
 }
 
-
 bool operator==(const InhabitedPlanetStyle &one, const InhabitedPlanetStyle &another)
 {
-    return (one.planetStyle == another.planetStyle) &&
-            (one.affiliation() == another.affiliation());
+    return (one.planetStyle == another.planetStyle) && (one.affiliation() == another.affiliation());
 }
 
 QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle &style)
@@ -113,7 +111,7 @@ QDataStream &operator<<(QDataStream &stream, const InhabitedPlanetStyle &style)
 
 QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -131,30 +129,25 @@ QDataStream &operator>>(QDataStream &stream, InhabitedPlanetStyle::Data &data)
     return stream >> data.affiliation;
 }
 
-const quint32 InhabitedPlanet::m_staticTypeId = typeIdFromClassName(InhabitedPlanet::staticMetaObject.className());
-
-template <>
-void WorldObject::registerType<InhabitedPlanet>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<InhabitedPlanet>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<InhabitedPlanetStyle>();
     qRegisterMetaType<InhabitedPlanetStyle::Data>();
     qmlRegisterType<InhabitedPlanet>("OpenSR.World", 1, 0, "InhabitedPlanet");
 }
 
-template <>
-InhabitedPlanet *WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> InhabitedPlanet *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new InhabitedPlanet(parent, id);
 }
 
-template <>
-quint32 WorldObject::staticTypeId<InhabitedPlanet>()
+template <> quint32 WorldObject::staticTypeId<InhabitedPlanet>()
 {
-    return InhabitedPlanet::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(InhabitedPlanet::staticMetaObject.className());
+    return id;
 }
 
-template <>
-const QMetaObject *WorldObject::staticTypeMeta<InhabitedPlanet>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<InhabitedPlanet>()
 {
     return &InhabitedPlanet::staticMetaObject;
 }
@@ -169,7 +162,7 @@ InhabitedPlanet::~InhabitedPlanet()
 
 quint32 InhabitedPlanet::typeId() const
 {
-    return InhabitedPlanet::m_staticTypeId;
+    return staticTypeId<InhabitedPlanet>();
 }
 
 QString InhabitedPlanet::namePrefix() const
@@ -185,7 +178,9 @@ InhabitedPlanetStyle InhabitedPlanet::style() const
 void InhabitedPlanet::setStyle(const InhabitedPlanetStyle &style)
 {
     if (m_style == style)
+    {
         return;
+    }
 
     m_style = style;
     emit styleChanged();
@@ -197,10 +192,10 @@ void InhabitedPlanet::prepareSave()
     m_style.registerResource();
 }
 
-int InhabitedPlanet::radius() {
+int InhabitedPlanet::radius()
+{
     return style().radius();
 }
 
-
-} //namespace World
-} //namespace OpenSR
+} // namespace World
+} // namespace OpenSR

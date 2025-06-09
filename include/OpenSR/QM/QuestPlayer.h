@@ -21,8 +21,8 @@
 
 #include <OpenSR/OpenSR.h>
 #include <OpenSR/QM/QM.h>
-#include <QObject>
 #include <QList>
+#include <QObject>
 #include <QPair>
 
 class QIODevice;
@@ -30,7 +30,7 @@ namespace OpenSR
 {
 namespace QM
 {
-class QM_API QuestPlayer: public QObject
+class QM_API QuestPlayer : public QObject
 {
     Q_OBJECT
     OPENSR_DECLARE_PRIVATE(QuestPlayer)
@@ -42,8 +42,8 @@ public:
         bool enabled;
     };
 
-    QuestPlayer(QObject *parent = 0);
-    ~QuestPlayer();
+    QuestPlayer(QObject *parent = nullptr);
+    ~QuestPlayer() override;
 
     QM::Location currentLocation() const;
     QM::Transition currentTransition() const;
@@ -68,7 +68,7 @@ protected:
     OPENSR_DECLARE_DPOINTER(QuestPlayer)
 };
 
-}
-}
+} // namespace QM
+} // namespace OpenSR
 
 #endif // OPENSR_QUESTPLAYER_H

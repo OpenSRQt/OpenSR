@@ -28,8 +28,6 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 WorldContext::m_staticTypeId = typeIdFromClassName(WorldContext::staticMetaObject.className());
-
 template <> void WorldObject::registerType<WorldContext>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<WorldContext>("OpenSR.World", 1, 0, "WorldContext");
@@ -42,7 +40,8 @@ template <> WorldContext *WorldObject::createObject(WorldObject *parent, quint32
 
 template <> quint32 WorldObject::staticTypeId<WorldContext>()
 {
-    return WorldContext::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(WorldContext::staticMetaObject.className());
+    return id;
 }
 
 template <> const QMetaObject *WorldObject::staticTypeMeta<WorldContext>()
@@ -50,9 +49,9 @@ template <> const QMetaObject *WorldObject::staticTypeMeta<WorldContext>()
     return &WorldContext::staticMetaObject;
 }
 
-WorldContext::WorldContext(WorldObject *parent, quint32 id) : WorldObject(parent, id), m_currentSystem(0)
+WorldContext::WorldContext(WorldObject *parent, quint32 id)
+    : WorldObject(parent, id), m_resources(new ResourceManager(this))
 {
-    m_resources = new ResourceManager(this);
 }
 
 WorldContext::~WorldContext()
@@ -61,7 +60,7 @@ WorldContext::~WorldContext()
 
 quint32 WorldContext::typeId() const
 {
-    return WorldContext::m_staticTypeId;
+    return staticTypeId<WorldContext>();
 }
 
 QString WorldContext::namePrefix() const
@@ -88,7 +87,9 @@ bool WorldContext::save(QDataStream &stream) const
     quint32 id = 0;
 
     if (m_currentSystem)
+    {
         id = m_currentSystem->id();
+    }
 
     stream << id << m_resources->id();
     return stream.status() == QDataStream::Ok;
@@ -96,11 +97,13 @@ bool WorldContext::save(QDataStream &stream) const
 
 bool WorldContext::load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     auto it = objects.find(id);
     if (it != objects.end())
+    {
         setCurrentSystem(qobject_cast<PlanetarySystem *>(it.value()));
+    }
 
     stream >> id;
     it = objects.find(id);
@@ -126,24 +129,32 @@ WorldObject *WorldContext::playerShip() const
 void WorldContext::setPlayerShip(WorldObject *ship)
 {
     if (m_playerShip == ship)
+    {
         return;
+    }
 
     Ship *oldPlayerShip = qobject_cast<Ship *>(m_playerShip);
     if (oldPlayerShip)
+    {
         disconnect(oldPlayerShip, &Ship::shipArrived, this, &WorldContext::onShipArrived);
+    }
 
     m_playerShip = ship;
     emit playerShipChanged(ship);
 
     Ship *newPlayerShip = qobject_cast<Ship *>(m_playerShip);
     if (newPlayerShip)
+    {
         connect(newPlayerShip, &Ship::shipArrived, this, &WorldContext::onShipArrived);
+    }
 }
 
 bool WorldContext::checkPlannedActions() const
 {
     if (m_playerShip)
+    {
         return qobject_cast<Ship *>(m_playerShip)->checkPlannedActions();
+    }
 
     return false;
 }
@@ -172,7 +183,9 @@ WorldObject *WorldContext::planetToEnter() const
 void WorldContext::setPlanetToEnter(WorldObject *planet)
 {
     if (m_planetToEnter == planet)
+    {
         return;
+    }
     m_planetToEnter = planet;
     emit planetToEnterChanged(planet);
 }
@@ -185,7 +198,9 @@ QPointF WorldContext::movementPosition()
 void WorldContext::setMovementPosition(const QPointF &pos)
 {
     if (m_planetPosition == pos)
+    {
         return;
+    }
     m_planetPosition = pos;
     emit movementPositionChanged(pos);
 }

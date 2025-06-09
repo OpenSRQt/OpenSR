@@ -23,9 +23,9 @@
 
 #include <AL/alc.h>
 
-#include <QSharedPointer>
-#include <QMap>
 #include <QIODevice>
+#include <QMap>
+#include <QSharedPointer>
 
 namespace OpenSR
 {
@@ -40,11 +40,11 @@ struct SampleData
 class SoundManager::SoundManagerPrivate
 {
 public:
-    QSharedPointer<SampleData> loadWAVFile(QIODevice* d);
-    ALCdevice *device;
-    ALCcontext *context;
-    QMap<QUrl, QSharedPointer<SampleData> > m_soundCache;
+    QSharedPointer<SampleData> loadWAVFile(QIODevice *d);
+    ALCdevice *device{};
+    ALCcontext *context{};
+    QMap<QUrl, QSharedPointer<SampleData>> m_soundCache;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_SOUND_MANAGER_P_H

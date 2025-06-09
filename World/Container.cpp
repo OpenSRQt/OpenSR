@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Container::m_staticTypeId = typeIdFromClassName(Container::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Container>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Container>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Container>("OpenSR.World", 1, 0, "Container");
 }
 
-template<>
-Container* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Container *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Container(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Container>()
+template <> quint32 WorldObject::staticTypeId<Container>()
 {
-    return Container::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Container::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Container>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Container>()
 {
     return &Container::staticMetaObject;
 }
 
-Container::Container(WorldObject *parent, quint32 id): SpaceObject(parent, id)
+Container::Container(WorldObject *parent, quint32 id) : SpaceObject(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Container::~Container()
 
 quint32 Container::typeId() const
 {
-    return Container::m_staticTypeId;
+    return staticTypeId<Container>();
 }
 
 QString Container::namePrefix() const
 {
     return tr("Container");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

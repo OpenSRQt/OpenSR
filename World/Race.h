@@ -68,15 +68,15 @@ class OPENSR_WORLD_API Race: public WorldObject
 
 public:
     Q_INVOKABLE Race(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Race();
+    ~Race() override;
 
     RaceStyle style() const;
     void setStyle(const RaceStyle& style);
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
-    virtual void prepareSave();
+    void prepareSave() override;
 
 Q_SIGNALS:
     void styleChanged();

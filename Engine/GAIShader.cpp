@@ -28,7 +28,7 @@ bool GAIShader::updateUniformData(RenderState &state, QSGMaterial *newMaterial, 
 void GAIShader::updateSampledImage(RenderState &state, int binding, QSGTexture **texture, QSGMaterial *newMaterial,
                                    QSGMaterial *oldMaterial)
 {
-    GAIMaterial *mat = static_cast<GAIMaterial *>(newMaterial);
+    GAIMaterial *mat = dynamic_cast<GAIMaterial *>(newMaterial);
     if (binding == 1)
     {
         mat->texture()->commitTextureOperations(state.rhi(), state.resourceUpdateBatch());

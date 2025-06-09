@@ -21,8 +21,8 @@
 #include <OpenSR/Engine.h>
 #include <OpenSR/ResourceManager.h>
 #include <QImageReader>
-#include <QSGSimpleTextureNode>
 #include <QQuickWindow>
+#include <QSGSimpleTextureNode>
 
 #include <cmath>
 
@@ -34,9 +34,9 @@ class TexturedPolylineNode : public QSGGeometryNode
 {
 public:
     QSGTextureMaterial material;
-    QSGTexture *texture;
+    QSGTexture *texture{};
 
-    TexturedPolylineNode(): texture(0)
+    TexturedPolylineNode()
     {
         setFlag(OwnsGeometry);
         material.setHorizontalWrapMode(QSGTexture::Repeat);
@@ -44,13 +44,15 @@ public:
         setMaterial(&material);
     }
 
-    virtual ~TexturedPolylineNode()
+    ~TexturedPolylineNode() override
     {
         if (texture)
+        {
             delete texture;
+        }
     }
 
-    void setPolyline(const QList<QPointF>& points)
+    void setPolyline(const QList<QPointF> &points)
     {
         if (points.count() < 2)
         {
@@ -62,17 +64,23 @@ public:
 
         if (material.texture())
         {
-            width = material.texture()->textureSize().height();
-            stride = material.texture()->textureSize().width();
+            width = static_cast<float>(material.texture()->textureSize().height());
+            stride = static_cast<float>(material.texture()->textureSize().width());
         }
 
         if (width < 1.0f)
+        {
             width = 1.0f;
+        }
 
         if (stride < 1.0f)
+        {
             stride = 1.0f;
+        }
 
-        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), (points.count() - 1) * 4, (points.count() - 1) * 6);
+        QSGGeometry *geometry =
+            new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(),
+                            (static_cast<int>(points.count() - 1) * 4), static_cast<int>((points.count() - 1) * 6));
         geometry->setDrawingMode(GL_TRIANGLES);
 
         QSGGeometry::TexturedPoint2D *p = geometry->vertexDataAsTexturedPoint2D();
@@ -88,13 +96,15 @@ public:
         {
             bool last = (i + 1) == end;
             bool first = i == (points.begin() + 1);
-            QVector2D d(i->x() - prev.x(), i->y() - prev.y());
+            QVector2D d(static_cast<float>(i->x() - prev.x()), static_cast<float>(i->y() - prev.y()));
             QVector2D n = QVector2D(-d.y(), d.x()).normalized();
 
             if (first)
             {
-                p[0].set(prev.x() - n.x() * width / 2.0f, prev.y() - n.y() * width / 2.0f, 0.0, 0.0);
-                p[1].set(prev.x() + n.x() * width / 2.0f, prev.y() + n.y() * width / 2.0f, 0.0, 1.0);
+                p[0].set(static_cast<float>(prev.x() - n.x() * width / 2.0f),
+                         static_cast<float>(prev.y() - n.y() * width / 2.0f), 0.0f, 0.0f);
+                p[1].set(static_cast<float>(prev.x() + n.x() * width / 2.0f),
+                         static_cast<float>(prev.y() + n.y() * width / 2.0f), 0.0f, 1.0f);
                 p += 2;
             }
 
@@ -102,8 +112,10 @@ public:
 
             if (last)
             {
-                p[0].set(i->x() - n.x() * width / 2.0f, i->y() - n.y() * width / 2.0f, tdelta, 0.0);
-                p[1].set(i->x() + n.x() * width / 2.0f, i->y() + n.y() * width / 2.0f, tdelta, 1.0);
+                p[0].set(static_cast<float>(i->x() - n.x() * width / 2.0f),
+                         static_cast<float>(i->y() - n.y() * width / 2.0f), static_cast<float>(tdelta), 0.0f);
+                p[1].set(static_cast<float>(i->x() + n.x() * width / 2.0f),
+                         static_cast<float>(i->y() + n.y() * width / 2.0f), static_cast<float>(tdelta), 1.0f);
             }
             else
             {
@@ -117,17 +129,23 @@ public:
 
                 double cosa = QVector2D::dotProduct(miter, n);
                 double tdx = tan(acos(cosa)) / 2.0 * width / stride;
-                miter *= width / 2.0f / cosa;
+                miter *= static_cast<float>(width / 2.0f / cosa);
 
                 if (greaterPi)
+                {
                     tdx = -tdx;
+                }
 
-                p[0].set(i->x() - miter.x(), i->y() - miter.y(), tdelta - tdx, 0.0);
-                p[1].set(i->x() + miter.x(), i->y() + miter.y(), tdelta + tdx, 1.0);
+                p[0].set(static_cast<float>(i->x() - miter.x()), static_cast<float>(i->y() - miter.y()),
+                         static_cast<float>(tdelta - tdx), 0.0f);
+                p[1].set(static_cast<float>(i->x() + miter.x()), static_cast<float>(i->y() + miter.y()),
+                         static_cast<float>(tdelta + tdx), 1.0f);
 
                 // Start of next segment
-                p[2].set(i->x() - miter.x(), i->y() - miter.y(), tdelta + tdx, 0.0);
-                p[3].set(i->x() + miter.x(), i->y() + miter.y(), tdelta - tdx, 1.0);
+                p[2].set(static_cast<float>(i->x() - miter.x()), static_cast<float>(i->y() - miter.y()),
+                         static_cast<float>(tdelta + tdx), 0.0f);
+                p[3].set(static_cast<float>(i->x() + miter.x()), static_cast<float>(i->y() + miter.y()),
+                         static_cast<float>(tdelta - tdx), 1.0f);
                 p += 4;
             }
             *(idx++) = currentIndex;
@@ -146,15 +164,19 @@ public:
     void setTexture(QSGTexture *tex)
     {
         if (tex == texture)
+        {
             return;
+        }
 
         if (texture)
+        {
             delete texture;
+        }
         texture = tex;
         material.setTexture(texture);
     }
 };
-}
+} // namespace
 
 class TexturedPolyline::TexturedPolylinePrivate
 {
@@ -164,18 +186,17 @@ class TexturedPolyline::TexturedPolylinePrivate
     TexturedPolylinePrivate(TexturedPolyline *q);
 
     QList<QPointF> points;
-    bool pointsChanged;
+    bool pointsChanged{};
     QUrl source;
-    bool sourceChanged;
+    bool sourceChanged{};
 };
 
-TexturedPolyline::TexturedPolylinePrivate::TexturedPolylinePrivate(TexturedPolyline *q)
+TexturedPolyline::TexturedPolylinePrivate::TexturedPolylinePrivate(TexturedPolyline *q) : q_ptr(q)
 {
-    q_ptr = q;
 }
 
-TexturedPolyline::TexturedPolyline(QQuickItem* parent): QQuickItem(parent),
-    d_osr_ptr(new TexturedPolylinePrivate(this))
+TexturedPolyline::TexturedPolyline(QQuickItem *parent)
+    : QQuickItem(parent), d_osr_ptr(new TexturedPolylinePrivate(this))
 {
     Q_D(TexturedPolyline);
     setFlag(QQuickItem::ItemHasContents);
@@ -188,25 +209,29 @@ TexturedPolyline::~TexturedPolyline()
     Q_D(TexturedPolyline);
 }
 
-QSGNode* TexturedPolyline::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
+QSGNode *TexturedPolyline::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *updatePaintNodeData)
 {
     Q_D(TexturedPolyline);
 
-    TexturedPolylineNode *n = dynamic_cast<TexturedPolylineNode*>(oldNode);
+    TexturedPolylineNode *n = dynamic_cast<TexturedPolylineNode *>(oldNode);
 
     if (!window())
+    {
         return oldNode;
+    }
 
     if (d->sourceChanged)
     {
         d->sourceChanged = false;
 
-        QIODevice *dev = qobject_cast<Engine*>(qApp)->resources()->getIODevice(d->source);
+        QIODevice *dev = qobject_cast<Engine *>(qApp)->resources()->getIODevice(d->source);
 
         if (!dev)
         {
             if (oldNode)
+            {
                 delete oldNode;
+            }
             return 0;
         }
 
@@ -218,22 +243,29 @@ QSGNode* TexturedPolyline::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
         if (img.isNull())
         {
             if (oldNode)
+            {
                 delete oldNode;
+            }
             return 0;
         }
 
-        QSGTexture *tex = window()->createTextureFromImage(img, QQuickWindow::CreateTextureOptions(QQuickWindow::TextureHasAlphaChannel) |
-                          QQuickWindow::CreateTextureOptions(QQuickWindow::TextureOwnsGLTexture));
+        QSGTexture *tex = window()->createTextureFromImage(
+            img, QQuickWindow::CreateTextureOptions(QQuickWindow::TextureHasAlphaChannel) |
+                     QQuickWindow::CreateTextureOptions(QQuickWindow::TextureOwnsGLTexture));
 
         if (!tex)
         {
             if (oldNode)
+            {
                 delete oldNode;
+            }
             return 0;
         }
 
         if (!n)
+        {
             n = new TexturedPolylineNode();
+        }
 
         n->setTexture(tex);
         n->setPolyline(d->points);
@@ -243,7 +275,9 @@ QSGNode* TexturedPolyline::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
     }
 
     if (!n)
+    {
         return n;
+    }
 
     if (d->pointsChanged)
     {
@@ -259,25 +293,29 @@ QVariantList TexturedPolyline::points() const
 {
     Q_D(const TexturedPolyline);
     QVariantList res;
-    for (const QPointF& p : d->points)
+    for (const QPointF &p : d->points)
+    {
         res.append(p);
+    }
     return res;
 }
 
-void TexturedPolyline::setPoints(const QVariantList& points)
+void TexturedPolyline::setPoints(const QVariantList &points)
 {
     Q_D(TexturedPolyline);
 
     d->points.clear();
-    for (const QVariant& v : points)
+    for (const QVariant &v : points)
+    {
         d->points.append(v.toPointF());
+    }
 
     emit(pointsChanged());
     d->pointsChanged = true;
     update();
 }
 
-void TexturedPolyline::setSource(const QUrl& source)
+void TexturedPolyline::setSource(const QUrl &source)
 {
     Q_D(TexturedPolyline);
     d->source = source;
@@ -290,4 +328,4 @@ QUrl TexturedPolyline::source() const
     Q_D(const TexturedPolyline);
     return d->source;
 }
-}
+} // namespace OpenSR

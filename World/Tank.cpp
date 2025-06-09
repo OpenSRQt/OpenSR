@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Tank::m_staticTypeId = typeIdFromClassName(Tank::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Tank>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Tank>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Tank>("OpenSR.World", 1, 0, "Tanks");
 }
 
-template<>
-Tank* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Tank *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Tank(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Tank>()
+template <> quint32 WorldObject::staticTypeId<Tank>()
 {
-    return Tank::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Tank::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Tank>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Tank>()
 {
     return &Tank::staticMetaObject;
 }
 
-Tank::Tank(WorldObject *parent, quint32 id): Equipment(parent, id)
+Tank::Tank(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Tank::~Tank()
 
 quint32 Tank::typeId() const
 {
-    return Tank::m_staticTypeId;
+    return staticTypeId<Tank>();
 }
 
 QString Tank::namePrefix() const
 {
     return tr("Tank");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

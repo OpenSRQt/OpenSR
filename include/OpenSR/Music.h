@@ -22,13 +22,13 @@
 #include <OpenSR/OpenSR.h>
 #include <OpenSR/SoundManager.h>
 #include <QObject>
-#include <QUrl>
 #include <QTimer>
+#include <QUrl>
 
 namespace OpenSR
 {
 class MusicDecoder;
-class ENGINE_API Music: public QObject
+class ENGINE_API Music : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
@@ -36,12 +36,12 @@ class ENGINE_API Music: public QObject
 
 public:
     Music(QObject *parent = 0);
-    virtual ~Music();
+    ~Music() override;
 
     QUrl source() const;
     float volume() const;
 
-    void setSource(const QUrl& source);
+    void setSource(const QUrl &source);
     void setVolume(float volume);
 
 public Q_SLOTS:
@@ -68,6 +68,6 @@ private:
     QTimer m_timer;
     int m_freeBuffers;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_MUSIC_H

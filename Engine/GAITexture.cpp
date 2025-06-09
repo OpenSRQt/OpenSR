@@ -26,7 +26,8 @@ namespace OpenSR
 {
 GAITexture::GAITexture(const GAIHeader &header, const QImage &background)
     : m_header(header), m_needDraw(true), m_bg(background),
-      m_size(QSize(m_header.finishX - m_header.startX, m_header.finishY - m_header.startY)),
+      m_size(QSize(static_cast<int>(m_header.finishX - m_header.startX),
+                   static_cast<int>(m_header.finishY - m_header.startY))),
       m_nextFrameData(QByteArray())
 {
 }
@@ -51,7 +52,8 @@ void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *res
 {
     if (!imgBuffer)
     {
-        imgBuffer = std::make_unique<uchar[]>(m_size.width() * m_size.height() * 4);
+        imgBuffer = std::make_unique<uchar[]>(static_cast<size_t>(m_size.width()) *
+                                              static_cast<size_t>(m_size.height()) * static_cast<size_t>(4));
     }
 
     if (!m_texture)
@@ -67,7 +69,9 @@ void GAITexture::commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *res
         {
             if (!m_bg.isNull())
             {
-                memcpy(imgBuffer.get(), m_bg.constBits(), m_size.width() * m_size.height() * 4);
+                memcpy(imgBuffer.get(), m_bg.constBits(),
+                       static_cast<size_t>(m_size.width()) * static_cast<size_t>(m_size.height()) *
+                           static_cast<size_t>(4));
                 img = QImage(imgBuffer.get(), m_size.width(), m_size.height(), QImage::Format_RGBA8888);
             }
             else

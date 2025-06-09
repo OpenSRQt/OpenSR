@@ -30,8 +30,8 @@ class ENGINE_API GAIAnimatedImage : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QList<QUrl> sources READ sources WRITE setSources NOTIFY sourcesChanged)
-    Q_PROPERTY(int framesCount READ framesCount NOTIFY framesCountChanged)
-    Q_PROPERTY(int currentFrame READ currentFrame NOTIFY currentFrameChanged)
+    Q_PROPERTY(unsigned int framesCount READ framesCount NOTIFY framesCountChanged)
+    Q_PROPERTY(unsigned int currentFrame READ currentFrame NOTIFY currentFrameChanged)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool playing READ playing WRITE setPlaying NOTIFY playingChanged)
     Q_PROPERTY(float speed READ speed WRITE setSpeed NOTIFY speedChanged)
@@ -40,11 +40,11 @@ class ENGINE_API GAIAnimatedImage : public QQuickItem
 
 public:
     GAIAnimatedImage(QQuickItem *parent = nullptr);
-    virtual ~GAIAnimatedImage();
+    ~GAIAnimatedImage() override;
 
     QList<QUrl> sources() const;
-    int framesCount() const;
-    int currentFrame() const;
+    unsigned int framesCount() const;
+    unsigned int currentFrame() const;
     bool paused() const;
     bool playing() const;
     float speed() const;

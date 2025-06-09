@@ -19,8 +19,8 @@
 #ifndef OPENSR_VORBISMUSICDECODER_H
 #define OPENSR_VORBISMUSICDECODER_H
 
-#include <OpenSR/OpenSR.h>
 #include <OpenSR/MusicDecoder.h>
+#include <OpenSR/OpenSR.h>
 
 #include "3rdparty/vorbisfile.h"
 
@@ -30,21 +30,21 @@ class QIODevice;
 
 namespace OpenSR
 {
-class VorbisMusicDecoder: public MusicDecoder
+class VorbisMusicDecoder : public MusicDecoder
 {
 public:
     VorbisMusicDecoder(QIODevice *dev, QObject *parent = 0);
-    virtual ~VorbisMusicDecoder();
+    ~VorbisMusicDecoder() override;
 
-    virtual bool valid() const;
+    bool valid() const override;
 
-    virtual QByteArray decode(int ms);
+    QByteArray decode(int ms) override;
 
-    virtual int sampleRate() const;
-    virtual int channels() const;
-    virtual int bps() const;
-    virtual int length() const;
-    virtual bool done() const;
+    long sampleRate() const override;
+    int channels() const override;
+    int bps() const override;
+    int length() const;
+    bool done() const override;
 
 private:
     QIODevice *m_device;
@@ -56,6 +56,6 @@ private:
     static bool m_vfInited;
     static bool m_vfInitFailed;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_VORBISMUSICDECODER_H

@@ -21,40 +21,34 @@
 
 #include <QtQml>
 
-
 namespace OpenSR
 {
 namespace World
 {
-const quint32 Planet::m_staticTypeId = typeIdFromClassName(Planet::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Planet>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Planet>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<PlanetStyle>();
     qRegisterMetaType<PlanetStyle::Data>();
     qmlRegisterType<Planet>("OpenSR.World", 1, 0, "Planet");
 }
 
-template<>
-Planet* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Planet *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Planet(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Planet>()
+template <> quint32 WorldObject::staticTypeId<Planet>()
 {
-    return Planet::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Planet::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Planet>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Planet>()
 {
     return &Planet::staticMetaObject;
 }
 
-Planet::Planet(WorldObject *parent, quint32 id): SpaceObject(parent, id)
+Planet::Planet(WorldObject *parent, quint32 id) : SpaceObject(parent, id)
 {
 }
 
@@ -64,7 +58,7 @@ Planet::~Planet()
 
 quint32 Planet::typeId() const
 {
-    return Planet::m_staticTypeId;
+    return staticTypeId<Planet>();
 }
 
 QString Planet::namePrefix() const
@@ -77,10 +71,12 @@ PlanetStyle Planet::style() const
     return m_style;
 }
 
-void Planet::setStyle(const PlanetStyle& style)
+void Planet::setStyle(const PlanetStyle &style)
 {
     if (m_style == style)
+    {
         return;
+    }
 
     m_style = style;
     emit styleChanged(style);
@@ -139,7 +135,7 @@ QColor PlanetStyle::atmosphere() const
     return getData<Data>().atmosphere;
 }
 
-void PlanetStyle::setAtmosphere(const QColor& c)
+void PlanetStyle::setAtmosphere(const QColor &c)
 {
     auto d = getData<Data>();
     d.atmosphere = c;
@@ -158,25 +154,22 @@ void PlanetStyle::setBackground(const QString &texture)
     setData(d);
 }
 
-bool operator==(const PlanetStyle& one, const PlanetStyle& another)
+bool operator==(const PlanetStyle &one, const PlanetStyle &another)
 {
-    return (one.surface() == another.surface()) &&
-            (one.cloud0() == another.cloud0()) &&
-            (one.cloud1() == another.cloud1()) &&
-            (one.radius() == another.radius()) &&
-            (one.atmosphere() == another.atmosphere()) &&
-            (one.background() == another.background());
+    return (one.surface() == another.surface()) && (one.cloud0() == another.cloud0()) &&
+           (one.cloud1() == another.cloud1()) && (one.radius() == another.radius()) &&
+           (one.atmosphere() == another.atmosphere()) && (one.background() == another.background());
 }
 
 // PlanetStyle Streaming
-QDataStream& operator<<(QDataStream & stream, const PlanetStyle& style)
+QDataStream &operator<<(QDataStream &stream, const PlanetStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, PlanetStyle& style)
+QDataStream &operator>>(QDataStream &stream, PlanetStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -184,17 +177,18 @@ QDataStream& operator>>(QDataStream & stream, PlanetStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const PlanetStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const PlanetStyle::Data &data)
 {
     return stream << data.surface << data.cloud0 << data.cloud1 << data.radius << data.background;
 }
 
-QDataStream& operator>>(QDataStream & stream, PlanetStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, PlanetStyle::Data &data)
 {
     return stream >> data.surface >> data.cloud0 >> data.cloud1 >> data.radius >> data.background;
 }
 
-int Planet::radius() {
+int Planet::radius()
+{
     return style().radius();
 }
 

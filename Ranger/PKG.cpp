@@ -30,8 +30,8 @@ struct PKGDirHeader
 
 PKGItem *loadItems(QIODevice *dev, PKGItem *previous)
 {
-    uint32_t zero;
-    PKGDirHeader dir;
+    uint32_t zero{};
+    PKGDirHeader dir{};
 
     PKGItem *result = 0;
 
@@ -49,35 +49,37 @@ PKGItem *loadItems(QIODevice *dev, PKGItem *previous)
     }
 
     dev->seek(previous->offset);
-    dev->read((char*)&dir, sizeof(PKGDirHeader));
+    dev->read((char *)&dir, sizeof(PKGDirHeader));
 
     previous->childCount = dir.itemsCount;
     previous->childs = new PKGItem[dir.itemsCount];
 
     for (int i = 0; i < dir.itemsCount; i++)
     {
-        PKGItem item;
+        PKGItem item{};
         item.parent = previous;
         item.childCount = 0;
         item.childs = 0;
 
         dev->seek(previous->offset + 12 + 158 * i);
 
-        dev->read((char*)&item.sizeInArc, 4);
-        dev->read((char*)&item.size, 4);
-        dev->read((char*)item.fullName, 63);
-        dev->read((char*)item.name, 63);
-        dev->read((char*)&item.dataType, 4);
-        dev->read((char*)&zero, 4);
-        dev->read((char*)&zero, 4);
-        dev->read((char*)&zero, 4);
-        dev->read((char*)&item.offset, 4);
-        dev->read((char*)&zero, 4);
+        dev->read((char *)&item.sizeInArc, 4);
+        dev->read((char *)&item.size, 4);
+        dev->read((char *)item.fullName, 63);
+        dev->read((char *)item.name, 63);
+        dev->read((char *)&item.dataType, 4);
+        dev->read((char *)&zero, 4);
+        dev->read((char *)&zero, 4);
+        dev->read((char *)&zero, 4);
+        dev->read((char *)&item.offset, 4);
+        dev->read((char *)&zero, 4);
 
         previous->childs[i] = item;
 
         if (item.dataType == 3)
+        {
             loadItems(dev, &previous->childs[i]);
+        }
     }
 
     return result;
@@ -91,20 +93,22 @@ PKGItem *loadItems(QIODevice *dev, PKGItem *previous)
 QByteArray extractFile(const PKGItem &item, QIODevice *dev)
 {
     if (item.dataType == 3)
+    {
         return QByteArray();
+    }
 
     QByteArray result;
 
     if (item.dataType == 2)
     {
         uint32_t outsize = item.size;
-        uint32_t bufsize;
+        uint32_t bufsize{};
         uint32_t done = 0;
         dev->seek(item.offset + 4);
 
         while (done < outsize)
         {
-            uint32_t bufsize;
+            uint32_t bufsize{};
             dev->read((char *)&bufsize, 4);
             QByteArray d = dev->read(bufsize);
             QByteArray r = unpackZL(d);
@@ -130,13 +134,13 @@ QByteArray extractFile(const PKGItem &item, QIODevice *dev)
  */
 PKGItem *loadPKG(QIODevice *dev)
 {
-    uint32_t offset;
-    uint32_t zero;
-    dev->read((char*)&offset, sizeof(uint32_t));
+    uint32_t offset{};
+    uint32_t zero{};
+    dev->read((char *)&offset, sizeof(uint32_t));
     dev->seek(offset);
 
     PKGItem *root = loadItems(dev, 0);
 
     return root;
 }
-}
+} // namespace OpenSR

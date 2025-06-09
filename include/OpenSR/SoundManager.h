@@ -19,8 +19,8 @@
 #ifndef OPENSR_SOUNDMANAGER_H
 #define OPENSR_SOUNDMANAGER_H
 
-#include <OpenSR/OpenSR.h>
 #include <AL/al.h>
+#include <OpenSR/OpenSR.h>
 
 #include <QObject>
 #include <QSharedPointer>
@@ -53,12 +53,12 @@ class SoundManager : public QObject
 
 public:
     SoundManager(QObject *parent = 0);
-    virtual ~SoundManager();
+    ~SoundManager() override;
 
-    Sample loadSample(const QUrl& url);
+    Sample loadSample(const QUrl &url);
     void start();
 
-    MusicDecoder *getMusicDecoder(const QUrl& url, QObject *parent = 0);
+    MusicDecoder *getMusicDecoder(const QUrl &url, QObject *parent = 0);
 
 protected:
     OPENSR_DECLARE_DPOINTER(SoundManager)
@@ -66,6 +66,6 @@ protected:
 private:
     Q_DISABLE_COPY(SoundManager)
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_SOUNDMANAGER_H

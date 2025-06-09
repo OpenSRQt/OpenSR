@@ -21,29 +21,33 @@
 
 #include <OpenSR/OpenSR.h>
 
-#include <QObject>
 #include <QByteArray>
+#include <QObject>
 
 class QIODevice;
 
 namespace OpenSR
 {
-class MusicDecoder: public QObject
+class MusicDecoder : public QObject
 {
     Q_OBJECT
 public:
-    MusicDecoder(QObject *parent = 0): QObject(parent) {}
-    virtual ~MusicDecoder() {}
+    MusicDecoder(QObject *parent = 0) : QObject(parent)
+    {
+    }
+    ~MusicDecoder() override
+    {
+    }
 
     virtual bool valid() const = 0;
 
     virtual QByteArray decode(int ms) = 0;
 
-    virtual int sampleRate() const = 0;
+    virtual long sampleRate() const = 0;
     virtual int channels() const = 0;
     virtual int bps() const = 0;
     virtual bool done() const = 0;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_MUSICDECODER_H

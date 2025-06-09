@@ -21,7 +21,6 @@
 #include "ResourceManager.h"
 
 #include <QtQml>
-#include <qlogging.h>
 
 namespace OpenSR
 {
@@ -33,8 +32,6 @@ const float TIME_DELTA_FOR_SPEED_CALC_MS = 16.0f;
 const float MS_IN_ONE_SECOND = 1000.0f;
 const int ITERATION_COUNTS = 10;
 } // namespace
-
-const quint32 Asteroid::m_staticTypeId = typeIdFromClassName(Asteroid::staticMetaObject.className());
 
 template <> void WorldObject::registerType<Asteroid>(QQmlEngine *qml, QJSEngine *script)
 {
@@ -50,7 +47,8 @@ template <> Asteroid *WorldObject::createObject(WorldObject *parent, quint32 id)
 
 template <> quint32 WorldObject::staticTypeId<Asteroid>()
 {
-    return Asteroid::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Asteroid::staticMetaObject.className());
+    return id;
 }
 
 template <> const QMetaObject *WorldObject::staticTypeMeta<Asteroid>()
@@ -89,7 +87,7 @@ QDataStream &operator<<(QDataStream &stream, const AsteroidStyle &style)
 
 QDataStream &operator>>(QDataStream &stream, AsteroidStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -108,7 +106,7 @@ QDataStream &operator>>(QDataStream &stream, AsteroidStyle::Data &data)
 }
 
 Asteroid::Asteroid(WorldObject *parent, quint32 id)
-    : SpaceObject(parent, id), m_angle(0), m_period(0), m_time(0), m_speed(0)
+    : SpaceObject(parent, id), m_angle(0), m_period(0), m_time(0), m_speed(0), m_e(0.0f)
 {
 }
 
@@ -163,7 +161,9 @@ void Asteroid::setSemiAxis(const QPointF &axis)
             m_semiAxis.setY(axis.x());
         }
         else
+        {
             m_semiAxis = axis;
+        }
 
         emit(semiAxisChanged());
         calcEccentricity();
@@ -211,7 +211,7 @@ void Asteroid::setTime(float time)
 
 quint32 Asteroid::typeId() const
 {
-    return Asteroid::m_staticTypeId;
+    return staticTypeId<Asteroid>();
 }
 
 QString Asteroid::namePrefix() const
@@ -226,7 +226,7 @@ void Asteroid::prepareSave()
 
 void Asteroid::calcEccentricity()
 {
-    m_e = sqrt(1 - (m_semiAxis.y() * m_semiAxis.y()) / (m_semiAxis.x() * m_semiAxis.x()));
+    m_e = static_cast<float>(sqrt(1 - (m_semiAxis.y() * m_semiAxis.y()) / (m_semiAxis.x() * m_semiAxis.x())));
 }
 
 void Asteroid::updateOrbitalTime(float dt)
@@ -235,7 +235,7 @@ void Asteroid::updateOrbitalTime(float dt)
     float periodInMS = m_period * MS_IN_ONE_SECOND;
     if (m_period > 0.0f)
     {
-        m_time = fmod(m_time, periodInMS);
+        m_time = static_cast<float>(fmod(m_time, periodInMS));
     }
 }
 
@@ -248,10 +248,10 @@ void Asteroid::calcPosition()
 void Asteroid::calcSpeed()
 {
     QPointF nextPos = E(solveKepler(m_time + TIME_DELTA_FOR_SPEED_CALC_MS));
-    float dx = nextPos.x() - position().x();
-    float dy = nextPos.y() - position().y();
+    float dx = static_cast<float>(nextPos.x() - position().x());
+    float dy = static_cast<float>(nextPos.y() - position().y());
     const float dtInMS = TIME_DELTA_FOR_SPEED_CALC_MS / MS_IN_ONE_SECOND;
-    m_speed = sqrt(dx * dx + dy * dy) / dtInMS;
+    m_speed = static_cast<float>(sqrt(dx * dx + dy * dy)) / dtInMS;
     emit(speedChanged());
 }
 
@@ -259,10 +259,12 @@ float Asteroid::solveKepler(float t)
 {
     // http://en.wikipedia.org/wiki/Kepler's_equation
     float periodInMS = m_period * MS_IN_ONE_SECOND;
-    float M = (2.0f * M_PI / periodInMS) * t;
+    float M = static_cast<float>((2.0f * M_PI / periodInMS)) * t;
     float E = M;
     for (int j = 0; j < ITERATION_COUNTS; j++)
-        E = m_e * sin(E) + M;
+    {
+        E = static_cast<float>(m_e * sin(E) + M);
+    }
     return E;
 }
 
@@ -293,12 +295,16 @@ void Asteroid::updateTrajectory()
 
     for (int i = 1; i < int(round(m_period)) + 1; i++)
     {
-        float t = m_time + i * MS_IN_ONE_SECOND;
+        float t = m_time + static_cast<float>(i) * MS_IN_ONE_SECOND;
         if (fabs(t) > periodInMS)
-            t = fmod(t, periodInMS);
+        {
+            t = static_cast<float>(fmod(t, periodInMS));
+        }
 
         if (t < 0)
+        {
             t = periodInMS + t;
+        }
 
         float eta = solveKepler(t);
 
@@ -311,8 +317,8 @@ void Asteroid::updateTrajectory()
         p = E(eta);
         c.p3 = QPointF(p.x(), p.y());
 
-        float tangent = tan((eta - prev) / 2.0f);
-        float k = sin(eta - prev) * (sqrt(4.0f + 3.0f * tangent * tangent) - 1.0f) / 3.0f;
+        float tangent = static_cast<float>(tan((eta - prev) / 2.0f));
+        float k = static_cast<float>(sin(eta - prev) * (sqrt(4.0f + 3.0f * tangent * tangent) - 1.0f) / 3.0f);
 
         p = Ederiv(prev);
         c.p1 = c.p0 + k * QPointF(p.x(), p.y());

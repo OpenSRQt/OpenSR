@@ -19,26 +19,26 @@
 #ifndef OPENSR_WORLD_EQUIPMENT_H
 #define OPENSR_WORLD_EQUIPMENT_H
 
-#include "World.h"
 #include "Item.h"
+#include "World.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Equipment: public Item
+class OPENSR_WORLD_API Equipment : public Item
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
 public:
     Q_INVOKABLE Equipment(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Equipment();
+    ~Equipment() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_EQUIPMENT_H

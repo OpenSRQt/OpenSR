@@ -69,7 +69,7 @@ class OPENSR_WORLD_API Asteroid : public SpaceObject
 
 public:
     Q_INVOKABLE Asteroid(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Asteroid();
+    ~Asteroid() override;
 
     AsteroidStyle style() const;
     QPointF semiAxis() const;
@@ -84,16 +84,16 @@ public:
     void setPeriod(float period);
     void setTime(float time);
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
-    virtual void prepareSave();
+    void prepareSave() override;
 
-    virtual void updateTrajectory();
+    void updateTrajectory() override;
 
-    virtual void startTurn();
-    virtual void processTurn(float time);
-    virtual void finishTurn();
+    void startTurn() override;
+    void processTurn(float time) override;
+    void finishTurn() override;
 
 signals:
     void styleChanged();

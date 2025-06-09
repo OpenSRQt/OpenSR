@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QStack>
 #include <cmath>
+#include <qtypes.h>
 
 namespace OpenSR
 {
@@ -31,48 +32,65 @@ namespace
 const uint8_t PRECEDENCES[23] = {0, 0, 0, 0, 6, 6, 8, 7, 8, 3, 3, 3, 3, 3, 3, 1, 2, 9, 4, 5, 0, 0, 8};
 }
 
-Token::Token()
+Token::Token() : type(TOKEN_NONE), value{}
 {
-    type = TOKEN_NONE;
+
     value.from = 0.0f;
     value.to = 0.0f;
     value.number = 0.0f;
 }
 
-Token::Token(float number)
+Token::Token(float number) : type(TOKEN_NUMBER), value{}
 {
-    type = TOKEN_NUMBER;
     value.number = number;
 }
 
-Token::Token(float from, float to)
+Token::Token(float from, float to) : type(TOKEN_RANGE), value{}
 {
-    type = TOKEN_RANGE;
     value.from = from;
     value.to = to;
 }
 
-Token Token::apply(const Token& a, const Token& b, const QMap<uint32_t, float> &parameters) const
+Token Token::apply(const Token &a, const Token &b, const QMap<uint32_t, float> &parameters) const
 {
-    float av, bv;
+    float av{}, bv{};
 
     if (a.type == TOKEN_RANGE)
-        av = a.value.from + (rand() % (uint32_t)(a.value.to - a.value.from + 1));
+    {
+        av = a.value.from + static_cast<float>(rand() % (uint32_t)(a.value.to - a.value.from + 1));
+    }
     else if (a.type == TOKEN_LIST)
+    {
         av = a.list.at(rand() % a.list.size());
+    }
     else if (a.type == TOKEN_PARAMETER)
+    {
         av = parameters.value(a.value.id);
+    }
     else
+    {
         av = a.value.number;
+    }
 
     if (b.type == TOKEN_RANGE)
-        bv = b.value.from + (rand() % (uint32_t)(b.value.to - b.value.from + 1));
+    {
+        bv = b.value.from + static_cast<float>(rand() % (uint32_t)(b.value.to - b.value.from + 1));
+    }
     else if (b.type == TOKEN_LIST)
+    {
         bv = b.list.at(rand() % b.list.size());
+    }
     else if (b.type == TOKEN_PARAMETER)
+    {
         bv = parameters.value(b.value.id);
+    }
     else
+    {
         bv = b.value.number;
+    }
+
+    const auto iAv = static_cast<int32_t>(av);
+    const auto iBv = static_cast<int32_t>(bv);
 
     switch (type)
     {
@@ -91,11 +109,11 @@ Token Token::apply(const Token& a, const Token& b, const QMap<uint32_t, float> &
     case TOKEN_OP_DIV:
         return Token(av / bv);
     case TOKEN_OP_INT_DIV:
-        return Token((int32_t)av / (int32_t)bv);
+        return Token(static_cast<float>(iAv) / static_cast<float>(iBv));
     case TOKEN_OP_MULTIPLY:
         return Token(av * bv);
     case TOKEN_OP_MOD:
-        return Token(fmod(av, bv));
+        return Token(static_cast<float>(fmod(av, bv)));
     case TOKEN_EQUAL:
         return Token(av == bv);
     case TOKEN_MORE:
@@ -109,13 +127,13 @@ Token Token::apply(const Token& a, const Token& b, const QMap<uint32_t, float> &
     case TOKEN_NOT_EQUAL:
         return Token(av != bv);
     case TOKEN_OR:
-        return Token(av || bv);
+        return Token(static_cast<bool>(av) || static_cast<bool>(bv));
     case TOKEN_AND:
-        return Token(av && bv);
+        return Token(static_cast<bool>(av) && static_cast<bool>(bv));
     case TOKEN_NOT:
-        return Token(!av);
+        return Token(!static_cast<bool>(av));
     case TOKEN_TO:
-        //FIXME: List?
+        // FIXME: List?
         if ((a.type == TOKEN_RANGE) && (b.type == TOKEN_RANGE))
         {
             float min = std::min(a.value.from, b.value.from);
@@ -160,7 +178,7 @@ Token Token::apply(const Token& a, const Token& b, const QMap<uint32_t, float> &
     }
 }
 
-int32_t getInt(int &pos, QString& exp)
+int32_t getInt(int &pos, QString &exp)
 {
     size_t offset = 0;
     const QChar *s = exp.constData() + pos;
@@ -169,12 +187,12 @@ int32_t getInt(int &pos, QString& exp)
         s++;
         offset++;
     }
-    int32_t res = exp.sliced(pos, offset).toInt();
-    pos += offset;
+    int32_t res = exp.sliced(pos, static_cast<qsizetype>(offset)).toInt();
+    pos += static_cast<int>(offset);
     return res;
 }
 
-float getFloat(int &pos, const QString& exp)
+float getFloat(int &pos, const QString &exp)
 {
     size_t offset = 0;
     const QChar *s = exp.constData() + pos;
@@ -182,16 +200,18 @@ float getFloat(int &pos, const QString& exp)
     while (*s != '\0' && (s->isDigit() || *s == '-' || (*s == '.' && !wasPoint)))
     {
         if (*s == '.')
+        {
             wasPoint = true;
+        }
         s++;
         offset++;
     }
-    int32_t res = exp.sliced(pos, offset).toInt();
-    pos += offset;
-    return res;
+    int32_t res = exp.sliced(pos, static_cast<qsizetype>(offset)).toInt();
+    pos += static_cast<int>(offset);
+    return static_cast<float>(res);
 }
 
-QList<Token> tokenize(const QString& expression)
+QList<Token> tokenize(const QString &expression)
 {
     int pos = 0;
     Token prev;
@@ -204,15 +224,20 @@ QList<Token> tokenize(const QString& expression)
 
     while (pos < exp.length())
     {
-        while ((pos < exp.length()) && (exp[pos].isSpace())) pos++;
+        while ((pos < exp.length()) && (exp[pos].isSpace()))
+        {
+            pos++;
+        }
         if (pos == exp.length())
+        {
             break;
+        }
 
         Token t;
-        //FIXME: Ugly unary minus detection.
+        // FIXME: Ugly unary minus detection.
         if ((exp[pos].isDigit()) || ((exp[pos] == '-') && (prev.type != Token::TOKEN_NUMBER) &&
-                                     (prev.type != Token::TOKEN_RANGE) && (prev.type != Token::TOKEN_PARAMETER) && (prev.type != Token::TOKEN_LIST) &&
-                                     (prev.type != Token::TOKEN_CLOSE_PAR)))
+                                     (prev.type != Token::TOKEN_RANGE) && (prev.type != Token::TOKEN_PARAMETER) &&
+                                     (prev.type != Token::TOKEN_LIST) && (prev.type != Token::TOKEN_CLOSE_PAR)))
         {
             t = Token(getFloat(pos, exp));
         }
@@ -299,7 +324,7 @@ QList<Token> tokenize(const QString& expression)
             else if ((exp[pos + 1].isDigit()) || ((exp[pos + 1] == '-')))
             {
                 pos++;
-                float v1, v2;
+                float v1{}, v2{};
                 v1 = getFloat(pos, exp);
                 if (exp[pos] == ']')
                 {
@@ -382,8 +407,8 @@ QList<Token> tokenize(const QString& expression)
             return QList<Token>();
         }
 
-        if ((t.type == Token::TOKEN_NUMBER) || (t.type == Token::TOKEN_RANGE) ||
-                (t.type == Token::TOKEN_PARAMETER) || (t.type == Token::TOKEN_LIST))
+        if ((t.type == Token::TOKEN_NUMBER) || (t.type == Token::TOKEN_RANGE) || (t.type == Token::TOKEN_PARAMETER) ||
+            (t.type == Token::TOKEN_LIST))
         {
             result.append(t);
         }
@@ -394,32 +419,42 @@ QList<Token> tokenize(const QString& expression)
         else if (t.type == Token::TOKEN_CLOSE_PAR)
         {
             Token t2;
-            do
+            if (opStack.empty())
             {
-                if (opStack.empty())
-                {
-                    qWarning() << "Parenthesis error in \"" << exp << "\"";
-                    return QList<Token>();
-                }
+                qWarning() << "Parenthesis error in \"" << exp << "\"";
+                return QList<Token>();
+            }
+            t2 = opStack.top();
+            opStack.pop();
+            if (t2.type != Token::TOKEN_OPEN_PAR)
+            {
+                result.append(t2);
+            }
+
+            while (t2.type != Token::TOKEN_OPEN_PAR && !opStack.empty())
+            {
                 t2 = opStack.top();
                 opStack.pop();
                 if (t2.type != Token::TOKEN_OPEN_PAR)
+                {
                     result.append(t2);
+                }
             }
-            while (t2.type != Token::TOKEN_OPEN_PAR && !opStack.empty());
         }
         else
         {
             if (!opStack.empty())
             {
                 Token o2 = opStack.top();
-                while ((!opStack.empty()) && (o2.type != Token::TOKEN_OPEN_PAR) && (o2.type != Token::TOKEN_CLOSE_PAR) &&
-                        (PRECEDENCES[t.type] <= PRECEDENCES[o2.type]))
+                while ((!opStack.empty()) && (o2.type != Token::TOKEN_OPEN_PAR) &&
+                       (o2.type != Token::TOKEN_CLOSE_PAR) && (PRECEDENCES[t.type] <= PRECEDENCES[o2.type]))
                 {
                     result.append(o2);
                     opStack.pop();
                     if (!opStack.empty())
+                    {
                         o2 = opStack.top();
+                    }
                 }
             }
             opStack.push(t);
@@ -441,11 +476,13 @@ QList<Token> tokenize(const QString& expression)
     return result;
 }
 
-float eval(const QList< Token >& exp, const QMap<uint32_t, float>& parameters)
+float eval(const QList<Token> &exp, const QMap<uint32_t, float> &parameters)
 {
     if (exp.empty())
+    {
         return 0;
-    
+    }
+
     /*QString dump;
     for(const Token& t: exp)
     {
@@ -525,10 +562,10 @@ float eval(const QList< Token >& exp, const QMap<uint32_t, float>& parameters)
     qDebug() << dump;*/
 
     QStack<Token> opStack;
-    for (const Token & t : exp)
+    for (const Token &t : exp)
     {
-        if ((t.type == Token::TOKEN_NUMBER) || (t.type == Token::TOKEN_RANGE) ||
-                (t.type == Token::TOKEN_PARAMETER) || (t.type == Token::TOKEN_LIST))
+        if ((t.type == Token::TOKEN_NUMBER) || (t.type == Token::TOKEN_RANGE) || (t.type == Token::TOKEN_PARAMETER) ||
+            (t.type == Token::TOKEN_LIST))
         {
             opStack.push(t);
         }
@@ -544,19 +581,27 @@ float eval(const QList< Token >& exp, const QMap<uint32_t, float>& parameters)
     Token r = opStack.top();
 
     if (r.type == Token::TOKEN_PARAMETER)
+    {
         return parameters.value(r.value.id);
+    }
     else if (r.type == Token::TOKEN_RANGE)
-        return r.value.from + (rand() % (uint32_t)(r.value.to - r.value.from + 1));
+    {
+        return r.value.from + static_cast<float>((rand() % (uint32_t)(r.value.to - r.value.from + 1)));
+    }
     else if (r.type == Token::TOKEN_LIST)
+    {
         return r.list.value(rand() % r.list.count());
+    }
     else
+    {
         return r.value.number;
+    }
 }
 
-float eval(const QString& exp, const QMap<uint32_t, float>& parameters)
+float eval(const QString &exp, const QMap<uint32_t, float> &parameters)
 {
     return eval(tokenize(exp), parameters);
 }
 
-}
-}
+} // namespace QM
+} // namespace OpenSR

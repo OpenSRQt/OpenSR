@@ -28,14 +28,14 @@ class GIImageIO : public QImageIOHandler
 {
 public:
     GIImageIO();
-    virtual ~GIImageIO();
+    ~GIImageIO() override;
 
-    virtual bool canRead() const;
-    virtual bool read(QImage *image);
+    bool canRead() const override;
+    bool read(QImage *image) override;
 
-    virtual bool supportsOption(ImageOption option) const;
-    virtual QVariant option(ImageOption option) const;
+    bool supportsOption(ImageOption option) const override;
+    QVariant option(ImageOption option) const override;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_GI_IMAGE_IO_H

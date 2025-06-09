@@ -19,16 +19,14 @@
 #include "FileModel.h"
 
 #include <OpenSR/libRangerQt.h>
-#include <QtGui>
 #include <QDebug>
 #include <QFile>
+#include <QtGui>
 
 namespace OpenSR
 {
-FileModel::FileModel(QObject *parent)
-    : QAbstractItemModel(parent)
+FileModel::FileModel(QObject *parent) : QAbstractItemModel(parent), rootItem(new FileNode)
 {
-    rootItem = new FileNode;
     rootItem->parent = 0;
     rootItem->name = "";
 }
@@ -41,10 +39,14 @@ int FileModel::columnCount(const QModelIndex & /* parent */) const
 QVariant FileModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
+    {
         return QVariant();
+    }
 
     if (role != Qt::DisplayRole && role != Qt::DecorationRole)
+    {
         return QVariant();
+    }
 
     FileNode *item = getItem(index);
 
@@ -54,17 +56,24 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
         return item->name;
     case Qt::DecorationRole:
         if (item->childs.count())
+        {
             return iconProvider.icon(QFileIconProvider::Folder);
+        }
         else
+        {
             return iconProvider.icon(QFileIconProvider::File);
+        }
+    default:
+        return QVariant();
     }
-    return QVariant();
 }
 
 Qt::ItemFlags FileModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
+    {
         return Qt::NoItemFlags;
+    }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
@@ -73,17 +82,19 @@ FileNode *FileModel::getItem(const QModelIndex &index) const
 {
     if (index.isValid())
     {
-        FileNode *item = static_cast<FileNode*>(index.internalPointer());
-        if (item) return item;
+        FileNode *item = static_cast<FileNode *>(index.internalPointer());
+        if (item)
+        {
+            return item;
+        }
     }
     return rootItem;
 }
 
-QVariant FileModel::headerData(int section, Qt::Orientation orientation,
-                               int role) const
+QVariant FileModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    //if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    //    return rootItem->data(section);
+    // if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    //     return rootItem->data(section);
 
     return QVariant();
 }
@@ -91,51 +102,65 @@ QVariant FileModel::headerData(int section, Qt::Orientation orientation,
 QModelIndex FileModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.column() != 0)
+    {
         return QModelIndex();
+    }
 
     FileNode *parentItem = getItem(parent);
 
     if (row >= parentItem->childs.count())
+    {
         return QModelIndex();
+    }
 
     FileNode *childItem = parentItem->childs.at(row);
     if (childItem)
+    {
         return createIndex(row, column, childItem);
+    }
     else
+    {
         return QModelIndex();
+    }
 }
 
 QModelIndex FileModel::parent(const QModelIndex &index) const
 {
     if (!index.isValid())
+    {
         return QModelIndex();
+    }
 
     FileNode *childItem = getItem(index);
     FileNode *parentItem = childItem->parent;
 
     if (parentItem == rootItem)
+    {
         return QModelIndex();
+    }
 
-    return createIndex(parentItem->childs.count(), 0, parentItem);
+    return createIndex(static_cast<int>(parentItem->childs.count()), 0, parentItem);
 }
 
 int FileModel::rowCount(const QModelIndex &parent) const
 {
     FileNode *parentItem = getItem(parent);
 
-    return parentItem->childs.count();
+    return static_cast<int>(parentItem->childs.count());
 }
 
 void convertPKGNode(PKGItem *node, FileNode *fileNode, FileNode *parent, QString fullName)
 {
-    fileNode->name = node->name;
+    fileNode->name = static_cast<char *>(node->name);
     fileNode->fullName = fullName + fileNode->name;
     fileNode->parent = parent;
     fileNode->userData = node;
     fileNode->type = NODE_PKG;
 
     if (node->childCount && fileNode->name != "")
+    {
         fullName += fileNode->name + "/";
+    }
 
     for (int i = 0; i < node->childCount; i++)
     {
@@ -145,7 +170,7 @@ void convertPKGNode(PKGItem *node, FileNode *fileNode, FileNode *parent, QString
     }
 }
 
-FileNode* FileModel::addPKG(const QFileInfo& file)
+FileNode *FileModel::addPKG(const QFileInfo &file)
 {
     QFile f(file.absoluteFilePath());
     f.open(QIODevice::ReadOnly);
@@ -163,7 +188,7 @@ FileNode* FileModel::addPKG(const QFileInfo& file)
     return node;
 }
 
-FileNode* FileModel::addFile(const QFileInfo& file)
+FileNode *FileModel::addFile(const QFileInfo &file)
 {
     beginResetModel();
     FileNode *node = new FileNode;
@@ -177,32 +202,38 @@ FileNode* FileModel::addFile(const QFileInfo& file)
     return node;
 }
 
-FileNode* FileModel::getSiblingNode(FileNode* node, const QString& name)
+FileNode *FileModel::getSiblingNode(FileNode *node, const QString &name)
 {
     switch (node->type)
     {
-    case NODE_PKG:
-    {
+    case NODE_PKG: {
         FileNode *parent = node->parent;
         if (!parent)
+        {
             return 0;
+        }
 
-        for (QList<FileNode*>::const_iterator i = parent->childs.constBegin(); i != parent->childs.constEnd(); ++i)
+        for (QList<FileNode *>::const_iterator i = parent->childs.constBegin(); i != parent->childs.constEnd(); ++i)
         {
             if ((*i)->name == name)
+            {
                 return *i;
+            }
         }
         break;
     }
-    case NODE_FILE:
-    {
+    case NODE_FILE: {
         QFileInfo info = archives[node];
         if (!info.absoluteDir().entryList().contains(name))
+        {
             return 0;
-        for (QList<FileNode*>::const_iterator i = rootItem->childs.constBegin(); i != rootItem->childs.constEnd(); ++i)
+        }
+        for (QList<FileNode *>::const_iterator i = rootItem->childs.constBegin(); i != rootItem->childs.constEnd(); ++i)
         {
             if ((*i)->name == name)
+            {
                 return *i;
+            }
         }
         return addFile(QFileInfo(info.absoluteDir().canonicalPath() + "/" + name));
     }
@@ -213,25 +244,27 @@ FileNode* FileModel::getSiblingNode(FileNode* node, const QString& name)
 QByteArray FileModel::getData(FileNode *node)
 {
     if (node->childs.count())
+    {
         return QByteArray();
+    }
 
     QByteArray result;
     switch (node->type)
     {
-    case NODE_PKG:
-    {
-        PKGItem *pkg = static_cast<PKGItem*>(node->userData);
+    case NODE_PKG: {
+        PKGItem *pkg = static_cast<PKGItem *>(node->userData);
         FileNode *root = node;
-        while (static_cast<PKGItem*>(root->userData)->parent)
+        while (static_cast<PKGItem *>(root->userData)->parent)
+        {
             root = root->parent;
+        }
 
         QFile f(archives[root].filePath());
         f.open(QIODevice::ReadOnly);
         result = extractFile(*pkg, &f);
         break;
     }
-    case NODE_FILE:
-    {
+    case NODE_FILE: {
         QFile f(archives[node].filePath());
         f.open(QIODevice::ReadOnly);
         result = f.readAll();
@@ -244,7 +277,7 @@ QByteArray FileModel::getData(FileNode *node)
 
 QByteArray FileModel::getData(const QModelIndex &index)
 {
-    FileNode *node = static_cast<FileNode*>(index.internalPointer());
+    FileNode *node = static_cast<FileNode *>(index.internalPointer());
     return getData(node);
 }
-}
+} // namespace OpenSR

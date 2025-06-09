@@ -30,7 +30,7 @@ public:
 
     virtual bool initPlugin(Engine *engine) = 0;
 };
-}
+} // namespace OpenSR
 
 Q_DECLARE_INTERFACE(OpenSR::PluginInterface, "OpenSR.PluginInterface")
 

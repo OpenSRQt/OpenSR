@@ -29,14 +29,14 @@
 // TODO: Move Constructors to Separate factory?
 
 #include "Asteroid.h"
+#include "DesertPlanet.h"
+#include "InhabitedPlanet.h"
 #include "Planet.h"
 #include "PlanetarySystem.h"
 #include "Race.h"
 #include "Ship.h"
 #include "SpaceStation.h"
 #include "TurnAnimation.h"
-#include "InhabitedPlanet.h"
-#include "DesertPlanet.h"
 
 namespace OpenSR
 {
@@ -76,7 +76,7 @@ class OPENSR_WORLD_API WorldManager : public QObject
 
 public:
     WorldManager(QObject *parent = nullptr);
-    virtual ~WorldManager();
+    ~WorldManager() override;
 
     quint32 getNextId() const;
 

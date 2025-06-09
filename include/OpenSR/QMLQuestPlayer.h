@@ -23,13 +23,13 @@
 #include <OpenSR/QM/QuestPlayer.h>
 
 #include <QObject>
-#include <QUrl>
 #include <QStringList>
+#include <QUrl>
 #include <QVariantList>
 
 namespace OpenSR
 {
-class ENGINE_API QMLQuestPlayer: public QObject
+class ENGINE_API QMLQuestPlayer : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString questID READ questID WRITE setQuestID NOTIFY questIDChanged)
@@ -47,7 +47,7 @@ public:
     QVariantList transitions() const;
     QUrl image() const;
 
-    void setQuestID(const QString& id);
+    void setQuestID(const QString &id);
 
 public Q_SLOTS:
     void resetQuest();
@@ -80,6 +80,6 @@ private:
     QMap<quint32, QString> m_transitionsImages;
     QUrl m_image;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_QMLQUESTPLAYER_H

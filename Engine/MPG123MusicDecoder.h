@@ -35,17 +35,17 @@ class MPG123MusicDecoder: public MusicDecoder
     Q_OBJECT
 public:
     MPG123MusicDecoder(QIODevice *dev, QObject *parent = 0);
-    virtual ~MPG123MusicDecoder();
+    ~MPG123MusicDecoder() override;
 
-    virtual bool valid() const;
+    bool valid() const override;
 
-    virtual QByteArray decode(int ms);
+    QByteArray decode(int ms) override;
 
-    virtual int sampleRate() const;
-    virtual int channels() const;
-    virtual int bps() const;
+    long sampleRate() const override;
+    int channels() const override;
+    int bps() const override;
     virtual int length() const;
-    virtual bool done() const;
+    bool done() const override;
 
 private:
     QIODevice *m_device;

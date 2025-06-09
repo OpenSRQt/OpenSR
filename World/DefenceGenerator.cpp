@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 DefenceGenerator::m_staticTypeId = typeIdFromClassName(DefenceGenerator::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<DefenceGenerator>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<DefenceGenerator>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<DefenceGenerator>("OpenSR.World", 1, 0, "DefenceGenerator");
 }
 
-template<>
-DefenceGenerator* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> DefenceGenerator *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new DefenceGenerator(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<DefenceGenerator>()
+template <> quint32 WorldObject::staticTypeId<DefenceGenerator>()
 {
-    return DefenceGenerator::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(DefenceGenerator::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<DefenceGenerator>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<DefenceGenerator>()
 {
     return &DefenceGenerator::staticMetaObject;
 }
 
-DefenceGenerator::DefenceGenerator(WorldObject *parent, quint32 id): Equipment(parent, id)
+DefenceGenerator::DefenceGenerator(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ DefenceGenerator::~DefenceGenerator()
 
 quint32 DefenceGenerator::typeId() const
 {
-    return DefenceGenerator::m_staticTypeId;
+    return staticTypeId<DefenceGenerator>();
 }
 
 QString DefenceGenerator::namePrefix() const
 {
     return tr("Defence generator");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

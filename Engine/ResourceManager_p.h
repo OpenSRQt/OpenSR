@@ -29,14 +29,14 @@ class QBuffer;
 
 namespace OpenSR
 {
-class ResourceManagerNAM: public QNetworkAccessManager
+class ResourceManagerNAM : public QNetworkAccessManager
 {
     Q_OBJECT
 public:
     ResourceManagerNAM(ResourceManager *manager, QObject *parent);
-    virtual ~ResourceManagerNAM();
+    ~ResourceManagerNAM() override;
 
-    virtual QNetworkReply * createRequest(Operation op, const QNetworkRequest & req, QIODevice *outgoingData);
+    QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData) override;
 
 private:
     ResourceManager *m_manger;
@@ -45,26 +45,28 @@ private Q_SLOTS:
     void emitReplyFinished();
 };
 
-class ResourceReply: public QNetworkReply
+class ResourceReply : public QNetworkReply
 {
     Q_OBJECT
+public:
+    ~ResourceReply() override;
+
 protected:
-    ResourceReply(const QUrl& url, QIODevice *device, QObject *parent);
-    virtual ~ResourceReply();
+    ResourceReply(const QUrl &url, QIODevice *device, QObject *parent);
 
-    virtual qint64 bytesAvailable() const;
-    virtual bool canReadLine() const;
-    virtual bool isSequential() const;
-    virtual qint64 size() const;
-    virtual bool seek(qint64 pos);
+    qint64 bytesAvailable() const override;
+    bool canReadLine() const override;
+    bool isSequential() const override;
+    qint64 size() const override;
+    bool seek(qint64 pos) override;
 
-    virtual void close();
+    void close() override;
 
 public Q_SLOTS:
-    virtual void abort();
+    void abort() override;
 
 protected:
-    virtual qint64 readData(char * data, qint64 maxSize);
+    qint64 readData(char *data, qint64 maxSize) override;
 
 private:
     QIODevice *m_device;
@@ -74,69 +76,69 @@ private Q_SLOTS:
     void emitFinished();
 };
 
-class FSProvider: public ResourceProvider
+class FSProvider : public ResourceProvider
 {
 public:
-    FSProvider(const QString& dir);
-    virtual ~FSProvider();
+    FSProvider(const QString &dir);
+    ~FSProvider() override;
 
-    virtual void load(ResourceNode& root);
-    virtual QIODevice *getDevice(const ResourceNode& node, QObject *parent = 0);
+    void load(ResourceNode &root) override;
+    QIODevice *getDevice(const ResourceNode &node, QObject *parent = nullptr) override;
 
 private:
-    void load(ResourceNode& current, const QDir& dir);
+    void load(ResourceNode &current, const QDir &dir);
     QString m_dir;
 };
 
-class PGKResourceInfo: public ResourceInfo
+class PGKResourceInfo : public ResourceInfo
 {
 public:
     PGKResourceInfo(PKGItem *item);
-    virtual ~PGKResourceInfo();
+    ~PGKResourceInfo() override;
 
     PKGItem *item;
 };
 
-class PKGIODevice: public QIODevice
+class PKGIODevice : public QIODevice
 {
 public:
-    PKGIODevice(const PKGItem& item, QIODevice *archiveDev, QObject *parent = 0);
-    virtual ~PKGIODevice();
+    PKGIODevice(const PKGItem &item, QIODevice *archiveDev, QObject *parent = 0);
+    ~PKGIODevice() override;
 
-    virtual qint64 bytesAvailable() const;
-    virtual bool canReadLine() const;
-    virtual bool isSequential() const;
-    virtual qint64 size() const;
-    virtual bool seek(qint64 pos);
+    qint64 bytesAvailable() const override;
+    bool canReadLine() const override;
+    bool isSequential() const override;
+    qint64 size() const override;
+    bool seek(qint64 pos) override;
 
-    virtual void close();
+    void close() override;
 
 protected:
-    virtual qint64 readData(char * data, qint64 maxSize);
-    virtual qint64 writeData(const char * data, qint64 maxSize);
+    qint64 readData(char *data, qint64 maxSize) override;
+    qint64 writeData(const char *data, qint64 maxSize) override;
 
 private:
     QByteArray m_data;
     QBuffer *m_buffer;
 };
 
-class PKGProvider: public ResourceProvider
+class PKGProvider : public ResourceProvider
 {
 public:
-    PKGProvider(const QString& file);
-    virtual ~PKGProvider();
+    PKGProvider(const QString &file);
+    ~PKGProvider() override;
 
-    virtual void load(ResourceNode& root);
-    virtual QIODevice *getDevice(const ResourceNode& node, QObject *parent = 0);
+    void load(ResourceNode &root) override;
+    QIODevice *getDevice(const ResourceNode &node, QObject *parent = nullptr) override;
 
 private:
-    void load(ResourceNode& current, PKGItem* item);
+    void load(ResourceNode &current, PKGItem *item);
     void cleanup(PKGItem *item);
 
     PKGItem *m_root;
     QString m_path;
 };
 
-}
+} // namespace OpenSR
 
 #endif // OPENSR_RESOURCEMANAGER_P_H

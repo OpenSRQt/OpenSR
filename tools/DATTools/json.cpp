@@ -19,13 +19,13 @@
 #include <OpenSR/libRangerQt.h>
 
 #include <QCoreApplication>
-#include <QStringList>
-#include <QFile>
 #include <QDebug>
+#include <QDirIterator>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
-#include <QDirIterator>
+#include <QStringList>
 #include <iostream>
 
 void printHelp()
@@ -134,7 +134,9 @@ int main(int argc, char **argv)
         {
             QFileInfo f(dir.next());
             if (f.suffix() != "json")
+            {
                 continue;
+            }
 
             QFile jf(f.canonicalPath());
             jf.open(QIODevice::ReadOnly);
@@ -152,10 +154,13 @@ int main(int argc, char **argv)
     }
 
     if (inf.isOpen())
+    {
         inf.close();
+    }
     if (outf.isOpen())
+    {
         outf.close();
+    }
 
     return 0;
 }
-

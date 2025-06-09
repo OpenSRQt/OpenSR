@@ -19,9 +19,9 @@
 #ifndef OPENSR_WORLD_PLANET_H
 #define OPENSR_WORLD_PLANET_H
 
-#include "World.h"
-#include "SpaceObject.h"
 #include "Resource.h"
+#include "SpaceObject.h"
+#include "World.h"
 
 #include <QColor>
 
@@ -29,15 +29,15 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API PlanetStyle: public Resource
+class OPENSR_WORLD_API PlanetStyle : public Resource
 {
     Q_GADGET
 
     Q_PROPERTY(QString surface READ surface WRITE setSurface)
-    Q_PROPERTY(QString cloud0  READ cloud0  WRITE setCloud0 )
-    Q_PROPERTY(QString cloud1  READ cloud1  WRITE setCloud1 )
-    Q_PROPERTY(int     radius  READ radius  WRITE setRadius )
-    Q_PROPERTY(QColor  atmosphere READ atmosphere WRITE setAtmosphere)
+    Q_PROPERTY(QString cloud0 READ cloud0 WRITE setCloud0)
+    Q_PROPERTY(QString cloud1 READ cloud1 WRITE setCloud1)
+    Q_PROPERTY(int radius READ radius WRITE setRadius)
+    Q_PROPERTY(QColor atmosphere READ atmosphere WRITE setAtmosphere)
     Q_PROPERTY(QString background READ background WRITE setBackground)
 
 public:
@@ -47,6 +47,7 @@ public:
         int radius;
         QColor atmosphere;
     };
+
 public:
     QString surface() const;
     QString cloud0() const;
@@ -55,22 +56,22 @@ public:
     QColor atmosphere() const;
     QString background() const;
 
-    void setSurface(const QString&);
-    void setCloud0(const QString&);
-    void setCloud1(const QString&);
+    void setSurface(const QString &);
+    void setCloud0(const QString &);
+    void setCloud1(const QString &);
     void setRadius(int);
-    void setAtmosphere(const QColor&);
+    void setAtmosphere(const QColor &);
     void setBackground(const QString &);
 };
 
-bool operator==(const PlanetStyle& one, const PlanetStyle& another);
+bool operator==(const PlanetStyle &one, const PlanetStyle &another);
 
-QDataStream& operator<<(QDataStream & stream, const PlanetStyle& style);
-QDataStream& operator>>(QDataStream & stream, PlanetStyle& style);
-QDataStream& operator<<(QDataStream & stream, const PlanetStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, PlanetStyle::Data& data);
+QDataStream &operator<<(QDataStream &stream, const PlanetStyle &style);
+QDataStream &operator>>(QDataStream &stream, PlanetStyle &style);
+QDataStream &operator<<(QDataStream &stream, const PlanetStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, PlanetStyle::Data &data);
 
-class OPENSR_WORLD_API Planet: public SpaceObject
+class OPENSR_WORLD_API Planet : public SpaceObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -79,17 +80,17 @@ class OPENSR_WORLD_API Planet: public SpaceObject
 
 public:
     Planet(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Planet();
+    ~Planet() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     PlanetStyle style() const;
     virtual int radius();
-    void setStyle(const PlanetStyle& style);
+    void setStyle(const PlanetStyle &style);
 
 signals:
-    void styleChanged(const PlanetStyle& style);
+    void styleChanged(const PlanetStyle &style);
 
 private:
     PlanetStyle m_style;
