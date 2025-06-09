@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 MannedObject::m_staticTypeId = typeIdFromClassName(MannedObject::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<MannedObject>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<MannedObject>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<MannedObject>("OpenSR.World", 1, 0, "MannedObject");
 }
 
-template<>
-MannedObject* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> MannedObject *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new MannedObject(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<MannedObject>()
+template <> quint32 WorldObject::staticTypeId<MannedObject>()
 {
-    return MannedObject::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(MannedObject::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<MannedObject>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<MannedObject>()
 {
     return &MannedObject::staticMetaObject;
 }
 
-MannedObject::MannedObject(WorldObject *parent, quint32 id): SpaceObject(parent, id)
+MannedObject::MannedObject(WorldObject *parent, quint32 id) : SpaceObject(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ MannedObject::~MannedObject()
 
 quint32 MannedObject::typeId() const
 {
-    return MannedObject::m_staticTypeId;
+    return staticTypeId<MannedObject>();
 }
 
 QString MannedObject::namePrefix() const
 {
     return tr("Manned object");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

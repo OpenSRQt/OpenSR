@@ -44,10 +44,10 @@ const quint32 OBJECT_SIGNATURE = 0x4F575253;
 
 struct ObjectHeader
 {
-    quint32 type;
-    quint32 id;
-    QString idName;
-    quint32 parentId;
+    quint32 type{};
+    quint32 id{};
+    QString idName{};
+    quint32 parentId{};
 };
 
 QDataStream &operator<<(QDataStream &stream, const ObjectHeader &h)
@@ -79,7 +79,9 @@ WorldObject *createObject(QMap<quint32, WorldObject *> &objects, QMap<quint32, O
             parent = createObject(objects, headers, *ph);
         }
         else
+        {
             parent = *p;
+        }
     }
     auto metai = metaMap.find(header.type);
     if (metai == metaMap.end())
@@ -92,7 +94,9 @@ WorldObject *createObject(QMap<quint32, WorldObject *> &objects, QMap<quint32, O
         qobject_cast<WorldObject *>(meta->newInstance(Q_ARG(WorldObject *, parent), Q_ARG(quint32, header.id)));
     obj->setObjectName(header.idName);
     if (obj)
+    {
         objects.insert(obj->id(), obj);
+    }
     return obj;
 }
 
@@ -104,10 +108,14 @@ bool writeObject(const WorldObject *object, QDataStream &stream)
         QMetaProperty p = meta->property(i);
         // FIXME: Save property id?
         if (p.isReadable() && p.isStored())
+        {
             stream << p.read(object);
+        }
 
         if (stream.status() != QDataStream::Ok)
+        {
             return false;
+        }
     }
     return object->save(stream);
 }
@@ -126,22 +134,28 @@ bool readObject(WorldObject *object, QDataStream &stream, const QMap<quint32, Wo
         }
 
         if (stream.status() != QDataStream::Ok)
+        {
             return false;
+        }
     }
     return object->load(stream, objects);
 }
 
 void countObjects(QList<WorldObject *> &objects, WorldObject *current)
 {
-    if (!current)
+    if (current == nullptr)
+    {
         return;
+    }
 
     objects.push_back(current);
     for (QObject *c : current->children())
     {
         WorldObject *o = qobject_cast<WorldObject *>(c);
         if (!o)
+        {
             continue;
+        }
         countObjects(objects, o);
     }
 }
@@ -152,8 +166,10 @@ quint32 WorldManager::m_idPool = 0;
 
 WorldManager::WorldManager(QObject *parent) : QObject(parent), m_context(0)
 {
-    if (WorldManager::m_staticInstance)
+    if (WorldManager::m_staticInstance != nullptr)
+    {
         throw std::runtime_error("WorldManager constructed twice");
+    }
 
     WorldManager::m_staticInstance = this;
 
@@ -204,7 +220,9 @@ QString WorldManager::typeName(quint32 type) const
     auto metai = metaMap.find(type);
 
     if (metai == metaMap.end())
+    {
         return QString();
+    }
 
     return metai.value()->className();
 }
@@ -237,10 +255,14 @@ quint32 WorldManager::getNextId() const
 void WorldManager::startTurn()
 {
     if (!m_context)
+    {
         return;
+    }
 
     if (m_animation->state() == TurnAnimation::Running)
+    {
         return;
+    }
 
     if (!m_context->checkPlannedActions())
     {
@@ -258,7 +280,9 @@ void WorldManager::startTurn()
 void WorldManager::finishTurn()
 {
     if (m_animation->state() == TurnAnimation::Running)
+    {
         m_animation->stop();
+    }
 
     if (!m_context->checkPlannedActions())
     {
@@ -284,7 +308,7 @@ bool WorldManager::loadWorld(const QString &path)
 
     QDataStream stream(&f);
 
-    quint32 sig;
+    quint32 sig{};
     stream >> sig;
 
     if (sig != SAVE_FILE_SIGNATURE)
@@ -294,7 +318,7 @@ bool WorldManager::loadWorld(const QString &path)
     }
 
     QMap<quint32, WorldObject *> objects;
-    quint32 objectCount;
+    quint32 objectCount{};
     QMap<quint32, ObjectHeader> headersMap;
 
     stream >> objectCount;
@@ -307,7 +331,9 @@ bool WorldManager::loadWorld(const QString &path)
     }
 
     if (m_context)
+    {
         delete m_context;
+    }
 
     ObjectHeader h;
 
@@ -344,7 +370,7 @@ bool WorldManager::loadWorld(const QString &path)
 
     for (int i = 0; i < objectCount; i++)
     {
-        quint32 sig, id;
+        quint32 sig{}, id{};
         stream >> sig;
         if (sig != OBJECT_SIGNATURE)
         {
@@ -394,9 +420,13 @@ bool WorldManager::saveWorld(const QString &path)
         h.idName = o->objectName();
         WorldObject *p = qobject_cast<WorldObject *>(o->parent());
         if (p)
+        {
             h.parentId = p->id();
+        }
         else
+        {
             h.parentId = 0;
+        }
         h.type = o->typeId();
 
         stream << h;

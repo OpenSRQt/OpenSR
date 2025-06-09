@@ -19,26 +19,26 @@
 #ifndef OPENSR_WORLD_DROID_H
 #define OPENSR_WORLD_DROID_H
 
-#include "World.h"
 #include "Equipment.h"
+#include "World.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Droid: public Equipment
+class OPENSR_WORLD_API Droid : public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
 public:
     Q_INVOKABLE Droid(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Droid();
+    ~Droid() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_DROID_H

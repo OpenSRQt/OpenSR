@@ -21,12 +21,11 @@
 
 #include <AL/alc.h>
 
-#include <QtEndian>
-#include <QFileInfo>
-#include <QDebug>
-#include <QUrl>
 #include <OpenSR/Engine.h>
 #include <OpenSR/ResourceManager.h>
+#include <QDebug>
+#include <QFileInfo>
+#include <QtEndian>
 
 #include "MPG123MusicDecoder.h"
 #include "VorbisMusicDecoder.h"
@@ -46,9 +45,9 @@ struct WAVFMTHeader
     quint16 align;
     quint16 bps;
 };
-}
+} // namespace
 
-SampleData::SampleData(): m_alID(0)
+SampleData::SampleData() : m_alID(0)
 {
     alGenBuffers(1, &m_alID);
 }
@@ -62,8 +61,7 @@ Sample::Sample()
 {
 }
 
-Sample::Sample(QSharedPointer<SampleData> data):
-    d(data)
+Sample::Sample(QSharedPointer<SampleData> data) : d(data)
 {
 }
 
@@ -74,13 +72,14 @@ Sample::~Sample()
 ALuint Sample::openALBufferID() const
 {
     if (!d)
+    {
         return 0;
+    }
 
     return d->m_alID;
 }
 
-SoundManager::SoundManager(QObject *parent):
-    QObject(parent), d_osr_ptr(new SoundManager::SoundManagerPrivate())
+SoundManager::SoundManager(QObject *parent) : QObject(parent), d_osr_ptr(new SoundManager::SoundManagerPrivate())
 {
     Q_D(SoundManager);
     d->device = alcOpenDevice(alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
@@ -99,79 +98,99 @@ SoundManager::~SoundManager()
 void SoundManager::start()
 {
     Q_D(SoundManager);
-    ALfloat direction[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
+    ALfloat direction[] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
     alListener3f(AL_POSITION, 0, 0, 0);
     alListener3f(AL_VELOCITY, 0, 0, 0);
-    alListenerfv(AL_ORIENTATION, direction);
+    alListenerfv(AL_ORIENTATION, static_cast<ALfloat *>(direction));
 }
 
-QSharedPointer<SampleData> SoundManager::SoundManagerPrivate::loadWAVFile(QIODevice* d)
+QSharedPointer<SampleData> SoundManager::SoundManagerPrivate::loadWAVFile(QIODevice *d)
 {
     quint32 header[3];
-    d->read((char *)header, 3 * 4);
+    d->read((char *)header, 3ll * 4ll);
 
-    if ((header[0] != qFromBigEndian<quint32>(0x52494646)) ||
-            header[2] != qFromBigEndian<quint32>(0x57415645))
+    if ((header[0] != qFromBigEndian<quint32>(0x52494646)) || header[2] != qFromBigEndian<quint32>(0x57415645))
+    {
         return QSharedPointer<SampleData>();
+    }
 
-    WAVFMTHeader fmtHeader;
+    WAVFMTHeader fmtHeader{};
 
     d->read((char *)&fmtHeader, sizeof(WAVFMTHeader));
 
     if (fmtHeader.id != qFromBigEndian<quint32>(0x666d7420))
+    {
         return QSharedPointer<SampleData>();
+    }
 
     if (fmtHeader.format != 0x1)
+    {
         return QSharedPointer<SampleData>();
+    }
 
     if (fmtHeader.channels != 1 && fmtHeader.channels != 2)
+    {
         return QSharedPointer<SampleData>();
+    }
 
     d->seek(d->pos() + fmtHeader.size - 16);
 
-    d->read((char *)&header, 2 * 4);
+    d->read((char *)&header, 2ll * 4ll);
 
     if (header[0] != qFromBigEndian<quint32>(0x64617461))
+    {
         return QSharedPointer<SampleData>();
+    }
 
     QByteArray samples = d->read(header[1]);
 
     QSharedPointer<SampleData> data(new SampleData());
 
-    ALenum alFormat;
+    ALenum alFormat{};
 
     switch (fmtHeader.bps)
     {
     case 8:
         if (fmtHeader.channels == 1)
+        {
             alFormat = AL_FORMAT_MONO8;
+        }
         else
+        {
             alFormat = AL_FORMAT_STEREO8;
+        }
         break;
 
     case 16:
         if (fmtHeader.channels == 1)
+        {
             alFormat = AL_FORMAT_MONO16;
+        }
         else
+        {
             alFormat = AL_FORMAT_STEREO16;
+        }
         break;
 
     default:
         return QSharedPointer<SampleData>();
     }
 
-    alBufferData(data->m_alID, alFormat, samples.constData(), samples.size(), fmtHeader.sampleRate);
+    alBufferData(data->m_alID, alFormat, samples.constData(), static_cast<int>(samples.size()),
+                 static_cast<int>(fmtHeader.sampleRate));
 
     return data;
 }
 
-Sample SoundManager::loadSample(const QUrl& url)
+Sample SoundManager::loadSample(const QUrl &url)
 {
     Q_D(SoundManager);
 
     auto it = d->m_soundCache.find(url);
     if (it != d->m_soundCache.end())
+    {
         return Sample(it.value());
+    }
 
     /*QFileInfo fi(url.path());
     if (fi.suffix().toLower() != "wav")
@@ -183,7 +202,9 @@ Sample SoundManager::loadSample(const QUrl& url)
     QIODevice *f = ((Engine *)qApp)->resources()->getIODevice(url, this);
 
     if (!f)
+    {
         return Sample(QSharedPointer<SampleData>());
+    }
 
     if (!f->isOpen())
     {
@@ -197,34 +218,39 @@ Sample SoundManager::loadSample(const QUrl& url)
     delete f;
 
     if (!data)
+    {
         return data;
+    }
 
     d->m_soundCache[url] = data;
     return Sample(data);
 }
 
-MusicDecoder *SoundManager::getMusicDecoder(const QUrl& url, QObject *parent)
+MusicDecoder *SoundManager::getMusicDecoder(const QUrl &url, QObject *parent)
 {
     QString path = url.path();
 
     if (!QFileInfo(path).suffix().compare("mp3", Qt::CaseInsensitive) ||
-            !QFileInfo(path).suffix().compare("dat", Qt::CaseInsensitive))
+        !QFileInfo(path).suffix().compare("dat", Qt::CaseInsensitive))
     {
         QIODevice *dev = ((Engine *)qApp)->resources()->getIODevice(url);
         if (!dev)
+        {
             return 0;
+        }
         return new MPG123MusicDecoder(dev, parent);
     }
     else if (!QFileInfo(path).suffix().compare("ogg", Qt::CaseInsensitive))
     {
         QIODevice *dev = ((Engine *)qApp)->resources()->getIODevice(url);
         if (!dev)
+        {
             return 0;
+        }
         return new VorbisMusicDecoder(dev, parent);
     }
     qWarning() << "Unsupported music format: " << QFileInfo(path).suffix();
     return 0;
 }
 
-}
-
+} // namespace OpenSR

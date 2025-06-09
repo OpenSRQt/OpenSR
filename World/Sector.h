@@ -28,7 +28,7 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Sector: public WorldObject
+class OPENSR_WORLD_API Sector : public WorldObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -37,13 +37,13 @@ class OPENSR_WORLD_API Sector: public WorldObject
 
 public:
     Q_INVOKABLE Sector(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Sector();
+    ~Sector() override;
 
     QPointF position() const;
-    void setPosition(const QPointF& position);
+    void setPosition(const QPointF &position);
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
 Q_SIGNALS:
     void positionChanged();
@@ -51,7 +51,7 @@ Q_SIGNALS:
 private:
     QPointF m_position;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_SECTOR_H

@@ -20,8 +20,8 @@
 #define OPENSR_RESOURCEMANAGER_H
 
 #include <OpenSR/OpenSR.h>
-#include <QObject>
 #include <QHash>
+#include <QObject>
 #include <QSharedPointer>
 
 class QQmlNetworkAccessManagerFactory;
@@ -37,8 +37,8 @@ class ResourceProvider
 public:
     virtual ~ResourceProvider();
 
-    virtual void load(ResourceNode& root) = 0;
-    virtual QIODevice *getDevice(const ResourceNode& node, QObject *parent = 0) = 0;
+    virtual void load(ResourceNode &root) = 0;
+    virtual QIODevice *getDevice(const ResourceNode &node, QObject *parent = 0) = 0;
 };
 
 class ResourceInfo
@@ -53,10 +53,14 @@ public:
 class ResourceNode
 {
 public:
-    enum Type {FILE, DIRECTORY};
+    enum Type
+    {
+        FILE,
+        DIRECTORY
+    };
 
-    ResourceNode(const QString& name = QString(), Type type = ResourceNode::DIRECTORY,
-                 ResourceNode *parent = 0, QSharedPointer<ResourceInfo> info = QSharedPointer<ResourceInfo>());
+    ResourceNode(const QString &name = QString(), Type type = ResourceNode::DIRECTORY, ResourceNode *parent = 0,
+                 QSharedPointer<ResourceInfo> info = QSharedPointer<ResourceInfo>());
     virtual ~ResourceNode();
 
     ResourceNode *parent;
@@ -71,24 +75,24 @@ class ENGINE_API ResourceManager : public QObject
     Q_OBJECT
 public:
     ResourceManager(QObject *parent = 0);
-    virtual ~ResourceManager();
+    ~ResourceManager() override;
 
     QQmlNetworkAccessManagerFactory *qmlNAMFactory() const;
 
-    bool fileExists(const QString& path) const;
-    QIODevice *getIODevice(const QString& path, QObject *parent = 0);
-    QIODevice *getIODevice(const QUrl& path, QObject *parent = 0);
+    bool fileExists(const QString &path) const;
+    QIODevice *getIODevice(const QString &path, QObject *parent = 0);
+    QIODevice *getIODevice(const QUrl &path, QObject *parent = 0);
 
 public Q_SLOTS:
-    void addFileSystemPath(const QString& path);
-    void addPKGArchive(const QString& path);
-    void addProvider(ResourceProvider* provider);
+    void addFileSystemPath(const QString &path);
+    void addPKGArchive(const QString &path);
+    void addProvider(ResourceProvider *provider);
 
 private:
     ResourceNode m_root;
     ResourceManagerNAMFactory *m_namFactory;
-    QList<ResourceProvider*> m_dataProviders;
+    QList<ResourceProvider *> m_dataProviders;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_RESOURCEMANAGER_H

@@ -21,14 +21,14 @@
 #include "OpenSR/Engine.h"
 #include "OpenSR/ResourceManager.h"
 
-#include <QOpenGLContext>
-#include <QOpenGLFunctions>
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
 #include <QImage>
 #include <QImageReader>
+#include <QOpenGLBuffer>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QOpenGLVertexArrayObject>
 #include <QtCore/QDebug>
 
 namespace OpenSR
@@ -106,18 +106,17 @@ static const QString FRAGMENT_SHADER =
     "    gl_FragColor = blend(surfaceColor, atmosphereColor);\n"
     "}\n";
 
-static const QString VERTEX_SHADER =
-    "attribute vec3 vPosition;\n"
-    "attribute vec2 vTexCoord;\n"
-    "varying vec2 texCoord;\n"
+static const QString VERTEX_SHADER = "attribute vec3 vPosition;\n"
+                                     "attribute vec2 vTexCoord;\n"
+                                     "varying vec2 texCoord;\n"
 
-    "void main()\n"
-    "{\n"
-    "    gl_Position = vec4(vPosition, 1.0);\n"
-    "    texCoord = vTexCoord;\n"
-    "}\n";
+                                     "void main()\n"
+                                     "{\n"
+                                     "    gl_Position = vec4(vPosition, 1.0);\n"
+                                     "    texCoord = vTexCoord;\n"
+                                     "}\n";
 
-class PlanetRenderer: public QQuickFramebufferObject::Renderer
+class PlanetRenderer : public QQuickFramebufferObject::Renderer
 {
     struct Vertex
     {
@@ -126,14 +125,7 @@ class PlanetRenderer: public QQuickFramebufferObject::Renderer
     };
 
 public:
-    PlanetRenderer(): QQuickFramebufferObject::Renderer(),
-        vbo(QOpenGLBuffer(QOpenGLBuffer::VertexBuffer)),
-        surfaceUpdated(false),
-        surfaceTexture(nullptr),
-        cloud0Updated(false),
-        cloud0Texture(nullptr),
-        cloud1Updated(false),
-        cloud1Texture(nullptr)
+    PlanetRenderer() : QQuickFramebufferObject::Renderer(), vbo(QOpenGLBuffer(QOpenGLBuffer::VertexBuffer))
     {
         vbo.create();
         vbo.bind();
@@ -141,14 +133,16 @@ public:
         vbo.allocate(4 * sizeof(Vertex));
 
         vbo.bind();
-        Vertex *v = (Vertex*)vbo.map(QOpenGLBuffer::WriteOnly);
+        Vertex *v = (Vertex *)vbo.map(QOpenGLBuffer::WriteOnly);
         if (!v)
+        {
             return;
+        }
 
         v[0] = {QVector3D(-1.0, -1.0, 0.0), QVector2D(0.0, 0.0)};
-        v[1] = {QVector3D(-1.0,  1.0, 0.0), QVector2D(0.0, 1.0)};
-        v[2] = {QVector3D( 1.0,  1.0, 0.0), QVector2D(1.0, 1.0)};
-        v[3] = {QVector3D( 1.0, -1.0, 0.0), QVector2D(1.0, 0.0)};
+        v[1] = {QVector3D(-1.0, 1.0, 0.0), QVector2D(0.0, 1.0)};
+        v[2] = {QVector3D(1.0, 1.0, 0.0), QVector2D(1.0, 1.0)};
+        v[3] = {QVector3D(1.0, -1.0, 0.0), QVector2D(1.0, 0.0)};
         vbo.unmap();
 
         shader.addShaderFromSourceCode(QOpenGLShader::Vertex, VERTEX_SHADER);
@@ -175,13 +169,13 @@ public:
     }
 
 protected:
-    virtual QOpenGLFramebufferObject *createFramebufferObject(const QSize &size)
+    QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override
     {
         QOpenGLFramebufferObject *fbo = Renderer::createFramebufferObject(size);
         return fbo;
     }
 
-    virtual void render()
+    void render() override
     {
         QOpenGLFunctions *g = QOpenGLContext::currentContext()->functions();
         g->glClearColor(0, 0, 0, 0);
@@ -191,13 +185,19 @@ protected:
         vbo.bind();
 
         if (surfaceTexture)
+        {
             surfaceTexture->bind(0);
+        }
 
         if (cloud0Texture)
+        {
             cloud0Texture->bind(1);
+        }
 
         if (cloud1Texture)
+        {
             cloud1Texture->bind(2);
+        }
 
         shader.enableAttributeArray(vPositionIndex);
         shader.enableAttributeArray(vTexCoordIndex);
@@ -207,13 +207,19 @@ protected:
         g->glDrawArrays(GL_QUADS, 0, 4);
 
         if (cloud1Texture)
+        {
             cloud1Texture->release(2);
+        }
 
         if (cloud0Texture)
+        {
             cloud0Texture->release(1);
+        }
 
         if (surfaceTexture)
+        {
             surfaceTexture->release(0);
+        }
 
         g->glActiveTexture(GL_TEXTURE0);
 
@@ -221,16 +227,18 @@ protected:
         shader.release();
     }
 
-    virtual void synchronize(QQuickFramebufferObject *item)
+    void synchronize(QQuickFramebufferObject *item) override
     {
-        PlanetDrawer *drawer = static_cast<PlanetDrawer*>(item);
+        PlanetDrawer *drawer = dynamic_cast<PlanetDrawer *>(item);
 
         shader.bind();
 
         if (surfaceUpdated)
         {
             if (surfaceTexture)
+            {
                 delete surfaceTexture;
+            }
             surfaceTexture = nullptr;
 
             if (!surfaceImage.isNull())
@@ -246,7 +254,9 @@ protected:
         if (cloud0Updated)
         {
             if (cloud0Texture)
+            {
                 delete cloud0Texture;
+            }
             cloud0Texture = nullptr;
 
             if (!cloud0Image.isNull())
@@ -258,7 +268,9 @@ protected:
                 shader.setUniformValue("hasCloud0", true);
             }
             else
+            {
                 shader.setUniformValue("hasCloud0", false);
+            }
 
             cloud0Updated = false;
         }
@@ -266,7 +278,9 @@ protected:
         if (cloud1Updated)
         {
             if (cloud1Texture)
+            {
                 delete cloud1Texture;
+            }
             cloud1Texture = nullptr;
 
             if (!cloud1Image.isNull())
@@ -278,7 +292,9 @@ protected:
                 shader.setUniformValue("hasCloud1", true);
             }
             else
+            {
                 shader.setUniformValue("hasCloud1", false);
+            }
 
             cloud1Updated = false;
         }
@@ -298,23 +314,23 @@ private:
     QOpenGLBuffer vbo;
     QOpenGLShaderProgram shader;
     QImage surfaceImage;
-    bool surfaceUpdated;
-    QOpenGLTexture *surfaceTexture;
+    bool surfaceUpdated{};
+    QOpenGLTexture *surfaceTexture{};
 
     QImage cloud0Image, cloud1Image;
-    bool cloud0Updated, cloud1Updated;
-    QOpenGLTexture *cloud0Texture, *cloud1Texture;
+    bool cloud0Updated{}, cloud1Updated{};
+    QOpenGLTexture *cloud0Texture{}, *cloud1Texture{};
 
     int vPositionIndex, vTexCoordIndex;
 
     friend class OpenSR::PlanetDrawer;
 
     // !!! Called from GUI thread
-    void updateSurface(const QUrl& surface)
+    void updateSurface(const QUrl &surface)
     {
         surfaceImage = QImage();
         // TODO: make async
-        QIODevice *imgDev = static_cast<Engine*>(qApp)->resources()->getIODevice(surface);
+        QIODevice *imgDev = dynamic_cast<Engine *>(qApp)->resources()->getIODevice(surface);
         if (imgDev)
         {
             QImageReader reader(imgDev);
@@ -329,7 +345,7 @@ private:
     {
         cloud0Image = QImage();
         // TODO: make async
-        QIODevice *imgDev = static_cast<Engine*>(qApp)->resources()->getIODevice(cloud0);
+        QIODevice *imgDev = dynamic_cast<Engine *>(qApp)->resources()->getIODevice(cloud0);
         if (imgDev)
         {
             QImageReader reader(imgDev);
@@ -344,7 +360,7 @@ private:
     {
         cloud1Image = QImage();
         // TODO: make async
-        QIODevice *imgDev = static_cast<Engine*>(qApp)->resources()->getIODevice(cloud1);
+        QIODevice *imgDev = dynamic_cast<Engine *>(qApp)->resources()->getIODevice(cloud1);
         if (imgDev)
         {
             QImageReader reader(imgDev);
@@ -354,30 +370,25 @@ private:
         cloud1Updated = true;
     }
 };
-}
+} // namespace
 
 class PlanetDrawer::PlanetDrawerPrivate
 {
 public:
     PlanetDrawerPrivate()
     {
-        phase = 0.0f;
-        cloud0Phase = 0.0f; cloud1Phase = 0.0f;
-        lightAngle = 0.0f;
-        renderer = nullptr;
     }
 
     QUrl surface;
-    float phase;
-    float cloud0Phase, cloud1Phase;
+    float phase{};
+    float cloud0Phase{}, cloud1Phase{};
     QColor atmosphere;
     QUrl cloud0, cloud1;
-    float lightAngle;
-    mutable PlanetRenderer *renderer;
+    float lightAngle{};
+    mutable PlanetRenderer *renderer{};
 };
 
-PlanetDrawer::PlanetDrawer(QQuickItem* parent): QQuickFramebufferObject(parent),
-    d_osr_ptr(new PlanetDrawerPrivate())
+PlanetDrawer::PlanetDrawer(QQuickItem *parent) : QQuickFramebufferObject(parent), d_osr_ptr(new PlanetDrawerPrivate())
 {
     qApp;
     Q_D(PlanetDrawer);
@@ -388,7 +399,7 @@ PlanetDrawer::~PlanetDrawer()
     Q_D(PlanetDrawer);
 }
 
-QQuickFramebufferObject::Renderer* PlanetDrawer::createRenderer() const
+QQuickFramebufferObject::Renderer *PlanetDrawer::createRenderer() const
 {
     Q_D(const PlanetDrawer);
     d->renderer = new PlanetRenderer();
@@ -398,14 +409,16 @@ QQuickFramebufferObject::Renderer* PlanetDrawer::createRenderer() const
     return d->renderer;
 }
 
-void PlanetDrawer::setSurface(const QUrl& surface)
+void PlanetDrawer::setSurface(const QUrl &surface)
 {
     Q_D(PlanetDrawer);
     if (d->surface != surface)
     {
         d->surface = surface;
         if (d->renderer)
+        {
             d->renderer->updateSurface(d->surface);
+        }
         update();
         emit(surfaceChanged());
     }
@@ -434,14 +447,13 @@ float PlanetDrawer::phase() const
     return d->phase;
 }
 
-
 QColor PlanetDrawer::atmosphere() const
 {
     Q_D(const PlanetDrawer);
     return d->atmosphere;
 }
 
-void PlanetDrawer::setAtmosphere(const QColor& atmosphere)
+void PlanetDrawer::setAtmosphere(const QColor &atmosphere)
 {
     Q_D(PlanetDrawer);
     if (d->atmosphere != atmosphere)
@@ -458,7 +470,7 @@ QUrl PlanetDrawer::cloud0() const
     return d->cloud0;
 }
 
-void PlanetDrawer::setCloud0(const QUrl& cloud0)
+void PlanetDrawer::setCloud0(const QUrl &cloud0)
 {
     Q_D(PlanetDrawer);
 
@@ -466,7 +478,9 @@ void PlanetDrawer::setCloud0(const QUrl& cloud0)
     {
         d->cloud0 = cloud0;
         if (d->renderer)
+        {
             d->renderer->updateCloud0(d->cloud0);
+        }
         update();
         emit(cloud0Changed());
     }
@@ -478,7 +492,7 @@ QUrl PlanetDrawer::cloud1() const
     return d->cloud1;
 }
 
-void PlanetDrawer::setCloud1(const QUrl& cloud1)
+void PlanetDrawer::setCloud1(const QUrl &cloud1)
 {
     Q_D(PlanetDrawer);
 
@@ -486,7 +500,9 @@ void PlanetDrawer::setCloud1(const QUrl& cloud1)
     {
         d->cloud1 = cloud1;
         if (d->renderer)
+        {
             d->renderer->updateCloud1(d->cloud1);
+        }
         update();
         emit(cloud1Changed());
     }
@@ -545,4 +561,4 @@ void PlanetDrawer::setLightAngle(float angle)
         emit(lightAngleChanged());
     }
 }
-}
+} // namespace OpenSR

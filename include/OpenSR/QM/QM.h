@@ -19,23 +19,22 @@
 #ifndef OPENSR_QM_H
 #define OPENSR_QM_H
 
-#include <cstdint>
-#include <QString>
-#include <QMap>
 #include <QList>
+#include <QMap>
+#include <QString>
 
 #ifdef QM_LIBRARY_BUILD
-# ifdef WIN32
-#  define QM_API __declspec(dllexport)
-# else
-#  define QM_API
-# endif
+#ifdef WIN32
+#define QM_API __declspec(dllexport)
 #else
-# ifdef WIN32
-#  define QM_API
-# else
-#  define QM_API
-# endif
+#define QM_API
+#endif
+#else
+#ifdef WIN32
+#define QM_API
+#else
+#define QM_API
+#endif
 #endif
 
 class QIODevice;
@@ -46,7 +45,13 @@ namespace QM
 {
 struct QM_API Parameter
 {
-    enum Type {PARAMETER_NORMAL = 0, PARAMETER_FAIL = 1, PARAMETER_SUCCESS = 2, PARAMETER_DEATH = 3};
+    enum Type
+    {
+        PARAMETER_NORMAL = 0,
+        PARAMETER_FAIL = 1,
+        PARAMETER_SUCCESS = 2,
+        PARAMETER_DEATH = 3
+    };
     struct Range
     {
         int32_t from;
@@ -76,8 +81,19 @@ struct QM_API Parameter
 
 struct QM_API Modifier
 {
-    enum Operation {OPERATION_ASSIGN, OPERATION_CHANGE, OPERATION_PERCENT, OPERATION_EXPRESSION};
-    enum Visibility {VISIBILITY_NO_CHANGE, VISIBILITY_HIDE, VISIBILITY_SHOW};
+    enum Operation
+    {
+        OPERATION_ASSIGN,
+        OPERATION_CHANGE,
+        OPERATION_PERCENT,
+        OPERATION_EXPRESSION
+    };
+    enum Visibility
+    {
+        VISIBILITY_NO_CHANGE,
+        VISIBILITY_HIDE,
+        VISIBILITY_SHOW
+    };
 
     Operation operation;
     Visibility visibility;
@@ -91,13 +107,13 @@ struct QM_API Transition
 {
     struct Condition
     {
-        uint32_t param;
+        uint32_t param{};
 
-        int32_t rangeFrom;
-        int32_t rangeTo;
+        int32_t rangeFrom{};
+        int32_t rangeTo{};
 
-        bool includeValues;
-        bool includeMultiples;
+        bool includeValues{};
+        bool includeMultiples{};
         QList<int32_t> values;
         QList<uint32_t> multiples;
     };
@@ -110,7 +126,7 @@ struct QM_API Transition
     double priority;
     bool day;
 
-    //Color in TGE?
+    // Color in TGE?
     bool alwaysVisible;
     uint32_t passCount;
     uint32_t position;
@@ -125,7 +141,13 @@ struct QM_API Transition
 
 struct QM_API Location
 {
-    enum Type {LOCATION_NORMAL, LOCATION_START, LOCATION_FAIL, LOCATION_SUCCESS};
+    enum Type
+    {
+        LOCATION_NORMAL,
+        LOCATION_START,
+        LOCATION_FAIL,
+        LOCATION_SUCCESS
+    };
 
     Type type;
 
@@ -164,8 +186,23 @@ struct QM_API QuestInfo
 
 struct QM_API Quest
 {
-    enum Race {RACE_MALOQ = 0x01, RACE_PELENG = 0x02, RACE_HUMAN = 0x04, RACE_FAEYAN = 0x08, RACE_GAAL = 0x10, RACE_NONE = 0x40, RACE_ANY = 0xFF};
-    enum PlayerType {PLAYER_TRADER = 0x01, PLAYER_PIRATE = 0x02, PLAYER_WARRIOR = 0x04, PLAYER_ANY = 0xFF};
+    enum Race
+    {
+        RACE_MALOQ = 0x01,
+        RACE_PELENG = 0x02,
+        RACE_HUMAN = 0x04,
+        RACE_FAEYAN = 0x08,
+        RACE_GAAL = 0x10,
+        RACE_NONE = 0x40,
+        RACE_ANY = 0xFF
+    };
+    enum PlayerType
+    {
+        PLAYER_TRADER = 0x01,
+        PLAYER_PIRATE = 0x02,
+        PLAYER_WARRIOR = 0x04,
+        PLAYER_ANY = 0xFF
+    };
 
     QMap<uint32_t, Parameter> parameters;
     QMap<uint32_t, Location> locations;
@@ -188,7 +225,7 @@ QM_API Quest readQuest(QIODevice *dev);
 
 //! Load only information about quest
 QM_API QuestInfo readQuestInfo(QIODevice *dev);
-}
-}
+} // namespace QM
+} // namespace OpenSR
 
 #endif // OPENSR_QM_H

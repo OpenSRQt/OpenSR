@@ -17,24 +17,22 @@
 */
 
 #include "PlayerWindow.h"
-#include <OpenSR/QM/QuestPlayer.h>
 #include "ui_PlayerWindow.h"
+#include <OpenSR/QM/QuestPlayer.h>
 
 #include <QAction>
-#include <QtWidgets/QFileDialog>
-#include <QtGui/QCursor>
-#include <QtGui/QMouseEvent>
 #include <QtCore/QDebug>
 #include <QtCore/QtGlobal>
+#include <QtGui/QCursor>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QFileDialog>
 
 namespace OpenSR
 {
 namespace QuestPlayer
 {
 
-PlayerWindow::PlayerWindow(QWidget *parent) :
-    QMainWindow(parent),
-    m_ui(new Ui::PlayerWindow)
+PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::PlayerWindow)
 {
     m_ui->setupUi(this);
 
@@ -66,7 +64,7 @@ void PlayerWindow::loadQuest()
 
 void PlayerWindow::updateQuest()
 {
-    for (QLabel * b : m_transitionButtons.keys())
+    for (QLabel *b : m_transitionButtons.keys())
     {
         m_ui->buttonLayout->removeWidget(b);
         delete b;
@@ -80,11 +78,15 @@ void PlayerWindow::updateQuest()
     QList<QM::QuestPlayer::TransitionItem> newButtons = m_player.visibleTransitions();
     for (QM::QuestPlayer::TransitionItem &p : newButtons)
     {
-        QLabel *b;
+        QLabel *b{};
         if (p.title.isEmpty())
+        {
             b = new QLabel(tr("Next"), this);
+        }
         else
+        {
             b = new QLabel(p.title, this);
+        }
 
         b->setWordWrap(true);
         if (p.enabled)
@@ -103,10 +105,10 @@ void PlayerWindow::updateQuest()
     }
 }
 
-void PlayerWindow::showTransition(const QString& text)
+void PlayerWindow::showTransition(const QString &text)
 {
     m_transition = true;
-    for (QLabel * b : m_transitionButtons.keys())
+    for (QLabel *b : m_transitionButtons.keys())
     {
         m_ui->buttonLayout->removeWidget(b);
         delete b;
@@ -126,22 +128,9 @@ void PlayerWindow::showTransition(const QString& text)
     m_transitionButtons[b] = 0;
 }
 
-void PlayerWindow::showQuestCompleted(const QString& text)
+void PlayerWindow::showQuestCompleted(const QString &text)
 {
-    for (QLabel * b : m_transitionButtons.keys())
-    {
-        m_ui->buttonLayout->removeWidget(b);
-        delete b;
-    }
-    m_transitionButtons.clear();
-
-    QString t = text;
-    m_ui->textLabel->setText("<p>" + t.replace("\r\n", "</p><p>") + "</p><p><font color=\"green\">Quest completed!</font></p>");
-}
-
-void PlayerWindow::showQuestFailed(const QString& text, bool death)
-{
-    for (QLabel * b : m_transitionButtons.keys())
+    for (QLabel *b : m_transitionButtons.keys())
     {
         m_ui->buttonLayout->removeWidget(b);
         delete b;
@@ -150,16 +139,29 @@ void PlayerWindow::showQuestFailed(const QString& text, bool death)
 
     QString t = text;
     m_ui->textLabel->setText("<p>" + t.replace("\r\n", "</p><p>") +
-                             "</p><p><font color=\"red\">" + tr("Quest failed!") + "</font></p>" +
-                             (death ? "<p><font color=\"red\">" + tr("You're dead!") + "</font></p>" : ""));
-
+                             "</p><p><font color=\"green\">Quest completed!</font></p>");
 }
 
-bool PlayerWindow::eventFilter(QObject* obj, QEvent* event)
+void PlayerWindow::showQuestFailed(const QString &text, bool death)
+{
+    for (QLabel *b : m_transitionButtons.keys())
+    {
+        m_ui->buttonLayout->removeWidget(b);
+        delete b;
+    }
+    m_transitionButtons.clear();
+
+    QString t = text;
+    m_ui->textLabel->setText("<p>" + t.replace("\r\n", "</p><p>") + "</p><p><font color=\"red\">" +
+                             tr("Quest failed!") + "</font></p>" +
+                             (death ? "<p><font color=\"red\">" + tr("You're dead!") + "</font></p>" : ""));
+}
+
+bool PlayerWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress)
     {
-        QMouseEvent *m = dynamic_cast<QMouseEvent*>(event);
+        QMouseEvent *m = dynamic_cast<QMouseEvent *>(event);
         if (m->button() == Qt::LeftButton)
         {
             if (m_transition)
@@ -169,7 +171,7 @@ bool PlayerWindow::eventFilter(QObject* obj, QEvent* event)
             }
             else
             {
-                auto t = m_transitionButtons.find(dynamic_cast<QLabel*>(obj));
+                auto t = m_transitionButtons.find(dynamic_cast<QLabel *>(obj));
                 if (t != m_transitionButtons.end())
                 {
                     m_player.startTransition(*t);
@@ -180,9 +182,10 @@ bool PlayerWindow::eventFilter(QObject* obj, QEvent* event)
         return obj->event(event);
     }
     else
+    {
         return obj->event(event);
+    }
 }
 
-}
-}
-
+} // namespace QuestPlayer
+} // namespace OpenSR

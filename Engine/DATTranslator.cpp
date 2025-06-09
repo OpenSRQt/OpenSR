@@ -26,7 +26,6 @@ namespace OpenSR
 {
 DATTranslator::DATTranslator(QObject *parent) : QTranslator(parent)
 {
-
 }
 
 bool DATTranslator::isEmpty() const
@@ -34,11 +33,13 @@ bool DATTranslator::isEmpty() const
     return false;
 }
 
-QString DATTranslator::translate(const char* context, const char* sourceText, const char* disambiguation, int n) const
+QString DATTranslator::translate(const char *context, const char *sourceText, const char *disambiguation, int n) const
 {
     if (!QString(context).isEmpty())
+    {
         return QString();
+    }
 
-    return qobject_cast<Engine*>(qApp)->datValue(sourceText).toString();
+    return qobject_cast<Engine *>(qApp)->datValue(sourceText).toString();
 }
-}
+} // namespace OpenSR

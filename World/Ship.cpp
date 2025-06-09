@@ -30,8 +30,6 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Ship::m_staticTypeId = typeIdFromClassName(Ship::staticMetaObject.className());
-
 template <> void WorldObject::registerType<Ship>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<ShipStyle>();
@@ -47,7 +45,8 @@ template <> Ship *WorldObject::createObject(WorldObject *parent, quint32 id)
 
 template <> quint32 WorldObject::staticTypeId<Ship>()
 {
-    return Ship::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Ship::staticMetaObject.className());
+    return id;
 }
 
 template <> const QMetaObject *WorldObject::staticTypeMeta<Ship>()
@@ -102,7 +101,7 @@ Ship::~Ship()
 
 quint32 Ship::typeId() const
 {
-    return Ship::m_staticTypeId;
+    return staticTypeId<Ship>();
 }
 
 QString Ship::namePrefix() const
@@ -143,7 +142,9 @@ bool Ship::isMoving() const
 void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
 {
     if (m_affiliation == affiliation)
+    {
         return;
+    }
 
     m_affiliation = affiliation;
     emit affiliationChanged(m_affiliation);
@@ -152,7 +153,9 @@ void Ship::setAffiliation(Ship::ShipAffiliation affiliation)
 void Ship::setRank(Ship::ShipRank rank)
 {
     if (m_rank == rank)
+    {
         return;
+    }
 
     m_rank = rank;
     emit rankChanged(m_rank);
@@ -161,7 +164,9 @@ void Ship::setRank(Ship::ShipRank rank)
 void Ship::setAngle(float angle)
 {
     if (angle == m_angle)
+    {
         return;
+    }
 
     m_angle = angle;
     emit angleChanged();
@@ -170,7 +175,9 @@ void Ship::setAngle(float angle)
 void Ship::setDestination(QPointF destination)
 {
     if (destination == m_destination)
+    {
         return;
+    }
 
     m_destination = destination;
     emit destinationChanged();
@@ -179,7 +186,9 @@ void Ship::setDestination(QPointF destination)
 void Ship::setIsMoving(bool isMoving)
 {
     if (isMoving == m_isMoving)
+    {
         return;
+    }
 
     m_isMoving = isMoving;
     emit isMovingChanged();
@@ -188,10 +197,14 @@ void Ship::setIsMoving(bool isMoving)
 void Ship::normalizeAnlge(float &deltaAngle)
 {
     while (deltaAngle > M_PI)
+    {
         deltaAngle -= 2 * M_PI;
+    }
 
     while (deltaAngle < -M_PI)
+    {
         deltaAngle += 2 * M_PI;
+    }
 }
 
 void Ship::resetSpeedParams()
@@ -203,22 +216,24 @@ void Ship::resetSpeedParams()
 void Ship::initTargetAngle(const QPointF &pos, const QPointF &dest)
 {
     QPointF directionalVector = dest - pos;
-    float directionNorm =
-        std::sqrt(directionalVector.x() * directionalVector.x() + directionalVector.y() * directionalVector.y());
+    float directionNorm = static_cast<float>(
+        std::sqrt(directionalVector.x() * directionalVector.x() + directionalVector.y() * directionalVector.y()));
     directionalVector /= directionNorm;
 
-    m_targetAngle = std::atan2(directionalVector.y(), directionalVector.x());
+    m_targetAngle = static_cast<float>(std::atan2(directionalVector.y(), directionalVector.x()));
 }
 
 void Ship::correctLinearSpeed(const QPointF &dest, const QPointF &pos)
 {
-    const float deltaX = dest.x() - pos.x();
-    const float deltaY = dest.y() - pos.y();
-    const float turnRadius =
-        (deltaX * deltaX + deltaY * deltaY) / (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle)));
+    const float deltaX = static_cast<float>(dest.x() - pos.x());
+    const float deltaY = static_cast<float>(dest.y() - pos.y());
+    const float turnRadius = static_cast<float>((deltaX * deltaX + deltaY * deltaY) /
+                                                (2 * abs(deltaX * sin(m_angle) - deltaY * cos(m_angle))));
 
     if (turnRadius < m_speed / m_angularSpeed)
+    {
         m_speed = m_angularSpeed * turnRadius;
+    }
 }
 
 void Ship::prepareToMove(const QPointF &dest)
@@ -334,7 +349,9 @@ void Ship::calcTrajectory(const QPointF &dest)
         const float distance = static_cast<float>(QLineF(dest, trajectoryPoint).length());
 
         if (distance < pointStep * m_speed)
+        {
             break;
+        }
 
         angle = calcAngle(pointStep, angle, trajectoryPoint, dest);
         trajectoryPoint = calcPosition(pointStep, angle, trajectoryPoint, dest);

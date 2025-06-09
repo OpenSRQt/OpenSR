@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Droid::m_staticTypeId = typeIdFromClassName(Droid::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Droid>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Droid>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Droid>("OpenSR.World", 1, 0, "Droid");
 }
 
-template<>
-Droid* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Droid *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Droid(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Droid>()
+template <> quint32 WorldObject::staticTypeId<Droid>()
 {
-    return Droid::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Droid::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Droid>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Droid>()
 {
     return &Droid::staticMetaObject;
 }
 
-Droid::Droid(WorldObject *parent, quint32 id): Equipment(parent, id)
+Droid::Droid(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Droid::~Droid()
 
 quint32 Droid::typeId() const
 {
-    return Droid::m_staticTypeId;
+    return staticTypeId<Droid>();
 }
 
 QString Droid::namePrefix() const
 {
     return tr("Droid");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

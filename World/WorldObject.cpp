@@ -25,8 +25,6 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 WorldObject::m_staticTypeId = typeIdFromClassName(WorldObject::staticMetaObject.className());
-
 template <> void WorldObject::registerType<WorldObject>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<WorldObject>("OpenSR.World", 1, 0, "WorldObject");
@@ -39,7 +37,8 @@ template <> WorldObject *WorldObject::createObject(WorldObject *parent, quint32 
 
 template <> quint32 WorldObject::staticTypeId<WorldObject>()
 {
-    return WorldObject::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(WorldObject::staticMetaObject.className());
+    return id;
 }
 
 template <> const QMetaObject *WorldObject::staticTypeMeta<WorldObject>()
@@ -50,7 +49,9 @@ template <> const QMetaObject *WorldObject::staticTypeMeta<WorldObject>()
 WorldObject::WorldObject(WorldObject *parent, quint32 id) : QObject(parent), m_id(id)
 {
     if (!m_id)
+    {
         m_id = WorldManager::instance()->getNextId();
+    }
 }
 
 WorldObject::~WorldObject()
@@ -64,7 +65,7 @@ quint32 WorldObject::id() const
 
 quint32 WorldObject::typeId() const
 {
-    return WorldObject::m_staticTypeId;
+    return staticTypeId<WorldObject>();
 }
 
 QString WorldObject::name() const
@@ -127,7 +128,9 @@ void WorldObject::startTurn()
     {
         WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
+        {
             wo->startTurn();
+        }
     }
 }
 
@@ -145,7 +148,9 @@ void WorldObject::processTurn(float time)
     {
         WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
+        {
             wo->processTurn(time);
+        }
     }
 }
 /*!
@@ -160,7 +165,9 @@ void WorldObject::finishTurn()
     {
         WorldObject *wo = qobject_cast<WorldObject *>(o);
         if (wo)
+        {
             wo->finishTurn();
+        }
     }
 }
 
@@ -172,7 +179,7 @@ void WorldObject::finishTurn()
 quint32 WorldObject::typeIdFromClassName(const QString &className)
 {
     quint32 h = 0;
-    int n = className.length();
+    int n = static_cast<int>(className.length());
 
     while (n--)
     {

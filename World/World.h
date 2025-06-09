@@ -20,20 +20,22 @@
 #define OPENSR_WORLD_H
 
 #ifdef OPENSR_WORLD_BUILD
-# ifdef Q_CC_MSVC
-#  define OPENSR_WORLD_API __declspec(dllexport)
-# else
-#  define OPENSR_WORLD_API
-# endif
+#ifdef Q_CC_MSVC
+#define OPENSR_WORLD_API __declspec(dllexport)
 #else
-# ifdef Q_CC_MSVC
-#  define OPENSR_WORLD_API __declspec(dllimport)
-# else
-#  define OPENSR_WORLD_API
-# endif
+#define OPENSR_WORLD_API
+#endif
+#else
+#ifdef Q_CC_MSVC
+#define OPENSR_WORLD_API __declspec(dllimport)
+#else
+#define OPENSR_WORLD_API
+#endif
 #endif
 
-#define OPENSR_WORLD_OBJECT public: static const quint32 m_staticTypeId;
+#define OPENSR_WORLD_OBJECT                                                                                            \
+public:                                                                                                                \
+    static const quint32 m_staticTypeId;
 
 #include <stdint.h>
 

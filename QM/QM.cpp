@@ -19,6 +19,7 @@
 #include "OpenSR/QM/QM.h"
 #include <QIODevice>
 #include <QString>
+#include <cstdint>
 
 namespace OpenSR
 {
@@ -26,44 +27,44 @@ namespace QM
 {
 QString readString(QIODevice *dev)
 {
-    uint32_t len;
-    dev->read((char*)&len, 4);
-    return QString::fromUtf16((char16_t *)dev->read(len * 2).constData(), len); // check later
+    uint32_t len{};
+    dev->read((char *)&len, 4);
+    return QString::fromUtf16((char16_t *)dev->read(static_cast<qint64>(len) * 2).constData(), len); // check later
 }
 
 void skipString(QIODevice *dev)
 {
-    uint32_t len;
-    dev->read((char*)&len, 4);
-    //FIXME: Dummy read?
-    dev->seek(dev->pos() + len * 2);
+    uint32_t len{};
+    dev->read((char *)&len, 4);
+    // FIXME: Dummy read?
+    dev->seek(dev->pos() + static_cast<qint64>(len) * 2);
 }
 
 uint8_t readByte(QIODevice *dev)
 {
-    uint8_t r;
-    dev->read((char*)&r, 1);
+    uint8_t r{};
+    dev->read((char *)&r, 1);
     return r;
 }
 
 uint32_t readUInt(QIODevice *dev)
 {
-    uint32_t r;
-    dev->read((char*)&r, 4);
+    uint32_t r{};
+    dev->read((char *)&r, 4);
     return r;
 }
 
 int32_t readInt(QIODevice *dev)
 {
-    int32_t r;
-    dev->read((char*)&r, 4);
+    int32_t r{};
+    dev->read((char *)&r, 4);
     return r;
 }
 
 double readDouble(QIODevice *dev)
 {
-    double r;
-    dev->read((char*)&r, 8);
+    double r{};
+    dev->read((char *)&r, 8);
     return r;
 }
 
@@ -71,7 +72,7 @@ Parameter readParameter(QIODevice *dev)
 {
     Parameter p;
 
-    uint8_t rangesNum;
+    uint8_t rangesNum{};
 
     p.min = readInt(dev);
     p.max = readInt(dev);
@@ -106,7 +107,7 @@ Parameter readParameter(QIODevice *dev)
 
 void skipParameter(QIODevice *dev)
 {
-    uint8_t rangesNum;
+    uint8_t rangesNum{};
 
     dev->seek(dev->pos() + 20);
     rangesNum = readByte(dev);
@@ -134,7 +135,7 @@ Transition readTransition(QIODevice *dev, const Quest &q, uint32_t totalParamCou
     t.id = readUInt(dev);
     t.from = readUInt(dev);
     t.to = readUInt(dev);
-    //Color?
+    // Color?
     readByte(dev);
     t.alwaysVisible = readByte(dev) == 1;
     t.passCount = readUInt(dev);
@@ -157,34 +158,49 @@ Transition readTransition(QIODevice *dev, const Quest &q, uint32_t totalParamCou
         if (it != q.parameters.end())
         {
             if ((c.rangeFrom > it->min) || (c.rangeTo < it->max))
+            {
                 inRange = true;
+            }
         }
 
         m.value = readInt(dev);
 
         uint8_t show = readUInt(dev);
         if (show == 1)
+        {
             m.visibility = Modifier::VISIBILITY_SHOW;
+        }
         else if (show == 2)
+        {
             m.visibility = Modifier::VISIBILITY_HIDE;
+        }
         else
+        {
             m.visibility = Modifier::VISIBILITY_NO_CHANGE;
+        }
 
         readByte(dev);
 
-        bool percent, assign, expression;
-        percent = readByte(dev) == 1;
-        assign = readByte(dev) == 1;
-        expression = readByte(dev) == 1;
+        bool percent = readByte(dev) == 1;
+        bool assign = readByte(dev) == 1;
+        bool expression = readByte(dev) == 1;
 
         if (percent)
+        {
             m.operation = Modifier::OPERATION_PERCENT;
+        }
         else if (assign)
+        {
             m.operation = Modifier::OPERATION_ASSIGN;
+        }
         else if (expression)
+        {
             m.operation = Modifier::OPERATION_EXPRESSION;
+        }
         else
+        {
             m.operation = Modifier::OPERATION_CHANGE;
+        }
 
         dev->seek(dev->pos() + 4);
         m.expression = readString(dev);
@@ -192,18 +208,23 @@ Transition readTransition(QIODevice *dev, const Quest &q, uint32_t totalParamCou
         uint32_t count = readUInt(dev);
         c.includeValues = readByte(dev) == 1;
         for (uint32_t j = 0; j < count; j++)
+        {
             c.values.append(readInt(dev));
+        }
 
         count = readUInt(dev);
         c.includeMultiples = readByte(dev) == 1;
         for (uint32_t j = 0; j < count; j++)
+        {
             c.multiples.append(readUInt(dev));
+        }
 
         dev->seek(dev->pos() + 4);
         skipString(dev);
 
-        if ((it != q.parameters.end()) && ((show != 0) || (m.value != 0) || (percent) || (assign) ||
-                                           (expression && (m.expression != "")) || c.values.size() || c.multiples.size() || inRange))
+        if ((it != q.parameters.end()) &&
+            ((show != 0) || (m.value != 0) || (percent) || (assign) || (expression && (m.expression != "")) ||
+             c.values.size() || c.multiples.size() || inRange))
         {
             t.modifiers.append(m);
             t.conditions.append(c);
@@ -228,26 +249,33 @@ Location readLocation(QIODevice *dev, const Quest &q, uint32_t totalParamCount)
     l.y = readInt(dev);
     l.id = readUInt(dev);
 
-    bool start, success, fail;
-    start = readByte(dev) == 1;
-    success = readByte(dev) == 1;
-    fail = readByte(dev) == 1;
+    bool start = readByte(dev) == 1;
+    bool success = readByte(dev) == 1;
+    bool fail = readByte(dev) == 1;
 
-    if ((start && success) || (start && fail) || (success && fail))
+    if ((start && success) || (start && fail) || (success && fail) || (!start && !success && !fail))
+    {
         l.type = Location::LOCATION_NORMAL;
-    else if (!start && !success && !fail)
-        l.type = Location::LOCATION_NORMAL;
+    }
     else if (start)
+    {
         l.type = Location::LOCATION_START;
+    }
     else if (success)
+    {
         l.type = Location::LOCATION_SUCCESS;
+    }
     else if (fail)
+    {
         l.type = Location::LOCATION_FAIL;
+    }
 
     l.death = readByte(dev) == 1;
 
     if (l.death)
+    {
         l.type = Location::LOCATION_FAIL;
+    }
 
     l.empty = readByte(dev) == 1;
 
@@ -262,26 +290,39 @@ Location readLocation(QIODevice *dev, const Quest &q, uint32_t totalParamCount)
 
         uint8_t show = readByte(dev);
         if (show == 1)
+        {
             m.visibility = Modifier::VISIBILITY_SHOW;
+        }
         else if (show == 2)
+        {
             m.visibility = Modifier::VISIBILITY_HIDE;
+        }
         else
+        {
             m.visibility = Modifier::VISIBILITY_NO_CHANGE;
+        }
 
         dev->seek(dev->pos() + 4);
-        bool percent, assign, expression;
-        percent = readByte(dev) == 1;
-        assign = readByte(dev) == 1;
-        expression = readByte(dev) == 1;
+        bool percent = readByte(dev) == 1;
+        bool assign = readByte(dev) == 1;
+        bool expression = readByte(dev) == 1;
 
         if (percent)
+        {
             m.operation = Modifier::OPERATION_PERCENT;
+        }
         else if (assign)
+        {
             m.operation = Modifier::OPERATION_ASSIGN;
+        }
         else if (expression)
+        {
             m.operation = Modifier::OPERATION_EXPRESSION;
+        }
         else
+        {
             m.operation = Modifier::OPERATION_CHANGE;
+        }
 
         dev->seek(dev->pos() + 4);
         m.expression = readString(dev);
@@ -290,9 +331,11 @@ Location readLocation(QIODevice *dev, const Quest &q, uint32_t totalParamCount)
         skipString(dev);
 
         auto it = q.parameters.find(i);
-        if ((it != q.parameters.end()) && ((show != 0) || (m.value != 0) || (percent) || (assign) ||
-                                           (expression && (m.expression != ""))))
+        if ((it != q.parameters.end()) &&
+            ((show != 0) || (m.value != 0) || (percent) || (assign) || (expression && (m.expression != ""))))
+        {
             l.modifiers.append(m);
+        }
     }
 
     for (int i = 0; i < 10; i++)
@@ -317,22 +360,30 @@ Location readLocation(QIODevice *dev, const Quest &q, uint32_t totalParamCount)
 
 Quest readQuest(QIODevice *dev)
 {
-    uint32_t sig;
-    Quest q;
-    uint32_t temp;
+    uint32_t sig{};
+    Quest q{};
+    uint32_t temp{};
 
-    uint8_t paramsCount;
-    uint32_t pathCount;
+    uint8_t paramsCount{};
+    uint32_t pathCount{};
 
-    dev->read((char*)&sig, 4);
+    dev->read((char *)&sig, 4);
     if (sig == 0x423a35d4)
+    {
         paramsCount = 96;
+    }
     else if (sig == 0x423a35d3)
+    {
         paramsCount = 48;
+    }
     else if (sig == 0x423a35d2)
+    {
         paramsCount = 24;
+    }
     else
+    {
         return Quest();
+    }
 
     dev->seek(dev->pos() + 4);
 
@@ -359,13 +410,15 @@ Quest readQuest(QIODevice *dev)
         p.id = i;
 
         if (p.active)
+        {
             q.parameters[i] = p;
+        }
     }
 
     dev->seek(dev->pos() + 4);
     q.toStar = readString(dev);
 
-    //FIXME: Other substitutions?
+    // FIXME: Other substitutions?
     dev->seek(dev->pos() + 4);
     skipString(dev);
     dev->seek(dev->pos() + 4);
@@ -398,7 +451,9 @@ Quest readQuest(QIODevice *dev)
         Location l = readLocation(dev, q, paramsCount);
         q.locations[l.id] = l;
         if (l.type == Location::LOCATION_START)
+        {
             q.startLocation = l.id;
+        }
     }
 
     for (uint32_t i = 0; i < pathCount; i++)
@@ -412,22 +467,30 @@ Quest readQuest(QIODevice *dev)
 
 QuestInfo readQuestInfo(QIODevice *dev)
 {
-    uint32_t sig;
-    QuestInfo info;
-    uint32_t temp;
+    uint32_t sig{};
+    QuestInfo info{};
+    uint32_t temp{};
 
-    uint8_t paramsCount;
-    uint32_t pathCount;
+    uint8_t paramsCount{};
+    uint32_t pathCount{};
 
-    dev->read((char*)&sig, 4);
+    dev->read((char *)&sig, 4);
     if (sig == 0x423a35d4)
+    {
         paramsCount = 96;
+    }
     else if (sig == 0x423a35d3)
+    {
         paramsCount = 48;
+    }
     else if (sig == 0x423a35d2)
+    {
         paramsCount = 24;
+    }
     else
+    {
         return QuestInfo();
+    }
 
     dev->seek(dev->pos() + 4);
 
@@ -449,7 +512,9 @@ QuestInfo readQuestInfo(QIODevice *dev)
     info.difficulty = readUInt(dev);
 
     for (uint8_t i = 0; i < paramsCount; i++)
+    {
         skipParameter(dev);
+    }
 
     dev->seek(dev->pos() + 4);
     skipString(dev);
@@ -477,5 +542,5 @@ QuestInfo readQuestInfo(QIODevice *dev)
 
     return info;
 }
-}
-}
+} // namespace QM
+} // namespace OpenSR

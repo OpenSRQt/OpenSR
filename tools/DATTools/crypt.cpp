@@ -17,9 +17,9 @@
 */
 
 #include "crypt.h"
-#include <stdint.h>
-#include <ctime>
 #include <cstdlib>
+#include <ctime>
+#include <stdint.h>
 
 namespace OpenSR
 {
@@ -29,7 +29,7 @@ namespace
 {
 const uint32_t RANGERS_KEY_RELOAD_CACHE = 0xF2FDE658;
 const uint32_t RANGERS_KEY_RELOAD = 0xBE970BF1;
-}
+} // namespace
 
 int32_t genKey()
 {
@@ -41,45 +41,54 @@ uint32_t getNextKey(int32_t key)
 {
     int32_t k = (key % 0x1F31D) * 0x41A7 - ((key / 0x1F31D) * 0xB14);
     if (k < 0)
+    {
         k = k + 0x7FFFFFFF;
+    }
     return k;
 }
 
-void decrypt(QByteArray& d, int32_t key, bool isCache)
+void decrypt(QByteArray &d, int32_t key, bool isCache)
 {
-    int32_t k;
+    int32_t k{};
 
-    uint8_t *data = (uint8_t*)d.data();
+    uint8_t *data = (uint8_t *)d.data();
 
     if (!isCache)
-        k = key ^ RANGERS_KEY_RELOAD;
+    {
+        k = static_cast<int>(key ^ RANGERS_KEY_RELOAD);
+    }
     else
-        k = key ^ RANGERS_KEY_RELOAD_CACHE;
+    {
+        k = static_cast<int>(key ^ RANGERS_KEY_RELOAD_CACHE);
+    }
 
     for (uint32_t i = 0; i < d.size(); i++)
     {
-        k = getNextKey(k);
+        k = static_cast<int>(getNextKey(k));
         data[i] = data[i] ^ ((k - 1) & 0xFF);
     }
 }
 
-void encrypt(QByteArray& d, int32_t key, bool isCache)
+void encrypt(QByteArray &d, int32_t key, bool isCache)
 {
-    int32_t k;
+    int32_t k{};
 
-    uint8_t *data = (uint8_t*)d.data();
+    uint8_t *data = (uint8_t *)d.data();
 
     if (!isCache)
-        k = key ^ RANGERS_KEY_RELOAD;
+    {
+        k = static_cast<int>(key ^ RANGERS_KEY_RELOAD);
+    }
     else
-        k = key ^ RANGERS_KEY_RELOAD_CACHE;
+    {
+        k = static_cast<int>(key ^ RANGERS_KEY_RELOAD_CACHE);
+    }
 
     for (uint32_t i = 0; i < d.size(); i++)
     {
-        k = getNextKey(k);
+        k = static_cast<int>(getNextKey(k));
         data[i] = data[i] ^ ((k - 1) & 0xFF);
     }
 }
-}
-}
-
+} // namespace DAT
+} // namespace OpenSR

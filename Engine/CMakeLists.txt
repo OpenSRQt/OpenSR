@@ -64,7 +64,6 @@ target_include_directories(engine PUBLIC
 
 target_include_directories(engine PRIVATE
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    ${OPENGL_INCLUDE_DIR}
     ${OPENAL_INCLUDE_DIR}
 )
 

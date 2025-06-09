@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Sector::m_staticTypeId = typeIdFromClassName(Sector::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Sector>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Sector>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Sector>("OpenSR.World", 1, 0, "Sector");
 }
 
-template<>
-Sector* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Sector *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Sector(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Sector>()
+template <> quint32 WorldObject::staticTypeId<Sector>()
 {
-    return Sector::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Sector::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Sector>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Sector>()
 {
     return &Sector::staticMetaObject;
 }
 
-Sector::Sector(WorldObject *parent, quint32 id): WorldObject(parent, id)
+Sector::Sector(WorldObject *parent, quint32 id) : WorldObject(parent, id)
 {
 }
 
@@ -63,7 +58,7 @@ QPointF Sector::position() const
     return m_position;
 }
 
-void Sector::setPosition(const QPointF& position)
+void Sector::setPosition(const QPointF &position)
 {
     m_position = position;
     emit(positionChanged());
@@ -71,12 +66,12 @@ void Sector::setPosition(const QPointF& position)
 
 quint32 Sector::typeId() const
 {
-    return Sector::m_staticTypeId;
+    return staticTypeId<Sector>();
 }
 
 QString Sector::namePrefix() const
 {
     return tr("Sector");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

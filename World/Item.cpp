@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Item::m_staticTypeId = typeIdFromClassName(Item::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Item>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Item>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Item>("OpenSR.World", 1, 0, "WorldItem");
 }
 
-template<>
-Item* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Item *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Item(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Item>()
+template <> quint32 WorldObject::staticTypeId<Item>()
 {
-    return Item::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Item::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Item>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Item>()
 {
     return &Item::staticMetaObject;
 }
 
-Item::Item(WorldObject *parent, quint32 id): WorldObject(parent, id)
+Item::Item(WorldObject *parent, quint32 id) : WorldObject(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Item::~Item()
 
 quint32 Item::typeId() const
 {
-    return Item::m_staticTypeId;
+    return staticTypeId<Item>();
 }
 
 QString Item::namePrefix() const
 {
     return tr("Item");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

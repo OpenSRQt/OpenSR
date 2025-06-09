@@ -17,19 +17,18 @@
 */
 
 #include "GAIAnimationIO.h"
-#include <QImage>
-#include <QVariant>
+#include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
-#include <QDebug>
+#include <QImage>
+#include <QVariant>
 
 namespace OpenSR
 {
-GAIAnimationIO::GAIAnimationIO(): QImageIOHandler(), m_currentFrame(-1)
+GAIAnimationIO::GAIAnimationIO() : QImageIOHandler(), m_currentFrame(-1)
 {
 }
-
 
 GAIAnimationIO::~GAIAnimationIO()
 {
@@ -38,22 +37,31 @@ GAIAnimationIO::~GAIAnimationIO()
 bool GAIAnimationIO::supportsOption(ImageOption option) const
 {
     if (option == QImageIOHandler::Size || option == QImageIOHandler::Animation)
+    {
         return true;
+    }
     return false;
 }
 
 QVariant GAIAnimationIO::option(ImageOption option) const
 {
     if (!checkGAIHeader(device()))
+    {
         return QVariant();
+    }
 
     GAIHeader header = peekGAIHeader(device());
 
     if (option == QImageIOHandler::Animation)
+    {
         return true;
+    }
 
     if (option == QImageIOHandler::Size)
-        return QSize(header.finishX - header.startX, header.finishY - header.startX);
+    {
+        return QSize(static_cast<int>(header.finishX - header.startX),
+                     static_cast<int>(header.finishY - header.startX));
+    }
 
     return QVariant();
 }
@@ -63,7 +71,9 @@ bool GAIAnimationIO::canRead() const
     QIODevice *d = device();
 
     if (!d)
+    {
         return false;
+    }
 
     if (m_currentFrame < 0)
     {
@@ -72,7 +82,9 @@ bool GAIAnimationIO::canRead() const
     else
     {
         if (m_currentFrame >= m_header.frameCount)
+        {
             return false;
+        }
     }
 
     return true;
@@ -83,7 +95,9 @@ bool GAIAnimationIO::read(QImage *image)
     QIODevice *d = device();
 
     if (!d)
+    {
         return false;
+    }
 
     if (m_currentFrame < 0)
     {
@@ -93,27 +107,35 @@ bool GAIAnimationIO::read(QImage *image)
     }
 
     if (m_currentFrame >= m_header.frameCount)
+    {
         return false;
+    }
 
     if (m_currentFrame == 0 && m_header.haveBackground)
     {
-        QFile *f = qobject_cast<QFile*>(d);
+        QFile *f = qobject_cast<QFile *>(d);
         if (f)
         {
             QFileInfo gaiFile(f->fileName());
             QString externalGIFrame = gaiFile.dir().canonicalPath() + QDir::separator() + gaiFile.baseName() + ".gi";
             if (!QFileInfo(externalGIFrame).exists())
+            {
                 externalGIFrame = gaiFile.dir().canonicalPath() + QDir::separator() + gaiFile.baseName() + ".GI";
+            }
 
             if (QFileInfo(externalGIFrame).exists())
+            {
                 m_prev = QImage(externalGIFrame);
+            }
         }
     }
 
     *image = loadGAIFrame(device(), m_header, m_currentFrame, m_prev);
 
     if (!image->isNull())
+    {
         m_currentFrame++;
+    }
 
     m_prev = *image;
 
@@ -132,15 +154,19 @@ int GAIAnimationIO::imageCount() const
     {
         header = peekGAIHeader(device());
     }
-    return header.frameCount;
+    return static_cast<int>(header.frameCount);
 }
 
 int GAIAnimationIO::nextImageDelay() const
 {
     if (m_currentFrame < 0)
+    {
         return 0;
+    }
     if (m_currentFrame >= m_times.count())
+    {
         return 0;
+    }
 
     return m_times[m_currentFrame];
 }
@@ -149,4 +175,4 @@ int GAIAnimationIO::loopCount() const
 {
     return -1;
 }
-}
+} // namespace OpenSR

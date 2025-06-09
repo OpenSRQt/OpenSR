@@ -29,9 +29,10 @@ class DATTranslator : public QTranslator
 public:
     DATTranslator(QObject *parent = 0);
 
-    virtual bool isEmpty() const;
-    virtual QString translate(const char* context, const char* sourceText, const char* disambiguation = 0, int n = -1) const;
+    bool isEmpty() const override;
+    QString translate(const char *context, const char *sourceText, const char *disambiguation = 0,
+                      int n = -1) const override;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_DATTRANSLATOR_H

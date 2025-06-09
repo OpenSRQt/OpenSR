@@ -25,19 +25,18 @@ namespace OpenSR
 {
 namespace World
 {
-class WorldPlugin: public QObject,
-    public PluginInterface
+class WorldPlugin : public QObject, public PluginInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "OpenSR.PluginInterface")
     Q_INTERFACES(OpenSR::PluginInterface)
 
 public:
-    virtual ~WorldPlugin() {};
+    ~WorldPlugin() override {};
 
-    virtual bool initPlugin(OpenSR::Engine *engine);
+    bool initPlugin(OpenSR::Engine *engine) override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_WORLDPLUGIN_H

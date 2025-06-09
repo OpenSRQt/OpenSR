@@ -20,7 +20,6 @@
 #define RANGERS_PLAYER_WINDOW_H
 
 #include <QMainWindow>
-#include <QMap>
 
 #include <OpenSR/QM/QuestPlayer.h>
 
@@ -39,27 +38,27 @@ class PlayerWindow : public QMainWindow
 
 public:
     explicit PlayerWindow(QWidget *parent = 0);
-    ~PlayerWindow();
+    ~PlayerWindow() override;
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     Ui::PlayerWindow *m_ui;
     QM::QuestPlayer m_player;
-    bool m_transition;
+    bool m_transition{};
 
-    QMap<QLabel*, uint32_t> m_transitionButtons;
+    QMap<QLabel *, uint32_t> m_transitionButtons;
 
 private Q_SLOTS:
     void loadQuest();
     void updateQuest();
-    void showTransition(const QString& text);
-    void showQuestCompleted(const QString& text);
-    void showQuestFailed(const QString& text, bool death);
+    void showTransition(const QString &text);
+    void showQuestCompleted(const QString &text);
+    void showQuestFailed(const QString &text, bool death);
 };
 
-}
-}
+} // namespace QuestPlayer
+} // namespace OpenSR
 
 #endif // RANGERS_PLAYER_WINDOW_H

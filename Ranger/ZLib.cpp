@@ -20,7 +20,6 @@
 
 #include <QByteArray>
 #include <QtEndian>
-#include <cstdlib>
 
 namespace OpenSR
 {
@@ -35,16 +34,18 @@ QByteArray unpackZL(QByteArray &src)
     uint32_t outsize = ((uint32_t *)src.constData())[1];
 
     if (sig != ZL02_SIGNATURE && sig != ZL01_SIGNATURE)
+    {
         return QByteArray();
+    }
 
     ((uint32_t *)src.data())[1] = qToBigEndian(outsize);
 
-    return qUncompress((const uchar*)(src.constData() + 4), src.size() - 4);
+    return qUncompress((const uchar *)(src.constData() + 4), src.size() - 4);
 }
 
 QByteArray packZL01(const QByteArray &src)
 {
-    //TODO: Optimize
+    // TODO: Optimize
     QByteArray compressed = qCompress(src);
     QByteArray sigArr(4, 0);
 
@@ -56,7 +57,7 @@ QByteArray packZL01(const QByteArray &src)
 
 QByteArray packZL02(const QByteArray &src)
 {
-    //TODO: Optimize
+    // TODO: Optimize
     QByteArray compressed = qCompress(src);
     QByteArray sigArr(4, 0);
 
@@ -65,4 +66,4 @@ QByteArray packZL02(const QByteArray &src)
     compressed.prepend(sigArr);
     return compressed;
 }
-}
+} // namespace OpenSR

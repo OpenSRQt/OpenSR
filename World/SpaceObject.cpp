@@ -25,33 +25,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 SpaceObject::m_staticTypeId = typeIdFromClassName(SpaceObject::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<SpaceObject>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<SpaceObject>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<SpaceObject>("OpenSR.World", 1, 0, "SpaceObject");
 }
 
-template<>
-SpaceObject* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> SpaceObject *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new SpaceObject(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<SpaceObject>()
+template <> quint32 WorldObject::staticTypeId<SpaceObject>()
 {
-    return SpaceObject::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(SpaceObject::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<SpaceObject>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<SpaceObject>()
 {
     return &SpaceObject::staticMetaObject;
 }
 
-SpaceObject::SpaceObject(WorldObject *parent, quint32 id): WorldObject(parent, id)
+SpaceObject::SpaceObject(WorldObject *parent, quint32 id) : WorldObject(parent, id)
 {
 }
 
@@ -64,7 +59,7 @@ QPointF SpaceObject::position() const
     return m_position;
 }
 
-void SpaceObject::setPosition(const QPointF& pos)
+void SpaceObject::setPosition(const QPointF &pos)
 {
     if (pos != m_position)
     {
@@ -75,7 +70,7 @@ void SpaceObject::setPosition(const QPointF& pos)
 
 quint32 SpaceObject::typeId() const
 {
-    return SpaceObject::m_staticTypeId;
+    return staticTypeId<SpaceObject>();
 }
 
 QString SpaceObject::namePrefix() const
@@ -87,11 +82,13 @@ QVariantList SpaceObject::trajectory() const
 {
     QVariantList result;
     for (auto curve : m_trajectory)
+    {
         result.append(QVariant::fromValue(curve));
+    }
     return result;
 }
 
-void SpaceObject::setTrajectory(const QList<BezierCurve>& trajectory)
+void SpaceObject::setTrajectory(const QList<BezierCurve> &trajectory)
 {
     m_trajectory = trajectory;
     emit(trajectoryChanged());
@@ -100,5 +97,5 @@ void SpaceObject::setTrajectory(const QList<BezierCurve>& trajectory)
 void SpaceObject::updateTrajectory()
 {
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

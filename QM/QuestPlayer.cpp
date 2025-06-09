@@ -20,11 +20,9 @@
 
 #include <OpenSR/QM/Parser.h>
 
-#include <QStringList>
 #include <QDebug>
-#include <QRegularExpression>
 #include <QFile>
-#include <cmath>
+#include <QRegularExpression>
 
 namespace OpenSR
 {
@@ -45,7 +43,7 @@ public:
     QString substituteValues(const QString &str) const;
 
     QM::Quest m_quest;
-    bool m_questLoaded;
+    bool m_questLoaded{};
 
     QM::Location m_currentLocation;
     QString m_locationText;
@@ -62,20 +60,16 @@ public:
     QuestPlayer *q;
 };
 
-QuestPlayer::QuestPlayer(QObject *parent): QObject(parent),
-    d_osr_ptr(new QuestPlayer::QuestPlayerPrivate(this))
+QuestPlayer::QuestPlayer(QObject *parent) : QObject(parent), d_osr_ptr(new QuestPlayer::QuestPlayerPrivate(this))
 {
 }
 
-QuestPlayer::QuestPlayerPrivate::QuestPlayerPrivate(QuestPlayer *q_)
+QuestPlayer::QuestPlayerPrivate::QuestPlayerPrivate(QuestPlayer *q_) : q(q_)
 {
-    q = q_;
-    m_questLoaded = false;
 }
 
 QuestPlayer::~QuestPlayer()
 {
-
 }
 
 QM::Location QuestPlayer::currentLocation() const
@@ -92,9 +86,11 @@ QM::Transition QuestPlayer::currentTransition() const
 
 QString QuestPlayer::QuestPlayerPrivate::substituteValues(const QString &str) const
 {
-    //TODO: Better tags handling (<format>, <fix>, etc)
+    // TODO: Better tags handling (<format>, <fix>, etc)
     if (str.isEmpty())
+    {
         return str;
+    }
 
     QString result = str;
     QRegularExpression valueExp("\\[p(\\d)+\\]");
@@ -105,9 +101,10 @@ QString QuestPlayer::QuestPlayerPrivate::substituteValues(const QString &str) co
     while (i.hasNext())
     {
         QRegularExpressionMatch match = i.next();
-        QString value = "<font class=\"selected\">" + QString::number((int32_t)round(QM::eval(match.captured(1), m_parameters))) + "</font>";
+        QString value = "<font class=\"selected\">" +
+                        QString::number((int32_t)round(QM::eval(match.captured(1), m_parameters))) + "</font>";
         result.replace(match.capturedStart() + deltaPos, match.capturedLength(), value);
-        deltaPos += value.length() - match.capturedLength();
+        deltaPos += static_cast<int>(value.length() - match.capturedLength());
     }
     deltaPos = 0;
     QString str2 = result;
@@ -115,9 +112,10 @@ QString QuestPlayer::QuestPlayerPrivate::substituteValues(const QString &str) co
     while (i.hasNext())
     {
         QRegularExpressionMatch match = i.next();
-        QString value = "<font class=\"selected\">" + QString::number((int32_t)round(QM::eval(match.captured(0), m_parameters))) + "</font>";
+        QString value = "<font class=\"selected\">" +
+                        QString::number((int32_t)round(QM::eval(match.captured(0), m_parameters))) + "</font>";
         result.replace(match.capturedStart() + deltaPos, match.capturedLength(), value);
-        deltaPos += value.length() - match.capturedLength();
+        deltaPos += static_cast<int>(value.length() - match.capturedLength());
     }
 
     result.replace("<ToStar>", "<font class=\"selected\">" + m_quest.toStar + "</font>");
@@ -141,7 +139,9 @@ void QuestPlayer::loadQuest(QIODevice *dev)
     d->m_questLoaded = false;
 
     if (!dev || !dev->isOpen())
+    {
         return;
+    }
 
     d->m_quest = QM::readQuest(dev);
     d->m_questLoaded = true;
@@ -159,7 +159,9 @@ void QuestPlayer::resetQuest()
     d->m_locationDescriptionsCount.clear();
 
     if (!d->m_questLoaded)
+    {
         return;
+    }
 
     auto end = d->m_quest.parameters.end();
     for (auto i = d->m_quest.parameters.begin(); i != end; ++i)
@@ -185,7 +187,7 @@ void QuestPlayer::QuestPlayerPrivate::setLocation(uint32_t location)
 
     m_oldParameters = m_parameters;
 
-    for (const QM::Modifier & m : m_currentLocation.modifiers)
+    for (const QM::Modifier &m : m_currentLocation.modifiers)
     {
         applyModifier(m);
     }
@@ -198,20 +200,25 @@ void QuestPlayer::QuestPlayerPrivate::setLocation(uint32_t location)
         if (m_currentLocation.descriptionExpression && !m_currentLocation.expression.isEmpty())
         {
             int32_t t = (int32_t)QM::eval(m_currentLocation.expression, m_parameters);
-            //FIXME: Bug or feature?
+            // FIXME: Bug or feature?
             if (t == 0)
+            {
                 t = 1;
+            }
             if ((t < 1) || (t > 10) || (m_currentLocation.descriptions[t - 1].isEmpty()))
             {
-                qCritical() << "Invalid location description selection (" << t << ") in location " << m_currentLocation.id;
+                qCritical() << "Invalid location description selection (" << t << ") in location "
+                            << m_currentLocation.id;
                 m_locationText = "";
             }
             else
+            {
                 m_locationText = substituteValues(m_currentLocation.descriptions[t - 1]);
+            }
         }
         else
         {
-            uint32_t value;
+            uint32_t value{};
             auto dit = m_locationDescriptionsCount.find(m_currentLocation.id);
             if (dit == m_locationDescriptionsCount.end())
             {
@@ -225,9 +232,11 @@ void QuestPlayer::QuestPlayerPrivate::setLocation(uint32_t location)
             }
 
             for (int i = 0; (i < 10) && (m_currentLocation.descriptions[value].isEmpty()); i++)
+            {
                 value = (value + 1) % 10;
+            }
 
-            *dit = value;
+            *dit = static_cast<int>(value);
 
             m_locationText = substituteValues(m_currentLocation.descriptions[value]);
         }
@@ -235,15 +244,24 @@ void QuestPlayer::QuestPlayerPrivate::setLocation(uint32_t location)
 
     qDebug() << "QuestPlayer: L" << m_currentLocation.id;
 
-    if ((m_possibleTransitions.count() == 1) && m_currentLocation.transitions[m_possibleTransitions.front()].title.isEmpty() &&
-            m_currentTransition.description.isEmpty())
+    if ((m_possibleTransitions.count() == 1) &&
+        m_currentLocation.transitions[m_possibleTransitions.front()].title.isEmpty() &&
+        m_currentTransition.description.isEmpty())
+    {
         q->startTransition(m_possibleTransitions.front());
+    }
     else if (m_currentLocation.type == QM::Location::LOCATION_SUCCESS)
+    {
         emit(q->questCompleted(m_locationText));
+    }
     else if (m_currentLocation.type == QM::Location::LOCATION_FAIL)
+    {
         emit(q->questFailed(m_locationText, m_currentLocation.death));
+    }
     else if (checkCriticalParameters())
+    {
         emit(q->locationChanged());
+    }
 }
 
 bool QuestPlayer::QuestPlayerPrivate::checkCriticalParameters()
@@ -254,14 +272,17 @@ bool QuestPlayer::QuestPlayerPrivate::checkCriticalParameters()
         const QM::Parameter &pr = m_quest.parameters.value(i.key());
 
         if (pr.type == QM::Parameter::PARAMETER_NORMAL)
+        {
             continue;
+        }
 
         bool crit = false;
 
-        if (pr.minCritical && i.value() <= pr.min)
+        if (pr.minCritical && i.value() <= static_cast<float>(pr.min) ||
+            (!pr.minCritical && i.value() >= static_cast<float>(pr.max)))
+        {
             crit = true;
-        else if (!pr.minCritical && i.value() >= pr.max)
-            crit = true;
+        }
 
         if (crit)
         {
@@ -298,10 +319,11 @@ QStringList QuestPlayer::visibleParameters() const
     auto end = d->m_parameters.end();
     for (auto i = d->m_parameters.begin(); i != end; ++i)
     {
-        if ((i.value() != 0 || d->m_quest.parameters.value(i.key()).showOnZero) && d->m_parametersVisibility.value(i.key()))
+        if ((i.value() != 0 || d->m_quest.parameters.value(i.key()).showOnZero) &&
+            d->m_parametersVisibility.value(i.key()))
         {
             QString value;
-            for (const QM::Parameter::Range & r : d->m_quest.parameters.value(i.key()).ranges)
+            for (const QM::Parameter::Range &r : d->m_quest.parameters.value(i.key()).ranges)
             {
                 int32_t v = (int32_t)round(i.value());
                 if ((v >= r.from) && (v <= r.to))
@@ -312,44 +334,56 @@ QStringList QuestPlayer::visibleParameters() const
                 }
             }
             if (!value.isEmpty())
+            {
                 params.append(d->substituteValues(value));
+            }
         }
     }
     return params;
 }
 
-bool QuestPlayer::QuestPlayerPrivate::checkCondition(const QM::Transition::Condition& c) const
+bool QuestPlayer::QuestPlayerPrivate::checkCondition(const QM::Transition::Condition &c) const
 {
     float param = m_parameters.value(c.param);
 
-    if ((param < c.rangeFrom) || (param > c.rangeTo))
+    if ((param < static_cast<float>(c.rangeFrom)) || (param > static_cast<float>(c.rangeTo)))
+    {
         return false;
+    }
 
     if (c.includeValues)
     {
         if ((c.values.count()) && (!c.values.contains(param)))
-            return false;
-    }
-    else
-    {
-        if ((c.values.count()) && (c.values.contains(param)))
-            return false;
-    }
-
-    if (c.includeMultiples)
-    {
-        for (int32_t m : c.multiples)
         {
-            if ((fmod(param, m)) != 0)
-                return false;
+            return false;
         }
     }
     else
     {
-        for (int32_t m : c.multiples)
+        if ((c.values.count()) && (c.values.contains(param)))
+        {
+            return false;
+        }
+    }
+
+    if (c.includeMultiples)
+    {
+        for (auto m : c.multiples)
+        {
+            if ((fmod(param, m)) != 0)
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        for (auto m : c.multiples)
         {
             if ((fmod(param, m)) == 0)
+            {
                 return false;
+            }
         }
     }
     return true;
@@ -361,20 +395,24 @@ void QuestPlayer::QuestPlayerPrivate::checkTransitions()
     m_alwaysVisibleTransitions.clear();
 
     int i = 0;
-    for (const QM::Transition & t : m_currentLocation.transitions)
+    for (const QM::Transition &t : m_currentLocation.transitions)
     {
         bool cond = true;
-        for (const QM::Transition::Condition & c : t.conditions)
+        for (const QM::Transition::Condition &c : t.conditions)
         {
             cond = cond && checkCondition(c);
         }
-        bool passed = (t.passCount == 0) || !((m_transitionCounts.find(t.id) != m_transitionCounts.end()) && (m_transitionCounts.value(t.id) >= t.passCount));
-        if (passed && cond && (t.globalCondition.isEmpty() || QM::eval(t.globalCondition, m_parameters)))
+        bool passed = (t.passCount == 0) || !((m_transitionCounts.find(t.id) != m_transitionCounts.end()) &&
+                                              (m_transitionCounts.value(t.id) >= t.passCount));
+        if (passed && cond &&
+            (t.globalCondition.isEmpty() || static_cast<int>(QM::eval(t.globalCondition, m_parameters))))
         {
             m_possibleTransitions.append(i);
         }
         else if (t.alwaysVisible)
+        {
             m_alwaysVisibleTransitions.append(i);
+        }
         i++;
     }
 }
@@ -403,16 +441,14 @@ QList<QuestPlayer::TransitionItem> QuestPlayer::visibleTransitions() const
         r.append(item);
     }
 
-    std::sort(r.begin(), r.end(),
-          [&](const TransitionItem & a, const TransitionItem & b) -> bool
-    {
+    std::sort(r.begin(), r.end(), [&](const TransitionItem &a, const TransitionItem &b) -> bool {
         return d->m_currentLocation.transitions[a.id].position < d->m_currentLocation.transitions[b.id].position;
     });
 
     return r;
 }
 
-void QuestPlayer::QuestPlayerPrivate::applyModifier(const QM::Modifier& m)
+void QuestPlayer::QuestPlayerPrivate::applyModifier(const QM::Modifier &m)
 {
     switch (m.visibility)
     {
@@ -426,24 +462,28 @@ void QuestPlayer::QuestPlayerPrivate::applyModifier(const QM::Modifier& m)
         break;
     }
 
-    float value;
+    float value{};
 
     switch (m.operation)
     {
     case QM::Modifier::OPERATION_ASSIGN:
-        value = m.value;
+        value = static_cast<float>(m.value);
         break;
     case QM::Modifier::OPERATION_CHANGE:
-        value = m_oldParameters[m.param] + m.value;
+        value = m_oldParameters[m.param] + static_cast<float>(m.value);
         break;
     case QM::Modifier::OPERATION_PERCENT:
-        value = m_oldParameters[m.param] + (m.value * m_oldParameters[m.param]) / 100.0f;
+        value = m_oldParameters[m.param] + (static_cast<float>(m.value) * m_oldParameters[m.param]) / 100.0f;
         break;
     case QM::Modifier::OPERATION_EXPRESSION:
         if (!m.expression.isEmpty())
+        {
             value = QM::eval(m.expression, m_oldParameters);
+        }
         else
+        {
             value = m_oldParameters[m.param];
+        }
         break;
     }
 
@@ -456,13 +496,15 @@ void QuestPlayer::startTransition(uint32_t num)
     Q_D(QuestPlayer);
 
     if (d->m_currentLocation.transitions.size() <= num)
+    {
         return;
+    }
 
     d->m_currentTransition = d->m_currentLocation.transitions[num];
 
     d->m_oldParameters = d->m_parameters;
 
-    for (const QM::Modifier & m : d->m_currentTransition.modifiers)
+    for (const QM::Modifier &m : d->m_currentTransition.modifiers)
     {
         d->applyModifier(m);
     }
@@ -471,11 +513,7 @@ void QuestPlayer::startTransition(uint32_t num)
 
     d->m_locationText = d->substituteValues(d->m_currentTransition.description);
 
-    if (d->m_quest.locations.value(d->m_currentTransition.to).empty)
-    {
-        finishTransition();
-    }
-    else if (d->m_currentTransition.description.isEmpty())
+    if ((d->m_quest.locations.value(d->m_currentTransition.to).empty) || (d->m_currentTransition.description.isEmpty()))
     {
         finishTransition();
     }
@@ -500,23 +538,25 @@ void QuestPlayer::finishTransition()
     d->setLocation(d->m_currentTransition.to);
 }
 
-//FIXME: Optimize
+// FIXME: Optimize
 void QuestPlayer::QuestPlayerPrivate::reduceTransitions()
 {
-    QMap<QString, QList<uint32_t> > transitions;
+    QMap<QString, QList<uint32_t>> transitions;
     QMap<QString, uint32_t> alwaysVisibleTransitions;
 
     for (uint32_t t : m_possibleTransitions)
     {
-        const QM::Transition& tr = m_currentLocation.transitions[t];
+        const QM::Transition &tr = m_currentLocation.transitions[t];
         transitions[tr.title].append(t);
     }
 
     for (uint32_t t : m_alwaysVisibleTransitions)
     {
-        const QM::Transition& tr = m_currentLocation.transitions[t];
+        const QM::Transition &tr = m_currentLocation.transitions[t];
         if (transitions.find(tr.title) == transitions.end())
+        {
             alwaysVisibleTransitions[tr.title] = t;
+        }
     }
 
     m_possibleTransitions.clear();
@@ -537,10 +577,14 @@ void QuestPlayer::QuestPlayerPrivate::reduceTransitions()
             if (pr < 1.0)
             {
                 if ((rand() % 1000) < pr * 1000)
+                {
                     m_possibleTransitions.append(i.value().front());
+                }
             }
             else
+            {
                 m_possibleTransitions.append(i.value().front());
+            }
             continue;
         }
         double range = 0;
@@ -550,20 +594,22 @@ void QuestPlayer::QuestPlayerPrivate::reduceTransitions()
             range += m_currentLocation.transitions[t].priority;
         }
 
-        uint32_t randRange = range * 1000;
+        uint32_t randRange = static_cast<uint32_t>(range) * 1000;
         uint32_t r = rand() % randRange;
         uint32_t counter = 0;
         uint32_t selected = 0;
 
         for (uint32_t t : i.value())
         {
-            counter += m_currentLocation.transitions[t].priority * 1000;
+            counter += static_cast<uint32_t>(m_currentLocation.transitions[t].priority) * 1000;
             selected = t;
             if (counter >= r)
+            {
                 break;
+            }
         }
         m_possibleTransitions.append(selected);
     }
 }
-}
-}
+} // namespace QM
+} // namespace OpenSR

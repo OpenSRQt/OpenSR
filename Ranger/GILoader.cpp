@@ -18,19 +18,21 @@
 
 #include <OpenSR/libRangerQt.h>
 
+#include <QDebug>
 #include <QIODevice>
 #include <QImage>
-#include <QDebug>
 
 namespace OpenSR
 {
 bool checkGIHeader(QIODevice *dev)
 {
-    quint32 sig;
-    qint64 size = dev->peek((char*)&sig, sizeof(quint32));
+    quint32 sig{};
+    qint64 size = dev->peek((char *)&sig, sizeof(quint32));
 
     if (size != sizeof(quint32) || sig != GI_FRAME_SIGNATURE)
+    {
         return false;
+    }
 
     return true;
 }
@@ -38,65 +40,78 @@ bool checkGIHeader(QIODevice *dev)
 void blitARGB(QImage &result, int x, int y, int w, int h, QIODevice *dev)
 {
     for (int i = y; i < y + h; i++)
-        dev->read((char *)((QRgb*)result.scanLine(i)) + x, w * 4);
+    {
+        dev->read((char *)((QRgb *)result.scanLine(i)) + x, static_cast<int>(w * 4));
+    }
 }
 
 void blitR5G6B5(QImage &result, int x, int y, int w, int h, QIODevice *dev)
 {
     for (int i = y; i < y + h; i++)
-        dev->read((char *)((quint16*)result.scanLine(i)) + x, w * 2);
+    {
+        dev->read((char *)((quint16 *)result.scanLine(i)) + x, static_cast<int>(w * 2));
+    }
 }
 
 void blitARGBI(QImage &result, int x, int y, int w, int h, QIODevice *dev)
 {
     for (int i = y; i < y + h; i++)
+    {
         dev->read((char *)(result.scanLine(i) + x), w);
+    }
 }
 
 void drawR5G6B5(QImage &result, int x, int y, QIODevice *dev)
 {
-    int size, cnt, line = y;
+    int size{}, cnt{}, line = y;
     int32_t tmp[4];
 
-    dev->read((char*)tmp, 16);
+    dev->read((char *)tmp, 16);
     size = tmp[0];
 
-    uchar *row = result.scanLine(line) + x * (result.depth() / 8);
+    uchar *row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
 
     while (size > 0)
     {
         uint8_t byte = 0;
-        dev->read((char*)&byte, 1);
+        dev->read((char *)&byte, 1);
         size--;
 
         if ((byte == 0) || (byte == 0x80))
         {
-            //goto new scanline
+            // goto new scanline
             line++;
-            row = result.scanLine(line) + x * (result.depth() / 8);
+            row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
         }
         else if (byte > 0x80)
         {
-            //pixels found
+            // pixels found
             cnt = byte & 0x7f;
             size -= cnt * 2;
 
             if (result.format() == QImage::Format_RGB16)
             {
-                dev->read((char *)row, cnt * 2);
-                row += cnt * 2;
+                const auto lenBuf = cnt * 2;
+                dev->read((char *)row, lenBuf);
+                row += static_cast<ptrdiff_t>(cnt * 2);
             }
             else if (result.format() == QImage::Format_ARGB32 || result.format() == QImage::Format_ARGB32_Premultiplied)
             {
-                do
+                quint16 color{};
+                dev->read((char *)&color, 2);
+                *((uint32_t *)row) = (0xff000000) | (((color >> 11) & 0x1f) << 19) | (((color >> 5) & 0x3f) << 10) |
+                                     (((color) & 0x1f) << 3);
+                row += 4;
+                cnt--;
+
+                while (cnt > 0)
                 {
-                    quint16 color;
                     dev->read((char *)&color, 2);
-                    *((uint32_t *)row) = (0xff000000) | (((color >> 11) & 0x1f) << 19) | (((color >> 5) & 0x3f) << 10) | (((color) & 0x1f) << 3);
+                    *((uint32_t *)row) = (0xff000000) | (((color >> 11) & 0x1f) << 19) | (((color >> 5) & 0x3f) << 10) |
+                                         (((color) & 0x1f) << 3);
                     row += 4;
                     cnt--;
                 }
-                while (cnt > 0);
             }
             else
             {
@@ -106,42 +121,45 @@ void drawR5G6B5(QImage &result, int x, int y, QIODevice *dev)
         }
         else if (byte < 0x80)
         {
-            //shift to right
-            row += byte * (result.depth() / 8);
+            // shift to right
+            row += static_cast<ptrdiff_t>(byte * (result.depth() / 8));
         }
     }
 }
 
 void drawRGBI(QImage &result, int x, int y, QIODevice *dev)
 {
-    int size, cnt, palsize, i, line = y;
+    int size{}, cnt{}, palsize{}, i{}, line = y;
     uint16_t pal[256];
 
     int32_t tmp[4];
 
-    dev->read((char*)tmp, 16);
+    dev->read((char *)tmp, 16);
 
     size = tmp[0];
-    palsize = ((uint8_t*)tmp)[12];
+    palsize = ((uint8_t *)tmp)[12];
 
     if (palsize == 0)
+    {
         palsize = 256;
+    }
 
-    dev->read((char*)pal, palsize * 2);
+    const auto lenBuf = palsize * 2;
+    dev->read((char *)pal, lenBuf);
 
-    uchar *row = result.scanLine(line) + x * (result.depth() / 8);
+    uchar *row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
 
     while (size > 0)
     {
         uint8_t byte = 0;
-        dev->read((char*)&byte, 1);
+        dev->read((char *)&byte, 1);
         size--;
 
         if ((byte == 0) || (byte == 0x80))
         {
-            //goto new scanline
+            // goto new scanline
             line++;
-            row = result.scanLine(line) + x * (result.depth() / 8);
+            row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
         }
         else if (byte > 0x80)
         {
@@ -150,27 +168,39 @@ void drawRGBI(QImage &result, int x, int y, QIODevice *dev)
 
             if (result.format() == QImage::Format_RGB16)
             {
-                do
+                quint8 index{};
+                dev->read((char *)&index, 1);
+                *((uint16_t *)row) = pal[index];
+
+                row += 2;
+                cnt--;
+
+                while (cnt > 0)
                 {
-                    quint8 index;
                     dev->read((char *)&index, 1);
                     *((uint16_t *)row) = pal[index];
                     row += 2;
                     cnt--;
                 }
-                while (cnt > 0);
             }
             else if (result.format() == QImage::Format_ARGB32 || result.format() == QImage::Format_ARGB32_Premultiplied)
             {
-                do
+                quint8 index{};
+                dev->read((char *)&index, 1);
+                *((uint32_t *)row) = (0xff000000) | (((pal[index] >> 11) & 0x1f) << 19) |
+                                     (((pal[index] >> 5) & 0x3f) << 10) | (((pal[index]) & 0x1f) << 3);
+
+                row += 4;
+                cnt--;
+
+                while (cnt > 0)
                 {
-                    quint8 index;
                     dev->read((char *)&index, 1);
-                    *((uint32_t *)row) = (0xff000000) | (((pal[index] >> 11) & 0x1f) << 19) | (((pal[index] >> 5) & 0x3f) << 10) | (((pal[index]) & 0x1f) << 3);
+                    *((uint32_t *)row) = (0xff000000) | (((pal[index] >> 11) & 0x1f) << 19) |
+                                         (((pal[index] >> 5) & 0x3f) << 10) | (((pal[index]) & 0x1f) << 3);
                     row += 4;
                     cnt--;
                 }
-                while (cnt > 0);
             }
             else
             {
@@ -180,51 +210,51 @@ void drawRGBI(QImage &result, int x, int y, QIODevice *dev)
         }
         else if (byte < 0x80)
         {
-            //shift to right
-            row += byte * (result.depth() / 8);
+            // shift to right
+            row += static_cast<ptrdiff_t>(byte * (result.depth() / 8));
         }
     }
 }
 
 void drawAI(QImage &result, int x, int y, QIODevice *dev)
 {
-    int size, cnt, palsize, i, line = y;
+    int size{}, cnt{}, palsize{}, i{}, line = y;
     uint32_t pal[256 * 2];
 
     int32_t tmp[4];
 
-    dev->read((char*)tmp, 16);
+    dev->read((char *)tmp, 16);
 
     size = tmp[0];
-    palsize = ((uint8_t*)tmp)[12];
+    palsize = ((uint8_t *)tmp)[12];
 
     if (palsize == 0)
+    {
         palsize = 256;
+    }
 
     for (int i = 0; i < palsize; i++)
     {
         uint16_t data[2];
-        dev->read((char*)&data, 4);
-        uint8_t alpha = 4 * (63 - * ((uint8_t*)&data[1]));
-        pal[i] = (alpha << 24)
-                 | (((data[0] >> 11) & 0x1f) << 19)
-                 | (((data[0] >> 5) & 0x3f) << 10)
-                 | (((data[0]) & 0x1f) << 3);
+        dev->read((char *)&data, 4);
+        uint8_t alpha = 4 * (63 - *((uint8_t *)&data[1]));
+        pal[i] = (alpha << 24) | (((data[0] >> 11) & 0x1f) << 19) | (((data[0] >> 5) & 0x3f) << 10) |
+                 (((data[0]) & 0x1f) << 3);
     }
 
-    uchar *row = result.scanLine(line) + x * (result.depth() / 8);
+    uchar *row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
 
     while (size > 0)
     {
         uint8_t byte = 0;
-        dev->read((char*)&byte, 1);
+        dev->read((char *)&byte, 1);
         size--;
 
         if ((byte == 0) || (byte == 0x80))
         {
-            //goto new scanline
+            // goto new scanline
             line++;
-            row = result.scanLine(line) + x * (result.depth() / 8);
+            row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8));
         }
         else if (byte > 0x80)
         {
@@ -232,15 +262,18 @@ void drawAI(QImage &result, int x, int y, QIODevice *dev)
             size -= cnt;
             if (result.format() == QImage::Format_ARGB32_Premultiplied)
             {
-                do
+                quint8 index{};
+                dev->read((char *)&index, 1);
+                *((uint32_t *)row) = pal[index];
+                row += 4;
+                cnt--;
+                while (cnt > 0)
                 {
-                    quint8 index;
                     dev->read((char *)&index, 1);
                     *((uint32_t *)row) = pal[index];
                     row += 4;
                     cnt--;
                 }
-                while (cnt > 0);
             }
             else
             {
@@ -250,51 +283,55 @@ void drawAI(QImage &result, int x, int y, QIODevice *dev)
         }
         else if (byte < 0x80)
         {
-            //shift to right
-            row += byte * (result.depth() / 8);
+            // shift to right
+            row += static_cast<ptrdiff_t>(byte * (result.depth() / 8));
         }
     }
 }
 
 void drawA6(QImage &result, int x, int y, QIODevice *dev)
 {
-    int size, cnt, line = y;
+    int size{}, cnt{}, line = y;
     int32_t tmp[4];
 
-    dev->read((char*)tmp, 16);
+    dev->read((char *)tmp, 16);
     size = tmp[0];
 
-    uchar *row = result.scanLine(y) + x * (result.depth() / 8) + 3;
+    uchar *row = result.scanLine(y) + static_cast<ptrdiff_t>(x * (result.depth() / 8)) + 3;
 
     while (size > 0)
     {
-        uint8_t byte;
-        dev->read((char*)&byte, 1);
+        uint8_t byte{};
+        dev->read((char *)&byte, 1);
         size--;
 
         if ((byte == 0) || (byte == 0x80))
         {
-            //goto new scanline
+            // goto new scanline
             line++;
-            row = result.scanLine(line) + x * (result.depth() / 8) + 3;
+            row = result.scanLine(line) + static_cast<ptrdiff_t>(x * (result.depth() / 8)) + 3;
         }
         else if (byte > 0x80)
         {
-            //pixels found
+            // pixels found
             cnt = byte & 0x7f;
             size -= cnt;
 
             if (result.format() == QImage::Format_ARGB32 || result.format() == QImage::Format_ARGB32_Premultiplied)
             {
-                do
+                quint8 alpha{};
+                dev->read((char *)&alpha, 1);
+                *row = 4 * (63 - alpha);
+                row += 4;
+                cnt--;
+
+                while (cnt > 0)
                 {
-                    quint8 alpha;
-                    dev->read((char*)&alpha, 1);
+                    dev->read((char *)&alpha, 1);
                     *row = 4 * (63 - alpha);
                     row += 4;
                     cnt--;
                 }
-                while (cnt > 0);
             }
             else
             {
@@ -304,21 +341,21 @@ void drawA6(QImage &result, int x, int y, QIODevice *dev)
         }
         else if (byte < 0x80)
         {
-            //shift to right
-            row += byte * (result.depth() / 8);
+            // shift to right
+            row += static_cast<ptrdiff_t>(byte * (result.depth() / 8));
         }
     }
 }
 
 void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
 {
-    int i, cnt, cnt2, shlc;
+    int i{}, cnt{}, cnt2{}, shlc{};
     int shlca[4];
-    unsigned char byte;
+    unsigned char byte{};
     int line = y;
     uint8_t tmp[16];
 
-    dev->read((char*)tmp, 16);
+    dev->read((char *)tmp, 16);
 
     byte = tmp[12];
     shlc = shlca[0] = 8 - (byte & 15);
@@ -330,12 +367,12 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
     quint32 offset = (((uint32_t *)tmp)[2]) << 2;
     dev->seek(dev->pos() + offset);
 
-    unsigned char *bufdesrow = dest.scanLine(line) + x * (dest.depth() / 8);
+    unsigned char *bufdesrow = dest.scanLine(line) + static_cast<ptrdiff_t>(x * (dest.depth() / 8));
 
     uint32_t channel = 0;
     while (true)
     {
-        dev->read((char*)&byte, 1);
+        dev->read((char *)&byte, 1);
 
         if ((byte & 0x80) != 0)
         {
@@ -343,10 +380,20 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
             byte = (byte >> 4) & 7;
             if (byte == 0)
             {
-                do
+                cnt2 = (cnt > 8) ? 8 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow + (((byte & 1) + 1) << shlc);
+                    byte >>= 1;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 8) ? 8 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow + (((byte & 1) + 1) << shlc);
@@ -355,14 +402,23 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 1)
             {
-                do
+                cnt2 = (cnt > 4) ? 4 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow + (((byte & 3) + 1) << shlc);
+                    byte >>= 2;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 4) ? 4 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow + (((byte & 3) + 1) << shlc);
@@ -371,14 +427,23 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 2)
             {
-                do
+                cnt2 = (cnt > 2) ? 2 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow + (((byte & 15) + 1) << shlc);
+                    byte >>= 4;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 2) ? 2 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow + (((byte & 15) + 1) << shlc);
@@ -387,23 +452,32 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 3)
             {
                 for (i = 0; i < cnt; i++)
                 {
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     *bufdesrow = *bufdesrow + ((byte + 1) << shlc);
                     bufdesrow += 4;
                 }
             }
             else if (byte == 4)
             {
-                do
+                cnt2 = (cnt > 8) ? 8 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow - (((byte & 1) + 1) << shlc);
+                    byte >>= 1;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 8) ? 8 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow - (((byte & 1) + 1) << shlc);
@@ -412,14 +486,23 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 5)
             {
-                do
+                cnt2 = (cnt > 4) ? 4 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow - (((byte & 3) + 1) << shlc);
+                    byte >>= 2;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 4) ? 4 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow - (((byte & 3) + 1) << shlc);
@@ -428,14 +511,23 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 6)
             {
-                do
+                cnt2 = (cnt > 2) ? 2 : cnt;
+                dev->read((char *)&byte, 1);
+                for (i = 0; i < cnt2; i++)
+                {
+                    *bufdesrow = *bufdesrow - (((byte & 15) + 1) << shlc);
+                    byte >>= 4;
+                    bufdesrow += 4;
+                }
+                cnt -= cnt2;
+
+                while (cnt > 0)
                 {
                     cnt2 = (cnt > 2) ? 2 : cnt;
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     for (i = 0; i < cnt2; i++)
                     {
                         *bufdesrow = *bufdesrow - (((byte & 15) + 1) << shlc);
@@ -444,13 +536,12 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
                     }
                     cnt -= cnt2;
                 }
-                while (cnt > 0);
             }
             else if (byte == 7)
             {
                 for (i = 0; i < cnt; i++)
                 {
-                    dev->read((char*)&byte, 1);
+                    dev->read((char *)&byte, 1);
                     *bufdesrow = *bufdesrow - ((byte + 1) << shlc);
                     bufdesrow += 4;
                 }
@@ -461,20 +552,20 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
             channel++;
             if (channel < 4)
             {
-                bufdesrow = dest.scanLine(line) + x * (dest.depth() / 8) + channel;
+                bufdesrow = dest.scanLine(line) + static_cast<ptrdiff_t>(x * (dest.depth() / 8)) + channel;
             }
             else
             {
                 channel = 0;
                 line++;
-                bufdesrow = dest.scanLine(line) + x * (dest.depth() / 8);
+                bufdesrow = dest.scanLine(line) + static_cast<ptrdiff_t>(x * (dest.depth() / 8));
             }
             shlc = shlca[channel];
         }
         else if (byte == 0x03f)
         {
-            quint16 shift;
-            dev->read((char*)&shift, 2);
+            quint16 shift{};
+            dev->read((char *)&shift, 2);
             bufdesrow += ((uint32_t)shift) << 2;
         }
         else if ((byte & 0xc0) == 0)
@@ -488,18 +579,21 @@ void decodeGAIDeltaFrame(QImage &dest, int x, int y, QIODevice *dev)
     }
 }
 
-QImage loadFrameType0(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
+QImage loadFrameType0(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
 {
 
     if (image.type != 0 || !image.layerCount || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result;
 
-    if ((image.aBitmask == 0xFF000000) && (image.rBitmask == 0xFF0000) && (image.gBitmask == 0xFF00) && (image.bBitmask == 0xFF))
+    if ((image.aBitmask == 0xFF000000) && (image.rBitmask == 0xFF0000) && (image.gBitmask == 0xFF00) &&
+        (image.bBitmask == 0xFF))
     {
         result = QImage(width, height, QImage::Format_ARGB32);
         result.fill(0);
@@ -507,7 +601,9 @@ QImage loadFrameType0(const GIFrameHeader& image, const GILayerHeader *layers, Q
         if (layers[0].size)
         {
             dev->seek(offset + layers[0].seek);
-            blitARGB(result, layers[0].startX, layers[0].startY, (layers[0].finishX - layers[0].startX), (layers[0].finishY - layers[0].startY), dev);
+            blitARGB(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY),
+                     static_cast<int>(layers[0].finishX - layers[0].startX),
+                     static_cast<int>(layers[0].finishY - layers[0].startY), dev);
         }
     }
     else if ((image.rBitmask == 0xF800) && (image.gBitmask == 0x7E0) && (image.bBitmask == 0x1F))
@@ -518,19 +614,23 @@ QImage loadFrameType0(const GIFrameHeader& image, const GILayerHeader *layers, Q
         if (layers[0].size)
         {
             dev->seek(offset + layers[0].seek);
-            blitR5G6B5(result, layers[0].startX, layers[0].startY, (layers[0].finishX - layers[0].startX), (layers[0].finishY - layers[0].startY), dev);
+            blitR5G6B5(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY),
+                       static_cast<int>(layers[0].finishX - layers[0].startX),
+                       static_cast<int>(layers[0].finishY - layers[0].startY), dev);
         }
     }
     return result;
 }
 
-QImage loadFrameType1(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
+QImage loadFrameType1(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
 {
     if (image.type != 1 || image.layerCount < 1 || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result(width, height, QImage::Format_RGB16);
     result.fill(0);
@@ -538,19 +638,21 @@ QImage loadFrameType1(const GIFrameHeader& image, const GILayerHeader *layers, Q
     if (layers[0].size)
     {
         dev->seek(offset + layers[0].seek);
-        drawR5G6B5(result, layers[0].startX, layers[0].startY, dev);
+        drawR5G6B5(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY), dev);
     }
 
     return result;
 }
 
-QImage loadFrameType2(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
+QImage loadFrameType2(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
 {
     if (image.type != 2 || image.layerCount < 3 || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result(width, height, QImage::Format_ARGB32);
     result.fill(0);
@@ -558,31 +660,33 @@ QImage loadFrameType2(const GIFrameHeader& image, const GILayerHeader *layers, Q
     if (layers[0].size)
     {
         dev->seek(offset + layers[0].seek);
-        drawR5G6B5(result, layers[0].startX, layers[0].startY, dev);
+        drawR5G6B5(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY), dev);
     }
 
     if (layers[1].size)
     {
         dev->seek(offset + layers[1].seek);
-        drawR5G6B5(result, layers[1].startX, layers[1].startY, dev);
+        drawR5G6B5(result, static_cast<int>(layers[1].startX), static_cast<int>(layers[1].startY), dev);
     }
 
     if (layers[2].size)
     {
         dev->seek(offset + layers[2].seek);
-        drawA6(result, layers[2].startX, layers[2].startY, dev);
+        drawA6(result, static_cast<int>(layers[2].startX), static_cast<int>(layers[2].startY), dev);
     }
 
     return result;
 }
 
-QImage loadFrameType3(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
+QImage loadFrameType3(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
 {
     if (image.type != 3 || image.layerCount < 2 || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result(width, height, QImage::Format_ARGB32_Premultiplied);
     result.fill(0);
@@ -590,26 +694,28 @@ QImage loadFrameType3(const GIFrameHeader& image, const GILayerHeader *layers, Q
     if (layers[0].size)
     {
         dev->seek(offset + layers[0].seek);
-        drawRGBI(result, layers[0].startX, layers[0].startY, dev);
+        drawRGBI(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY), dev);
     }
 
     if (layers[1].size)
     {
         dev->seek(offset + layers[1].seek);
-        drawAI(result, layers[1].startX, layers[1].startY, dev);
+        drawAI(result, static_cast<int>(layers[1].startX), static_cast<int>(layers[1].startY), dev);
     }
 
     return result;
 }
 
-QImage loadFrameType4(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
+QImage loadFrameType4(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, qint64 offset)
 {
 
     if (image.type != 4 || image.layerCount < 2 || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result(width, height, QImage::Format_Indexed8);
     result.fill(0);
@@ -617,15 +723,21 @@ QImage loadFrameType4(const GIFrameHeader& image, const GILayerHeader *layers, Q
     if (layers[0].size && layers[1].size)
     {
         dev->seek(offset + layers[0].seek);
-        blitARGBI(result, layers[0].startX, layers[0].startY, (layers[0].finishX - layers[0].startX), (layers[0].finishY - layers[0].startY), dev);
+        blitARGBI(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY),
+                  static_cast<int>((layers[0].finishX - layers[0].startX)),
+                  static_cast<int>((layers[0].finishY - layers[0].startY)), dev);
 
         dev->seek(offset + layers[1].seek);
         QVector<QRgb> pal(layers[1].size / 4);
-        dev->read((char*)pal.data(), layers[1].size);
+        dev->read((char *)pal.data(), layers[1].size);
 
-        //FIXME: Does color table really requires a premultiply?
+        // FIXME: Does color table really requires a premultiply?
         for (int i = 0; i < layers[1].size / 4; i++)
-            pal[i] = qPremultiply(qRgba(pal[i] & 0xFF, ((pal[i] >> 8) & 0xFF), ((pal[i] >> 16) & 0xFF), (pal[i] >> 24) & 0xFF));
+        {
+            pal[i] =
+                qPremultiply(qRgba(static_cast<int>(pal[i] & 0xFF), static_cast<int>(((pal[i] >> 8) & 0xFF)),
+                                   static_cast<int>(((pal[i] >> 16) & 0xFF)), static_cast<int>((pal[i] >> 24) & 0xFF)));
+        }
 
         result.setColorTable(pal);
     }
@@ -633,13 +745,16 @@ QImage loadFrameType4(const GIFrameHeader& image, const GILayerHeader *layers, Q
     return result;
 }
 
-QImage loadFrameType5(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, const QImage &background, qint64 offset)
+QImage loadFrameType5(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev, const QImage &background,
+                      qint64 offset)
 {
     if (image.type != 5 || !image.layerCount || !layers)
+    {
         return QImage();
+    }
 
-    int width = image.finishX;
-    int height = image.finishY;
+    int width = static_cast<int>(image.finishX);
+    int height = static_cast<int>(image.finishY);
 
     QImage result;
 
@@ -653,17 +768,17 @@ QImage loadFrameType5(const GIFrameHeader& image, const GILayerHeader *layers, Q
         result.fill(0);
     }
 
-
     if (layers[0].size)
     {
         dev->seek(offset + layers[0].seek);
-        decodeGAIDeltaFrame(result, layers[0].startX, layers[0].startY, dev);
+        decodeGAIDeltaFrame(result, static_cast<int>(layers[0].startX), static_cast<int>(layers[0].startY), dev);
     }
 
     return result;
 }
 
-QImage loadGIImageData(const GIFrameHeader& image, const GILayerHeader *layers, QIODevice *dev, const QImage &background, qint64 offset)
+QImage loadGIImageData(const GIFrameHeader &image, const GILayerHeader *layers, QIODevice *dev,
+                       const QImage &background, qint64 offset)
 {
     switch (image.type)
     {
@@ -685,22 +800,25 @@ QImage loadGIImageData(const GIFrameHeader& image, const GILayerHeader *layers, 
     return QImage();
 }
 
-QImage loadGIFrame(QIODevice *dev, bool animation, const QImage &background, int startX, int startY, int finishX, int finishY)
+QImage loadGIFrame(QIODevice *dev, bool animation, const QImage &background, int startX, int startY, int finishX,
+                   int finishY)
 {
-    GIFrameHeader image;
-    GILayerHeader *layers;
+    GIFrameHeader image{};
+    GILayerHeader *layers{};
 
     if (!checkGIHeader(dev))
+    {
         return QImage();
+    }
 
     qint64 offset = dev->pos();
-    dev->read((char*)&image, sizeof(GIFrameHeader));
+    dev->read((char *)&image, sizeof(GIFrameHeader));
 
     layers = new GILayerHeader[image.layerCount];
 
     for (int i = 0; i < image.layerCount; i++)
     {
-        dev->read((char*)&layers[i], sizeof(GILayerHeader));
+        dev->read((char *)&layers[i], sizeof(GILayerHeader));
 
         if (animation)
         {
@@ -721,10 +839,14 @@ QImage loadGIFrame(QIODevice *dev, bool animation, const QImage &background, int
     if (animation)
     {
         if (finishX)
+        {
             image.finishX = finishX;
+        }
 
         if (finishY)
+        {
             image.finishY = finishY;
+        }
 
         image.startX -= startX;
         image.startY -= startY;
@@ -748,15 +870,15 @@ QImage loadGIFrame(QIODevice *dev, bool animation, const QImage &background, int
 
 GIFrameHeader peekGIHeader(QIODevice *dev)
 {
-    GIFrameHeader result;
+    GIFrameHeader result{};
     dev->peek((char *)&result, sizeof(GIFrameHeader));
     return result;
 }
 
 GIFrameHeader readGIHeader(QIODevice *dev)
 {
-    GIFrameHeader result;
+    GIFrameHeader result{};
     dev->read((char *)&result, sizeof(GIFrameHeader));
     return result;
 }
-}
+} // namespace OpenSR

@@ -18,72 +18,80 @@
 
 #include "QtOpenSRImagePlugin.h"
 
-#include <stdint.h>
 #include <OpenSR/libRangerQt.h>
+#include <stdint.h>
 
-#include "GIImageIO.h"
-#include "PSDImageIO.h"
 #include "GAIAnimationIO.h"
+#include "GIImageIO.h"
 #include "HAIAnimationIO.h"
+#include "PSDImageIO.h"
 
 namespace OpenSR
 {
-QtOpenSRImagePlugin::QtOpenSRImagePlugin(QObject *parent) :
-    QImageIOPlugin(parent)
+QtOpenSRImagePlugin::QtOpenSRImagePlugin(QObject *parent) : QImageIOPlugin(parent)
 {
 }
 
-QImageIOPlugin::Capabilities QtOpenSRImagePlugin::capabilities(QIODevice * device, const QByteArray & format) const
+QImageIOPlugin::Capabilities QtOpenSRImagePlugin::capabilities(QIODevice *device, const QByteArray &format) const
 {
-    uint32_t sig;
+    uint32_t sig{};
     if (format == "gi" || format == "gai" || format == "hai" || format == "psd")
     {
         return QImageIOPlugin::CanRead;
     }
-    if (device && device->peek((char*)&sig, 4) == 4)
+    if (device && device->peek((char *)&sig, 4) == 4)
     {
-        if (sig == GI_FRAME_SIGNATURE || sig == GAI_SIGNATURE ||
-                sig == HAI_SIGNATURE || sig == PSD_SIGNATURE)
+        if (sig == GI_FRAME_SIGNATURE || sig == GAI_SIGNATURE || sig == HAI_SIGNATURE || sig == PSD_SIGNATURE)
+        {
             return QImageIOPlugin::CanRead;
+        }
     }
     return QImageIOPlugin::Capabilities();
 }
 
-QImageIOHandler* QtOpenSRImagePlugin::create(QIODevice * device, const QByteArray & format) const
+QImageIOHandler *QtOpenSRImagePlugin::create(QIODevice *device, const QByteArray &format) const
 {
-    QImageIOHandler* result = 0;
+    QImageIOHandler *result = 0;
     QByteArray rFormat = format;
-    quint32 sig;
-    
+    quint32 sig{};
+
     if (format == "gi")
-        result = new GIImageIO();
-    else if (format == "gai")
-        result = new GAIAnimationIO();
-    else if (format == "hai")
-        result = new HAIAnimationIO();
-    else if (format == "psd")
-        result = new PSDImageIO();
-    
-    if(!result)
     {
-        if (device && device->peek((char*)&sig, 4) == 4)
+        result = new GIImageIO();
+    }
+    else if (format == "gai")
+    {
+        result = new GAIAnimationIO();
+    }
+    else if (format == "hai")
+    {
+        result = new HAIAnimationIO();
+    }
+    else if (format == "psd")
+    {
+        result = new PSDImageIO();
+    }
+
+    if (!result)
+    {
+        if (device && device->peek((char *)&sig, 4) == 4)
         {
-            if(sig == GI_FRAME_SIGNATURE)
+            if (sig == GI_FRAME_SIGNATURE)
             {
                 result = new GIImageIO();
                 rFormat = "gi";
             }
-            else if(sig == GAI_SIGNATURE)
+            else if (sig == GAI_SIGNATURE)
             {
                 result = new GAIAnimationIO();
                 rFormat = "gai";
             }
-            else if(sig == HAI_SIGNATURE)
+            else if (sig == HAI_SIGNATURE)
             {
                 result = new HAIAnimationIO();
                 rFormat = "hai";
             }
-            else if(sig == PSD_SIGNATURE)
+            else if (sig == PSD_SIGNATURE)
             {
                 result = new PSDImageIO();
                 rFormat = "psd";
@@ -104,7 +112,7 @@ QStringList QtOpenSRImagePlugin::keys() const
 {
     return QStringList() << "gi" << "gai" << "hai" << "psd";
 }
-}
+} // namespace OpenSR
 
 #if QT_VERSION < 0x050000
 Q_EXPORT_PLUGIN2(QtOpenSRImagePlugin, OpenSR::QtOpenSRImagePlugin)

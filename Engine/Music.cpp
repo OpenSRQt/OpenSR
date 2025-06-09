@@ -19,10 +19,10 @@
 #include "OpenSR/Music.h"
 
 #include <OpenSR/Engine.h>
-#include <OpenSR/SoundManager.h>
 #include <OpenSR/MusicDecoder.h>
-#include <QtQml>
+#include <OpenSR/SoundManager.h>
 #include <QDebug>
+#include <QtQml>
 
 namespace OpenSR
 {
@@ -30,9 +30,10 @@ namespace
 {
 const int BUFFER_SIZE_MS = 200;
 const int BUFFER_COUNT = 5;
-}
-Music::Music(QObject *parent): QObject(parent),
-    m_volume(1.0), m_alSource(0), m_freeBuffers(BUFFER_COUNT), m_decoder(0)
+} // namespace
+Music::Music(QObject *parent)
+    : QObject(parent), m_alBuffers(new ALuint[BUFFER_COUNT]), m_volume(1.0), m_alSource(0), m_freeBuffers(BUFFER_COUNT),
+      m_decoder(0)
 {
     alGenSources((ALuint)1, &m_alSource);
 
@@ -42,7 +43,6 @@ Music::Music(QObject *parent): QObject(parent),
     alSource3f(m_alSource, AL_VELOCITY, 0, 0, 0);
     alSourcei(m_alSource, AL_LOOPING, AL_FALSE);
 
-    m_alBuffers = new ALuint[BUFFER_COUNT];
     alGenBuffers(BUFFER_COUNT, m_alBuffers);
 
     m_timer.setSingleShot(true);
@@ -58,7 +58,7 @@ Music::~Music()
     delete[] m_alBuffers;
 }
 
-void Music::setSource(const QUrl& source)
+void Music::setSource(const QUrl &source)
 {
     m_source = source;
     resetDecoding();
@@ -94,7 +94,6 @@ void Music::stop()
     m_timer.stop();
 }
 
-
 void Music::play()
 {
     m_timer.start();
@@ -113,41 +112,58 @@ void Music::queue()
     }
 
     if (!doneBuffers)
+    {
         return;
+    }
 
     m_freeBuffers += doneBuffers;
     ALuint doneBuf[BUFFER_COUNT];
-    alSourceUnqueueBuffers(m_alSource, doneBuffers, doneBuf);
+    alSourceUnqueueBuffers(m_alSource, doneBuffers, static_cast<ALuint *>(doneBuf));
     for (int i = 0; i < doneBuffers; i++)
     {
         if (m_decoder->done())
+        {
             break;
+        }
 
         QByteArray decodedData = m_decoder->decode(BUFFER_SIZE_MS);
 
         if (decodedData.isEmpty())
+        {
             break;
+        }
 
-        ALenum format;
+        ALenum format{};
 
         if (m_decoder->channels() == 1)
-            format = m_decoder->bps() == 8 ? AL_FORMAT_MONO8 : AL_FORMAT_MONO8;
+        {
+            format = m_decoder->bps() == 8 ? AL_FORMAT_MONO8 : AL_FORMAT_MONO16;
+        }
         else if (m_decoder->channels() == 2)
+        {
             format = m_decoder->bps() == 8 ? AL_FORMAT_STEREO8 : AL_FORMAT_STEREO16;
+        }
         else
+        {
             break;
+        }
 
-        alBufferData(doneBuf[i], format, decodedData.constData(), decodedData.size(), m_decoder->sampleRate());
+        alBufferData(doneBuf[i], format, decodedData.constData(), static_cast<int>(decodedData.size()),
+                     static_cast<int>(m_decoder->sampleRate()));
         alSourceQueueBuffers(m_alSource, 1, &doneBuf[i]);
 
         m_freeBuffers--;
     }
 
     if (m_freeBuffers != BUFFER_COUNT)
+    {
         m_timer.start();
+    }
 
     if (m_freeBuffers == BUFFER_COUNT && m_decoder->done())
+    {
         emit(finished());
+    }
 }
 
 void Music::resetDecoding()
@@ -161,7 +177,9 @@ void Music::resetDecoding()
     m_decoder = ((Engine *)qApp)->sound()->getMusicDecoder(m_source, this);
 
     if (!m_decoder)
+    {
         return;
+    }
 
     if (!m_decoder->valid())
     {
@@ -175,27 +193,37 @@ void Music::resetDecoding()
     for (int i = 0; i < BUFFER_COUNT; i++)
     {
         if (m_decoder->done())
+        {
             break;
+        }
 
         QByteArray decodedData = m_decoder->decode(BUFFER_SIZE_MS);
 
         if (decodedData.isEmpty())
+        {
             break;
+        }
 
-        ALenum format;
+        ALenum format{};
 
         if (m_decoder->channels() == 1)
-            format = m_decoder->bps() == 8 ? AL_FORMAT_MONO8 : AL_FORMAT_MONO8;
+        {
+            format = m_decoder->bps() == 8 ? AL_FORMAT_MONO8 : AL_FORMAT_MONO16;
+        }
         else if (m_decoder->channels() == 2)
+        {
             format = m_decoder->bps() == 8 ? AL_FORMAT_STEREO8 : AL_FORMAT_STEREO16;
+        }
         else
+        {
             break;
+        }
 
-        alBufferData(m_alBuffers[i], format, decodedData.constData(), decodedData.size(), m_decoder->sampleRate());
+        alBufferData(m_alBuffers[i], format, decodedData.constData(), static_cast<int>(decodedData.size()),
+                     static_cast<int>(m_decoder->sampleRate()));
         alSourceQueueBuffers(m_alSource, 1, &m_alBuffers[i]);
 
         m_freeBuffers--;
     }
 }
-}
-
+} // namespace OpenSR

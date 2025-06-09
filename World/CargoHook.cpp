@@ -24,7 +24,6 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 CargoHook::m_staticTypeId = typeIdFromClassName(CargoHook::staticMetaObject.className());
 
 template<>
 void WorldObject::registerType<CargoHook>(QQmlEngine *qml, QJSEngine *script)
@@ -41,7 +40,8 @@ CargoHook* WorldObject::createObject(WorldObject *parent, quint32 id)
 template<>
 quint32 WorldObject::staticTypeId<CargoHook>()
 {
-    return CargoHook::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(CargoHook::staticMetaObject.className());
+    return id;
 }
 
 template<>
@@ -60,7 +60,7 @@ CargoHook::~CargoHook()
 
 quint32 CargoHook::typeId() const
 {
-    return CargoHook::m_staticTypeId;
+    return staticTypeId<CargoHook>();
 }
 
 QString CargoHook::namePrefix() const

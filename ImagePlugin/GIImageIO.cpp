@@ -24,11 +24,9 @@
 
 namespace OpenSR
 {
-GIImageIO::GIImageIO() :
-    QImageIOHandler()
+GIImageIO::GIImageIO() : QImageIOHandler()
 {
 }
-
 
 GIImageIO::~GIImageIO()
 {
@@ -37,7 +35,9 @@ GIImageIO::~GIImageIO()
 bool GIImageIO::supportsOption(ImageOption option) const
 {
     if (option == QImageIOHandler::Size || option == QImageIOHandler::ImageFormat)
+    {
         return true;
+    }
 
     return false;
 }
@@ -45,13 +45,16 @@ bool GIImageIO::supportsOption(ImageOption option) const
 QVariant GIImageIO::option(ImageOption option) const
 {
     if (!checkGIHeader(device()))
+    {
         return QVariant();
+    }
 
     GIFrameHeader header = peekGIHeader(device());
 
     if (option == QImageIOHandler::Size)
     {
-        return QSize(header.finishX - header.startX, header.finishY - header.startY);
+        return QSize(static_cast<int>(header.finishX - header.startX),
+                     static_cast<int>(header.finishY - header.startY));
     }
 
     if (option == QImageIOHandler::ImageFormat)
@@ -61,12 +64,19 @@ QVariant GIImageIO::option(ImageOption option) const
         case 1:
             return QImage::Format_RGB16;
         case 0:
-            if ((header.aBitmask == 0xFF000000) && (header.rBitmask == 0xFF0000) && (header.gBitmask == 0xFF00) && (header.bBitmask == 0xFF))
+            if ((header.aBitmask == 0xFF000000) && (header.rBitmask == 0xFF0000) && (header.gBitmask == 0xFF00) &&
+                (header.bBitmask == 0xFF))
+            {
                 return QImage::Format_ARGB32;
+            }
             else if ((header.rBitmask == 0xF800) && (header.gBitmask == 0x7E0) && (header.bBitmask == 0x1F))
+            {
                 return QImage::Format_RGB16;
+            }
             else
+            {
                 return QImage::Format_Invalid;
+            }
         case 3:
             return QImage::Format_ARGB32_Premultiplied;
         case 2:
@@ -91,4 +101,4 @@ bool GIImageIO::read(QImage *image)
     *image = loadGIFrame(device());
     return true;
 }
-}
+} // namespace OpenSR

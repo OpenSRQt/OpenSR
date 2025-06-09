@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ResourceManager.h"
 #include "SpaceStation.h"
+#include "ResourceManager.h"
 #include "WorldBindings.h"
 
 #include <QtQml>
@@ -26,10 +26,7 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 SpaceStation::m_staticTypeId = typeIdFromClassName(SpaceStation::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<SpaceStation>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<SpaceStation>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<StationStyle>();
     qRegisterMetaType<StationStyle::Data>();
@@ -37,26 +34,24 @@ void WorldObject::registerType<SpaceStation>(QQmlEngine *qml, QJSEngine *script)
     qmlRegisterType<SpaceStation>("OpenSR.World", 1, 0, "SpaceStation");
 }
 
-template<>
-SpaceStation* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> SpaceStation *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new SpaceStation(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<SpaceStation>()
+template <> quint32 WorldObject::staticTypeId<SpaceStation>()
 {
-    return SpaceStation::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(SpaceStation::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<SpaceStation>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<SpaceStation>()
 {
     return &SpaceStation::staticMetaObject;
 }
 
-SpaceStation::SpaceStation(WorldObject *parent, quint32 id): MannedObject(parent, id)
-  , m_stationKind(StationKind::Unspecified)
+SpaceStation::SpaceStation(WorldObject *parent, quint32 id)
+    : MannedObject(parent, id), m_stationKind(StationKind::Unspecified)
 {
 }
 
@@ -66,7 +61,7 @@ SpaceStation::~SpaceStation()
 
 quint32 SpaceStation::typeId() const
 {
-    return SpaceStation::m_staticTypeId;
+    return staticTypeId<SpaceStation>();
 }
 
 QString SpaceStation::namePrefix() const
@@ -93,16 +88,20 @@ void SpaceStation::prepareSave()
 void SpaceStation::setStationKind(StationKind kind)
 {
     if (m_stationKind == kind)
+    {
         return;
+    }
 
     m_stationKind = kind;
     emit stationKindChanged(kind);
 }
 
-void SpaceStation::setStyle(const StationStyle& style)
+void SpaceStation::setStyle(const StationStyle &style)
 {
     if (m_style == style)
+    {
         return;
+    }
 
     m_style = style;
     emit styleChanged(style);
@@ -120,20 +119,20 @@ void StationStyle::setTexture(const QString &texture)
     setData(d);
 }
 
-bool operator==(const StationStyle& one, const StationStyle& another)
+bool operator==(const StationStyle &one, const StationStyle &another)
 {
     return one.texture() == another.texture();
 }
 
 // StationStyle Streaming
-QDataStream& operator<<(QDataStream & stream, const StationStyle& style)
+QDataStream &operator<<(QDataStream &stream, const StationStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, StationStyle& style)
+QDataStream &operator>>(QDataStream &stream, StationStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -141,15 +140,15 @@ QDataStream& operator>>(QDataStream & stream, StationStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const StationStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const StationStyle::Data &data)
 {
     return stream << data.texture;
 }
 
-QDataStream& operator>>(QDataStream & stream, StationStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, StationStyle::Data &data)
 {
     return stream >> data.texture;
 }
 
-}
-}
+} // namespace World
+} // namespace OpenSR

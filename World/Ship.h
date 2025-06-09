@@ -96,10 +96,10 @@ public:
     Q_ENUM(ShipRank)
 
     Q_INVOKABLE Ship(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~Ship();
+    ~Ship() override;
 
-    virtual quint32 typeId() const override;
-    virtual QString namePrefix() const override;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     ShipAffiliation affiliation() const;
     ShipRank rank() const;
@@ -150,15 +150,15 @@ private:
     void correctLinearSpeed(const QPointF &dest, const QPointF &pos);
     void resetSpeedParams();
 
-    ShipAffiliation m_affiliation;
-    ShipRank m_rank;
+    ShipAffiliation m_affiliation{};
+    ShipRank m_rank{};
 
-    float m_angle;
-    float m_speed;
-    float m_angularSpeed;
-    float m_targetAngle;
-    QPointF m_destination;
-    QPointF m_start_position;
+    float m_angle{};
+    float m_speed{};
+    float m_angularSpeed{};
+    float m_targetAngle{};
+    QPointF m_destination{};
+    QPointF m_start_position{};
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;

@@ -19,9 +19,9 @@
 #ifndef OPENSR_WORLD_PLANETARYSYSTEM_H
 #define OPENSR_WORLD_PLANETARYSYSTEM_H
 
+#include "Resource.h"
 #include "World.h"
 #include "WorldObject.h"
-#include "Resource.h"
 
 #include <QColor>
 
@@ -29,7 +29,7 @@ namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API PlanetarySystemStyle: public Resource
+class OPENSR_WORLD_API PlanetarySystemStyle : public Resource
 {
     Q_GADGET
 
@@ -49,17 +49,17 @@ public:
     QString star() const;
     QColor starColor() const;
 
-    void setBackground(const QString& bg);
-    void setStar(QString& star);
-    void setStarColor(const QColor& color);
+    void setBackground(const QString &bg);
+    void setStar(QString &star);
+    void setStarColor(const QColor &color);
 };
 
-QDataStream& operator<<(QDataStream & stream, const PlanetarySystemStyle& style);
-QDataStream& operator>>(QDataStream & stream, PlanetarySystemStyle& style);
-QDataStream& operator<<(QDataStream & stream, const PlanetarySystemStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, PlanetarySystemStyle::Data& data);
+QDataStream &operator<<(QDataStream &stream, const PlanetarySystemStyle &style);
+QDataStream &operator>>(QDataStream &stream, PlanetarySystemStyle &style);
+QDataStream &operator<<(QDataStream &stream, const PlanetarySystemStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, PlanetarySystemStyle::Data &data);
 
-class OPENSR_WORLD_API PlanetarySystem: public WorldObject
+class OPENSR_WORLD_API PlanetarySystem : public WorldObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -69,18 +69,18 @@ class OPENSR_WORLD_API PlanetarySystem: public WorldObject
 
 public:
     Q_INVOKABLE PlanetarySystem(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~PlanetarySystem();
+    ~PlanetarySystem() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     PlanetarySystemStyle style() const;
     int size() const;
 
-    void setStyle(const PlanetarySystemStyle& style);
+    void setStyle(const PlanetarySystemStyle &style);
     void setSize(int size);
 
-    virtual void prepareSave();
+    void prepareSave() override;
 
 Q_SIGNALS:
     void styleChanged();
@@ -88,10 +88,10 @@ Q_SIGNALS:
 
 private:
     PlanetarySystemStyle m_style;
-    int m_size;
+    int m_size{};
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::PlanetarySystemStyle::Data)
 Q_DECLARE_METATYPE(OpenSR::World::PlanetarySystemStyle)

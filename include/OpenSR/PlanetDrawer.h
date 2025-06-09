@@ -20,13 +20,13 @@
 #define OPENSR_PLANETDRAWER_H
 
 #include <OpenSR/OpenSR.h>
-#include <QQuickFramebufferObject>
 #include <QList>
+#include <QQuickFramebufferObject>
 #include <QVariantList>
 
 namespace OpenSR
 {
-class ENGINE_API PlanetDrawer: public QQuickFramebufferObject
+class ENGINE_API PlanetDrawer : public QQuickFramebufferObject
 {
     Q_OBJECT
     OPENSR_DECLARE_PRIVATE(PlanetDrawer)
@@ -41,25 +41,25 @@ class ENGINE_API PlanetDrawer: public QQuickFramebufferObject
     Q_PROPERTY(float lightAngle READ lightAngle WRITE setLightAngle NOTIFY lightAngleChanged)
 
 public:
-    PlanetDrawer(QQuickItem * parent = 0);
-    virtual ~PlanetDrawer();
+    PlanetDrawer(QQuickItem *parent = 0);
+    ~PlanetDrawer() override;
 
-    virtual Renderer *createRenderer() const;
+    Renderer *createRenderer() const override;
 
     QUrl surface() const;
-    void setSurface(const QUrl& surface);
+    void setSurface(const QUrl &surface);
 
     QColor atmosphere() const;
-    void setAtmosphere(const QColor& atmosphere);
+    void setAtmosphere(const QColor &atmosphere);
 
     float phase() const;
     void setPhase(float phase);
 
     QUrl cloud0() const;
-    void setCloud0(const QUrl& clouds);
+    void setCloud0(const QUrl &clouds);
 
     QUrl cloud1() const;
-    void setCloud1(const QUrl& clouds);
+    void setCloud1(const QUrl &clouds);
 
     float cloud0Phase() const;
     void setCloud0Phase(float phase);
@@ -83,6 +83,6 @@ Q_SIGNALS:
 protected:
     OPENSR_DECLARE_DPOINTER(PlanetDrawer)
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_PLANETDRAWER_H

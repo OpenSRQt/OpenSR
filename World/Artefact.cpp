@@ -24,33 +24,29 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Artefact::m_staticTypeId = typeIdFromClassName(Artefact::staticMetaObject.className());
 
-template<>
-void WorldObject::registerType<Artefact>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Artefact>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Artefact>("OpenSR.World", 1, 0, "Artefact");
 }
 
-template<>
-Artefact* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Artefact *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Artefact(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Artefact>()
+template <> quint32 WorldObject::staticTypeId<Artefact>()
 {
-    return Artefact::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Artefact::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Artefact>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Artefact>()
 {
     return &Artefact::staticMetaObject;
 }
 
-Artefact::Artefact(WorldObject *parent, quint32 id): Equipment(parent, id)
+Artefact::Artefact(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -60,12 +56,12 @@ Artefact::~Artefact()
 
 quint32 Artefact::typeId() const
 {
-    return Artefact::m_staticTypeId;
+    return staticTypeId<Artefact>();
 }
 
 QString Artefact::namePrefix() const
 {
     return tr("Artefact");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

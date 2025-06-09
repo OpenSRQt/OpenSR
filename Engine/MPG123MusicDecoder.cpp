@@ -18,8 +18,8 @@
 
 #include "MPG123MusicDecoder.h"
 
-#include <QIODevice>
 #include <QDebug>
+#include <QIODevice>
 #include <QLibrary>
 
 namespace OpenSR
@@ -35,19 +35,23 @@ static const QString MPG123_NAME = "mpg123";
 ssize_t iodevRead(void *ptr, void *buf, size_t size)
 {
     if (!ptr)
+    {
         return -1;
+    }
 
     QIODevice *dev = static_cast<QIODevice *>(ptr);
-    return dev->read((char*)buf, size);
+    return dev->read(static_cast<char *>(buf), static_cast<qint64>(size));
 }
 
 off_t iodevSeek(void *ptr, off_t offset, int whence)
 {
     if (!ptr)
+    {
         return -1;
+    }
 
     QIODevice *dev = static_cast<QIODevice *>(ptr);
-    bool result;
+    bool result{};
     switch (whence)
     {
     case SEEK_CUR:
@@ -59,22 +63,25 @@ off_t iodevSeek(void *ptr, off_t offset, int whence)
     case SEEK_END:
         result = dev->seek(dev->size() + offset);
         break;
+    default:
+        return -1;
     }
     return result ? dev->pos() : -1;
 }
 
 typedef int (*mpg123_init_f)(void);
-typedef mpg123_handle* (*mpg123_new_f)(const char*, int*);
-typedef void (*mpg123_delete_f)(mpg123_handle*);
-typedef const char* (*mpg123_plain_strerror_f)(int);
-typedef int (*mpg123_format_none_f)(mpg123_handle*);
-typedef int (*mpg123_format_f)(mpg123_handle*, long, int, int);
-typedef int (*mpg123_getformat_f)(mpg123_handle*, long*, int*, int*);
-typedef int (*mpg123_open_handle_f)(mpg123_handle*, void*);
-typedef int (*mpg123_close_f)(mpg123_handle*);
-typedef int (*mpg123_read_f)(mpg123_handle*, unsigned char*, size_t, size_t*);
-typedef off_t (*mpg123_length_f)(mpg123_handle*);
-typedef int (*mpg123_replace_reader_handle_f)(mpg123_handle*, ssize_t (*)(void *, void *, size_t), off_t (*)(void *, off_t, int), void (*)(void*));
+typedef mpg123_handle *(*mpg123_new_f)(const char *, int *);
+typedef void (*mpg123_delete_f)(mpg123_handle *);
+typedef const char *(*mpg123_plain_strerror_f)(int);
+typedef int (*mpg123_format_none_f)(mpg123_handle *);
+typedef int (*mpg123_format_f)(mpg123_handle *, long, int, int);
+typedef int (*mpg123_getformat_f)(mpg123_handle *, long *, int *, int *);
+typedef int (*mpg123_open_handle_f)(mpg123_handle *, void *);
+typedef int (*mpg123_close_f)(mpg123_handle *);
+typedef int (*mpg123_read_f)(mpg123_handle *, unsigned char *, size_t, size_t *);
+typedef off_t (*mpg123_length_f)(mpg123_handle *);
+typedef int (*mpg123_replace_reader_handle_f)(mpg123_handle *, ssize_t (*)(void *, void *, size_t),
+                                              off_t (*)(void *, off_t, int), void (*)(void *));
 
 mpg123_init_f mpg123_init = 0;
 mpg123_new_f mpg123_new = 0;
@@ -88,12 +95,12 @@ mpg123_close_f mpg123_close = 0;
 mpg123_read_f mpg123_read = 0;
 mpg123_length_f mpg123_length = 0;
 mpg123_replace_reader_handle_f mpg123_replace_reader_handle = 0;
-}
+} // namespace
 bool MPG123MusicDecoder::m_mpgInited = false;
 bool MPG123MusicDecoder::m_mpgInitFailed = false;
 
-MPG123MusicDecoder::MPG123MusicDecoder(QIODevice* dev, QObject *parent): MusicDecoder(parent),
-    m_device(dev), m_done(false), m_mpgHandle(0)
+MPG123MusicDecoder::MPG123MusicDecoder(QIODevice *dev, QObject *parent)
+    : MusicDecoder(parent), m_device(dev), m_done(false), m_mpgHandle(0), m_rate(0), m_channels(0), m_encoding(0)
 {
     if (!mpg123_init && !m_mpgInitFailed)
     {
@@ -111,7 +118,8 @@ MPG123MusicDecoder::MPG123MusicDecoder(QIODevice* dev, QObject *parent): MusicDe
             mpg123_close = (mpg123_close_f)mpg123Lib.resolve("mpg123_close");
             mpg123_read = (mpg123_read_f)mpg123Lib.resolve("mpg123_read");
             mpg123_length = (mpg123_length_f)mpg123Lib.resolve("mpg123_length");
-            mpg123_replace_reader_handle = (mpg123_replace_reader_handle_f)mpg123Lib.resolve("mpg123_replace_reader_handle");
+            mpg123_replace_reader_handle =
+                (mpg123_replace_reader_handle_f)mpg123Lib.resolve("mpg123_replace_reader_handle");
         }
         else
         {
@@ -129,13 +137,16 @@ MPG123MusicDecoder::MPG123MusicDecoder(QIODevice* dev, QObject *parent): MusicDe
         }
         else
         {
-            qWarning().noquote() << QString("Cannot init mpg123 library: %1, mp3 music will be unavailable.").arg(mpg123_plain_strerror(err));
+            qWarning().noquote() << QString("Cannot init mpg123 library: %1, mp3 music will be unavailable.")
+                                        .arg(mpg123_plain_strerror(err));
             m_mpgInitFailed = true;
         }
     }
 
     if (m_device)
+    {
         m_device->setParent(this);
+    }
 
     if (m_mpgInited)
     {
@@ -148,16 +159,24 @@ MPG123MusicDecoder::MPG123MusicDecoder(QIODevice* dev, QObject *parent): MusicDe
             err = mpg123_open_handle(m_mpgHandle, dev);
         }
         if (err == MPG123_OK)
+        {
             err = mpg123_getformat(m_mpgHandle, &m_rate, &m_channels, &m_encoding);
+        }
 
         if (err == MPG123_OK)
+        {
             err = mpg123_format_none(m_mpgHandle);
+        }
 
         if (err == MPG123_OK)
+        {
             err = mpg123_format(m_mpgHandle, m_rate, m_channels, m_encoding);
+        }
 
         if (err == MPG123_OK)
-            m_length = mpg123_length(m_mpgHandle);
+        {
+            m_length = static_cast<int>(mpg123_length(m_mpgHandle));
+        }
 
         if (err != MPG123_OK)
         {
@@ -212,28 +231,36 @@ bool MPG123MusicDecoder::valid() const
 QByteArray MPG123MusicDecoder::decode(int ms)
 {
     if (!m_mpgHandle)
+    {
         return QByteArray();
+    }
 
     quint32 size = (bps() / 8) * m_rate * ms * m_channels / 1000;
 
     QByteArray result(size, 0);
-    int err;
-    size_t decoded;
+    int err{};
+    size_t decoded{};
 
-    err = mpg123_read(m_mpgHandle, (unsigned char*)result.data(), result.size(), &decoded);
+    err = mpg123_read(m_mpgHandle, (unsigned char *)result.data(), result.size(), &decoded);
     if (err != MPG123_OK && err != MPG123_DONE)
+    {
         qWarning().noquote() << QString("mpg123 decoding error: %1").arg(mpg123_plain_strerror(err));
+    }
 
     if (err == MPG123_DONE)
+    {
         m_done = true;
+    }
 
     if (decoded != size)
-        result.resize(decoded);
+    {
+        result.resize(static_cast<qsizetype>(decoded));
+    }
 
     return result;
 }
 
-int MPG123MusicDecoder::sampleRate() const
+long MPG123MusicDecoder::sampleRate() const
 {
     return m_rate;
 }
@@ -248,4 +275,4 @@ bool MPG123MusicDecoder::done() const
     return m_done;
 }
 
-}
+} // namespace OpenSR

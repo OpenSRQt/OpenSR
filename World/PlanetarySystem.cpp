@@ -25,30 +25,25 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 PlanetarySystem::m_staticTypeId = typeIdFromClassName(PlanetarySystem::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<PlanetarySystem>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<PlanetarySystem>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<PlanetarySystemStyle::Data>();
     qRegisterMetaType<PlanetarySystemStyle>();
     qmlRegisterType<PlanetarySystem>("OpenSR.World", 1, 0, "PlanetarySystem");
 }
 
-template<>
-PlanetarySystem* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> PlanetarySystem *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new PlanetarySystem(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<PlanetarySystem>()
+template <> quint32 WorldObject::staticTypeId<PlanetarySystem>()
 {
-    return PlanetarySystem::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(PlanetarySystem::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<PlanetarySystem>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<PlanetarySystem>()
 {
     return &PlanetarySystem::staticMetaObject;
 }
@@ -68,35 +63,35 @@ QColor PlanetarySystemStyle::starColor() const
     return getData<Data>().starColor;
 }
 
-void PlanetarySystemStyle::setBackground(const QString& bg)
+void PlanetarySystemStyle::setBackground(const QString &bg)
 {
     Data d = getData<Data>();
     d.background = bg;
     setData(d);
 }
 
-void PlanetarySystemStyle::setStar(QString& star)
+void PlanetarySystemStyle::setStar(QString &star)
 {
     Data d = getData<Data>();
     d.star = star;
     setData(d);
 }
 
-void PlanetarySystemStyle::setStarColor(const QColor& color)
+void PlanetarySystemStyle::setStarColor(const QColor &color)
 {
     Data d = getData<Data>();
     d.starColor = color;
     setData(d);
 }
 
-QDataStream& operator<<(QDataStream & stream, const PlanetarySystemStyle& style)
+QDataStream &operator<<(QDataStream &stream, const PlanetarySystemStyle &style)
 {
     return stream << style.id();
 }
 
-QDataStream& operator>>(QDataStream & stream, PlanetarySystemStyle& style)
+QDataStream &operator>>(QDataStream &stream, PlanetarySystemStyle &style)
 {
-    quint32 id;
+    quint32 id{};
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);
@@ -104,17 +99,17 @@ QDataStream& operator>>(QDataStream & stream, PlanetarySystemStyle& style)
     return stream;
 }
 
-QDataStream& operator<<(QDataStream & stream, const PlanetarySystemStyle::Data& data)
+QDataStream &operator<<(QDataStream &stream, const PlanetarySystemStyle::Data &data)
 {
     return stream << data.background << data.star << data.starColor;
 }
 
-QDataStream& operator>>(QDataStream & stream, PlanetarySystemStyle::Data& data)
+QDataStream &operator>>(QDataStream &stream, PlanetarySystemStyle::Data &data)
 {
     return stream >> data.background >> data.star >> data.starColor;
 }
 
-PlanetarySystem::PlanetarySystem(WorldObject *parent, quint32 id): WorldObject(parent, id)
+PlanetarySystem::PlanetarySystem(WorldObject *parent, quint32 id) : WorldObject(parent, id)
 {
 }
 
@@ -124,7 +119,7 @@ PlanetarySystem::~PlanetarySystem()
 
 quint32 PlanetarySystem::typeId() const
 {
-    return PlanetarySystem::m_staticTypeId;
+    return staticTypeId<PlanetarySystem>();
 }
 
 QString PlanetarySystem::namePrefix() const
@@ -142,7 +137,7 @@ int PlanetarySystem::size() const
     return m_size;
 }
 
-void PlanetarySystem::setStyle(const PlanetarySystemStyle& style)
+void PlanetarySystem::setStyle(const PlanetarySystemStyle &style)
 {
     m_style = style;
     emit(styleChanged());
@@ -162,5 +157,5 @@ void PlanetarySystem::prepareSave()
     WorldObject::prepareSave();
     m_style.registerResource();
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

@@ -20,29 +20,30 @@
 
 #include <OpenSR/libRangerQt.h>
 
-#include "OpenSR/SoundManager.h"
-#include "OpenSR/ResourceManager.h"
-#include "OpenSR/PluginInterface.h"
 #include "OpenSR/DATTranslator.h"
+#include "OpenSR/PluginInterface.h"
 #include "OpenSR/QMLHelper.h"
+#include "OpenSR/ResourceManager.h"
+#include "OpenSR/SoundManager.h"
 
-#include <QQuickView>
 #include <QBoxLayout>
+#include <QDebug>
+#include <QDir>
+#include <QJSEngine>
+#include <QPluginLoader>
 #include <QQmlApplicationEngine>
 #include <QQmlComponent>
 #include <QQmlContext>
-#include <QSettings>
-#include <QResource>
-#include <QDebug>
 #include <QQuickItem>
-#include <QDir>
-#include <QPluginLoader>
+#include <QQuickView>
+#include <QResource>
+#include <QSettings>
 #include <QString>
-#include <QJSEngine>
 
 namespace OpenSR
 {
-namespace {
+namespace
+{
 void mergeMap(QVariantMap &source, const QVariantMap &append)
 {
     auto end = append.end();
@@ -50,12 +51,16 @@ void mergeMap(QVariantMap &source, const QVariantMap &append)
     {
         auto target = source.find(i.key());
         if (target == source.end())
+        {
             source.insert(i.key(), i.value());
+        }
         else
+        {
             *target = append;
+        }
     }
 }
-}
+} // namespace
 
 class Engine::EnginePrivate
 {
@@ -74,8 +79,7 @@ public:
     bool running = false;
 };
 
-Engine::Engine(int& argc, char** argv): QApplication(argc, argv),
-    d_osr_ptr(new EnginePrivate())
+Engine::Engine(int &argc, char **argv) : QApplication(argc, argv), d_osr_ptr(new EnginePrivate())
 {
     Q_D(Engine);
 
@@ -101,19 +105,23 @@ Engine::~Engine()
 int Engine::run()
 {
     Q_D(Engine);
-    
+
     QString libraryPath = QDir::current().absolutePath();
 
     QSettings settings;
 
     QString dataDir = settings.value("engine/mainDataDir").toString();
     if (!dataDir.isEmpty())
+    {
         setDataDir(dataDir);
+    }
     else if (d->dataDir.isEmpty())
+    {
         setDataDir(QDir::current().absolutePath() + "/data");
+    }
 
     addLibraryPath(libraryPath);
-    
+
     d->qmlEngine->addImportPath(d->dataDir);
     d->qmlEngine->addImportPath(":/");
 
@@ -124,19 +132,24 @@ int Engine::run()
 
     QUrl qml = settings.value("engine/mainQML").toString();
     if (!qml.isEmpty())
+    {
         setMainQML(qml);
+    }
 
     QUrl startup = settings.value("engine/startupScript").toString();
     if (!startup.isEmpty())
+    {
         setStartupScript(startup);
+    }
 
     d->sound->start();
 
-    auto scriptExec = [this]
-    {
+    auto scriptExec = [this] {
         Q_D(Engine);
         if (!d->startupScript.isEmpty())
+        {
             execScript(d->startupScript);
+        }
     };
 
     if (!d->mainQML.isEmpty())
@@ -145,72 +158,80 @@ int Engine::run()
         connect(d->qmlEngine.get(), &QQmlApplicationEngine::objectCreated, scriptExec);
     }
     else
+    {
         scriptExec();
+    }
 
     d->running = true;
 
     return exec();
 }
 
-void Engine::addRCCArchive(const QString& path)
+void Engine::addRCCArchive(const QString &path)
 {
     QResource::registerResource(path);
 }
 
-void Engine::showQMLComponent(const QString& url)
+void Engine::showQMLComponent(const QString &url)
 {
     Q_D(Engine);
 
     for (auto root : d->qmlEngine->rootObjects())
+    {
         QMetaObject::invokeMethod(root, "changeScreen", Q_ARG(QVariant, QUrl(url)), Q_ARG(QVariant, QVariantMap()));
+    }
 }
 
-SoundManager* Engine::sound() const
+SoundManager *Engine::sound() const
 {
     Q_D(const Engine);
     return d->sound;
 }
 
-ResourceManager* Engine::resources() const
+ResourceManager *Engine::resources() const
 {
     Q_D(const Engine);
     return d->resources;
 }
 
-QQmlEngine* Engine::qmlEngine() const
+QQmlEngine *Engine::qmlEngine() const
 {
     Q_D(const Engine);
     return d->qmlEngine.get();
 }
 
-QJSEngine* Engine::scriptEngine() const
+QJSEngine *Engine::scriptEngine() const
 {
     Q_D(const Engine);
     return d->qmlEngine.get();
 }
 
-void Engine::addDATFile(const QString& url, bool isCache)
+void Engine::addDATFile(const QString &url, bool isCache)
 {
     Q_D(Engine);
     QScopedPointer<QIODevice> dev(d->resources->getIODevice(QUrl(url)));
     if (!dev || !dev->isOpen())
+    {
         return;
+    }
     QVariantMap dat = loadDAT(dev.get(), isCache);
     mergeMap(d->datRoot, dat);
 }
 
-QVariant Engine::datValue(const QString& path) const
+QVariant Engine::datValue(const QString &path) const
 {
     Q_D(const Engine);
 
     if (path.isEmpty())
+    {
         return QVariant();
+    }
 
     QList<QString> pathes = path.split('.', Qt::SkipEmptyParts);
     QVariantMap current = d->datRoot;
     QVariant result = current;
 
-    for (const QString& p : pathes)
+    for (const QString &p : pathes)
     {
         auto it = current.find(p);
         if (it == current.end())
@@ -220,13 +241,15 @@ QVariant Engine::datValue(const QString& path) const
         }
         result = it.value();
         if (result.typeId() != QMetaType::QVariantMap)
+        {
             break;
+        }
         current = result.toMap();
     }
     return result;
 }
 
-void Engine::loadPlugin(const QString& name)
+void Engine::loadPlugin(const QString &name)
 {
     QPluginLoader loader(name);
     if (!loader.load())
@@ -234,8 +257,8 @@ void Engine::loadPlugin(const QString& name)
         qWarning().noquote() << QString("Cannot load plugin \"%1\": %2").arg(name, loader.errorString());
         return;
     }
-    //TODO: Unloading
-    PluginInterface *plugin = qobject_cast<PluginInterface*>(loader.instance());
+    // TODO: Unloading
+    PluginInterface *plugin = qobject_cast<PluginInterface *>(loader.instance());
     if (!plugin)
     {
         qWarning().noquote() << QString("Cannot load plugin \"%1\": %2").arg(name, tr("seems not a plugin."));
@@ -251,7 +274,7 @@ void Engine::loadPlugin(const QString& name)
     loader.instance()->setParent(this);
 }
 
-void Engine::execScript(const QUrl& url)
+void Engine::execScript(const QUrl &url)
 {
     Q_D(Engine);
 
@@ -268,8 +291,8 @@ void Engine::execScript(const QUrl& url)
     QJSValue result = d->qmlEngine->evaluate(script, url.toString());
     if (result.isError())
     {
-        qWarning().noquote() << QString("%1:%2: %3").arg(url.toString(),
-                             result.property("lineNumber").toString(), result.toString());
+        qWarning().noquote()
+            << QString("%1:%2: %3").arg(url.toString(), result.property("lineNumber").toString(), result.toString());
     }
 }
 
@@ -279,7 +302,7 @@ QString Engine::dataDir() const
     return d->dataDir;
 }
 
-void Engine::setDataDir(const QString& dir)
+void Engine::setDataDir(const QString &dir)
 {
     Q_D(Engine);
     if (d->running)
@@ -300,7 +323,7 @@ QUrl Engine::startupScript() const
     return d->startupScript;
 }
 
-void Engine::setStartupScript(const QUrl& script)
+void Engine::setStartupScript(const QUrl &script)
 {
     Q_D(Engine);
     if (d->running)
@@ -313,7 +336,6 @@ void Engine::setStartupScript(const QUrl& script)
         d->startupScript = script;
         emit(startupScriptChanged());
     }
-
 }
 
 QUrl Engine::mainQML() const
@@ -322,7 +344,7 @@ QUrl Engine::mainQML() const
     return d->mainQML;
 }
 
-void Engine::setMainQML(const QUrl& qml)
+void Engine::setMainQML(const QUrl &qml)
 {
     Q_D(Engine);
     if (d->running)
@@ -335,6 +357,5 @@ void Engine::setMainQML(const QUrl& qml)
         d->mainQML = qml;
         emit(mainQMLChanged());
     }
-
 }
-}
+} // namespace OpenSR

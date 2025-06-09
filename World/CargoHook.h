@@ -19,26 +19,26 @@
 #ifndef OPENSR_WORLD_CARGOHOOK_H
 #define OPENSR_WORLD_CARGOHOOK_H
 
-#include "World.h"
 #include "Equipment.h"
+#include "World.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API CargoHook: public Equipment
+class OPENSR_WORLD_API CargoHook : public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
 public:
     Q_INVOKABLE CargoHook(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~CargoHook();
+    ~CargoHook() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_CARGOHOOK_H

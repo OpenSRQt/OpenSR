@@ -18,12 +18,12 @@
 
 #include "crypt.h"
 
-#include <iostream>
 #include <OpenSR/libRangerQt.h>
 #include <QCoreApplication>
-#include <QStringList>
 #include <QDebug>
 #include <QFile>
+#include <QStringList>
+#include <iostream>
 
 void printHelp()
 {
@@ -52,10 +52,11 @@ int main(int argc, char **argv)
 
     bool isCache = cmd[0] == 'h';
     if (isCache)
+    {
         cmd.remove(0, 1);
+    }
 
-    if (cmd != "d" && cmd != "x" && cmd != "dx" &&
-            cmd != "c" && cmd != "e" && cmd != "ce")
+    if (cmd != "d" && cmd != "x" && cmd != "dx" && cmd != "c" && cmd != "e" && cmd != "ce")
     {
         qCritical() << "Invalid command: " << cmd;
         printHelp();
@@ -78,15 +79,15 @@ int main(int argc, char **argv)
 
     if (cmd == "d")
     {
-        uint32_t crc;
-        uint32_t key;
+        uint32_t crc{};
+        uint32_t key{};
 
-        inf.read((char*)&crc, 4);
-        inf.read((char*)&key, 4);
+        inf.read((char *)&crc, 4);
+        inf.read((char *)&key, 4);
 
         QByteArray dat = inf.readAll();
 
-        OpenSR::DAT::decrypt(dat, key, isCache);
+        OpenSR::DAT::decrypt(dat, static_cast<int>(key), isCache);
         if (crc != OpenSR::DAT::crc32(dat))
         {
             qCritical() << "CRC Error";
@@ -96,8 +97,8 @@ int main(int argc, char **argv)
     }
     else if (cmd == "x")
     {
-        uint32_t sig;
-        inf.peek((char*)&sig, 4);
+        uint32_t sig{};
+        inf.peek((char *)&sig, 4);
         if (sig != OpenSR::ZL01_SIGNATURE)
         {
             qCritical() << "Invalid input file";
@@ -114,21 +115,21 @@ int main(int argc, char **argv)
     }
     else if (cmd == "dx")
     {
-        uint32_t crc;
-        uint32_t key;
+        uint32_t crc{};
+        uint32_t key{};
 
-        inf.read((char*)&crc, 4);
-        inf.read((char*)&key, 4);
+        inf.read((char *)&crc, 4);
+        inf.read((char *)&key, 4);
 
         QByteArray dat = inf.readAll();
 
-        OpenSR::DAT::decrypt(dat, key, isCache);
+        OpenSR::DAT::decrypt(dat, static_cast<int>(key), isCache);
         if (crc != OpenSR::DAT::crc32(dat))
         {
             qCritical() << "CRC Error";
             return -1;
         }
-        if (*((const uint32_t*)dat.constData()) != OpenSR::ZL01_SIGNATURE)
+        if (*((const uint32_t *)dat.constData()) != OpenSR::ZL01_SIGNATURE)
         {
             qCritical() << "Invalid input file";
             return -1;
@@ -146,9 +147,9 @@ int main(int argc, char **argv)
         QByteArray dat = inf.readAll();
         uint32_t crc = OpenSR::DAT::crc32(dat);
         uint32_t key = OpenSR::DAT::genKey();
-        OpenSR::DAT::encrypt(dat, key, isCache);
-        outf.write((char*)&crc, 4);
-        outf.write((char*)&key, 4);
+        OpenSR::DAT::encrypt(dat, static_cast<int>(key), isCache);
+        outf.write((char *)&crc, 4);
+        outf.write((char *)&key, 4);
         outf.write(dat);
     }
     else if (cmd == "c")
@@ -171,9 +172,9 @@ int main(int argc, char **argv)
         }
         uint32_t crc = OpenSR::DAT::crc32(dat);
         uint32_t key = OpenSR::DAT::genKey();
-        OpenSR::DAT::encrypt(dat, key, isCache);
-        outf.write((char*)&crc, 4);
-        outf.write((char*)&key, 4);
+        OpenSR::DAT::encrypt(dat, static_cast<int>(key), isCache);
+        outf.write((char *)&crc, 4);
+        outf.write((char *)&key, 4);
         outf.write(dat);
     }
 

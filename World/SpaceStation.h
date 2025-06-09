@@ -19,37 +19,38 @@
 #ifndef OPENSR_WORLD_SPACESTATION_H
 #define OPENSR_WORLD_SPACESTATION_H
 
-#include "World.h"
 #include "MannedObject.h"
 #include "Resource.h"
+#include "World.h"
 
 namespace OpenSR
 {
 namespace World
 {
 
-class OPENSR_WORLD_API StationStyle: public Resource
+class OPENSR_WORLD_API StationStyle : public Resource
 {
     Q_GADGET
     Q_PROPERTY(QString texture READ texture WRITE setTexture)
 
 public:
-    struct Data {
+    struct Data
+    {
         QString texture;
     };
 
     QString texture() const;
-    void setTexture(const QString& texture);
+    void setTexture(const QString &texture);
 };
 
-bool operator==(const StationStyle& one, const StationStyle& another);
+bool operator==(const StationStyle &one, const StationStyle &another);
 
-QDataStream& operator<<(QDataStream & stream, const StationStyle& style);
-QDataStream& operator>>(QDataStream & stream, StationStyle& style);
-QDataStream& operator<<(QDataStream & stream, const StationStyle::Data& data);
-QDataStream& operator>>(QDataStream & stream, StationStyle::Data& data);
+QDataStream &operator<<(QDataStream &stream, const StationStyle &style);
+QDataStream &operator>>(QDataStream &stream, StationStyle &style);
+QDataStream &operator<<(QDataStream &stream, const StationStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, StationStyle::Data &data);
 
-class OPENSR_WORLD_API SpaceStation: public MannedObject
+class OPENSR_WORLD_API SpaceStation : public MannedObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -58,38 +59,43 @@ class OPENSR_WORLD_API SpaceStation: public MannedObject
     Q_PROPERTY(OpenSR::World::StationStyle style READ style WRITE setStyle NOTIFY styleChanged)
 
 public:
-    enum class StationKind {
+    enum class StationKind
+    {
         Unspecified = 0,
-        RangerCenter, ScienceBase, MilitaryBase, BusinessCenter, MedicalCenter
+        RangerCenter,
+        ScienceBase,
+        MilitaryBase,
+        BusinessCenter,
+        MedicalCenter
     };
     Q_ENUM(StationKind)
 
 public:
     Q_INVOKABLE SpaceStation(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~SpaceStation();
+    ~SpaceStation() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     StationKind stationKind() const;
     StationStyle style() const;
 
-    virtual void prepareSave();
+    void prepareSave() override;
 
 public slots:
     void setStationKind(StationKind kind);
-    void setStyle(const StationStyle& style);
+    void setStyle(const StationStyle &style);
 
 signals:
     void stationKindChanged(StationKind kind);
-    void styleChanged(const StationStyle& style);
+    void styleChanged(const StationStyle &style);
 
 private:
     StationKind m_stationKind;
     OpenSR::World::StationStyle m_style;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 Q_DECLARE_METATYPE(OpenSR::World::StationStyle)
 Q_DECLARE_METATYPE(OpenSR::World::StationStyle::Data)

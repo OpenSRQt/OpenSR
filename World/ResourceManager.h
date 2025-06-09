@@ -19,25 +19,25 @@
 #ifndef OPENSR_WORLD_RESOURCEMANAGER_H
 #define OPENSR_WORLD_RESOURCEMANAGER_H
 
+#include "Resource.h"
 #include "World.h"
 #include "WorldObject.h"
-#include "Resource.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API ResourceManager: public WorldObject
+class OPENSR_WORLD_API ResourceManager : public WorldObject
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
 
 public:
     Q_INVOKABLE ResourceManager(WorldObject *parent = 0, quint32 id = 0);
-    virtual ~ResourceManager();
+    ~ResourceManager() override;
 
-    virtual quint32 typeId() const;
-    virtual QString namePrefix() const;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     static ResourceManager *instance();
 
@@ -46,12 +46,12 @@ public:
     //! Forget about all resources.
     void clearResources();
 
-    virtual void prepareSave();
-    virtual bool save(QDataStream &stream) const;
-    virtual bool load(QDataStream &stream, const QMap<quint32, WorldObject*>& objects);
+    void prepareSave() override;
+    bool save(QDataStream &stream) const override;
+    bool load(QDataStream &stream, const QMap<quint32, WorldObject *> &objects) override;
 
 private:
-    quint32 registerResource(const Resource& res);
+    quint32 registerResource(const Resource &res);
     quint32 getNextId();
 
     quint32 m_idPool;
@@ -59,7 +59,7 @@ private:
 
     friend class Resource;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_RESOURCEMANAGER_H

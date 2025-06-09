@@ -20,8 +20,8 @@
 #define OPENSR_HAI_ANIMATION_IO_H
 
 #include <OpenSR/libRangerQt.h>
-#include <QImageIOHandler>
 #include <QImage>
+#include <QImageIOHandler>
 #include <QVector>
 
 namespace OpenSR
@@ -30,23 +30,23 @@ class HAIAnimationIO : public QImageIOHandler
 {
 public:
     HAIAnimationIO();
-    ~HAIAnimationIO();
+    ~HAIAnimationIO() override;
 
-    virtual bool canRead() const;
-    virtual bool read(QImage *image);
+    bool canRead() const override;
+    bool read(QImage *image) override;
 
-    virtual bool supportsOption(ImageOption option) const;
-    virtual QVariant option(ImageOption option) const;
+    bool supportsOption(ImageOption option) const override;
+    QVariant option(ImageOption option) const override;
 
-    int imageCount() const;
-    int loopCount() const;
-    int nextImageDelay() const;
-    int currentImageNumber() const;
+    int imageCount() const override;
+    int loopCount() const override;
+    int nextImageDelay() const override;
+    int currentImageNumber() const override;
 
 private:
-    HAIHeader m_header;
+    HAIHeader m_header{};
     int m_currentFrame;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_HAI_ANIMATION_IO_H

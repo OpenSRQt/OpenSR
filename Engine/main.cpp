@@ -24,11 +24,11 @@ static const QString SETTINGS_ORGANIZATION = "OpenSR";
 static const QString SETTINGS_APPLICATION = "OpenSR";
 static const QString STARTUP_SCRIPT = "res:/opensr.js";
 static const QString MAIN_QML = "res:/OpenSR/GameWindow.qml";
-}
+} // namespace
 
 int main(int argc, char **argv)
 {
-    //qputenv("QSG_RHI_BACKEND", "vulkan");
+    // qputenv("QSG_RHI_BACKEND", "vulkan");
     OpenSR::Engine engine(argc, argv);
 
     QApplication::setOrganizationName(SETTINGS_ORGANIZATION);

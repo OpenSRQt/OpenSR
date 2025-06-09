@@ -20,12 +20,12 @@
 
 #include <OpenSR/Engine.h>
 #include <OpenSR/SoundManager.h>
-#include <QtQml>
 #include <QDebug>
+#include <QtQml>
 
 namespace OpenSR
 {
-Sound::Sound(QObject *parent): QObject(parent), m_volume(1.0), m_alSource(0)
+Sound::Sound(QObject *parent) : QObject(parent), m_volume(1.0), m_alSource(0)
 {
     alGenSources((ALuint)1, &m_alSource);
 
@@ -46,19 +46,19 @@ void Sound::play()
     alSourcePlay(m_alSource);
 }
 
-void Sound::setSource(const QUrl& source)
+void Sound::setSource(const QUrl &source)
 {
     m_source = source;
 
     if (!source.isLocalFile() && source.scheme().compare("qrc", Qt::CaseInsensitive) &&
-            source.scheme().compare("res", Qt::CaseInsensitive) &&
-            source.scheme().compare("dat", Qt::CaseInsensitive))
+        source.scheme().compare("res", Qt::CaseInsensitive) && source.scheme().compare("dat", Qt::CaseInsensitive))
+    {
         qWarning() << "Non-local sound is not supported";
-
+    }
 
     m_sample = ((Engine *)qApp)->sound()->loadSample(source);
 
-    alSourcei(m_alSource, AL_BUFFER, m_sample.openALBufferID());
+    alSourcei(m_alSource, AL_BUFFER, static_cast<int>(m_sample.openALBufferID()));
 
     emit(sourceChanged());
 }
@@ -79,5 +79,4 @@ float Sound::volume() const
 {
     return m_volume;
 }
-}
-
+} // namespace OpenSR

@@ -9,7 +9,7 @@ class GAIMaterial : public QSGMaterial
 {
 public:
     GAIMaterial(GAITexture *texture = nullptr);
-    ~GAIMaterial() = default;
+    ~GAIMaterial() override = default;
 
     QSGMaterialType *type() const override;
     QSGMaterialShader *createShader(QSGRendererInterface::RenderMode) const override;

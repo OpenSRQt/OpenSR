@@ -20,22 +20,22 @@
 #define OPENSR_RV_FILEMODEL_H
 
 #include <QAbstractItemModel>
-#include <QModelIndex>
-#include <QVariant>
-#include <QList>
-#include <QFileInfo>
-#include <QMap>
 #include <QFileIconProvider>
+#include <QModelIndex>
 
 namespace OpenSR
 {
-enum NodeType {NODE_FILE, NODE_PKG};
+enum NodeType
+{
+    NODE_FILE,
+    NODE_PKG
+};
 struct FileNode
 {
     QString name;
     QString fullName;
     FileNode *parent;
-    QList<FileNode*> childs;
+    QList<FileNode *> childs;
     NodeType type;
     void *userData;
 };
@@ -45,30 +45,30 @@ class FileModel : public QAbstractItemModel
 public:
     FileModel(QObject *parent = 0);
 
-    FileNode* addPKG(const QFileInfo& file);
-    FileNode* addFile(const QFileInfo& file);
+    FileNode *addPKG(const QFileInfo &file);
+    FileNode *addFile(const QFileInfo &file);
 
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     QByteArray getData(const QModelIndex &index);
     QByteArray getData(FileNode *node);
-    FileNode* getSiblingNode(FileNode* node, const QString& name);
+    FileNode *getSiblingNode(FileNode *node, const QString &name);
 
 private:
     FileNode *rootItem;
     FileNode *getItem(const QModelIndex &index) const;
-    QMap<FileNode*, QFileInfo> archives;
+    QMap<FileNode *, QFileInfo> archives;
     QFileIconProvider iconProvider;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_RV_FILEMODEL_H

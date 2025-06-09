@@ -20,8 +20,8 @@
 #define OPENSR_QMLHELPER_H
 
 #include <OpenSR/OpenSR.h>
-#include <OpenSR/Types.h>
 #include <OpenSR/QM/QM.h>
+#include <OpenSR/Types.h>
 #include <QObject>
 #include <QVariant>
 
@@ -29,18 +29,18 @@ namespace OpenSR
 {
 namespace QML
 {
-class QMLHelper: public QObject
+class QMLHelper : public QObject
 {
     Q_OBJECT
 public:
     QMLHelper(QObject *parent = 0);
 
-    Q_INVOKABLE QVariant questInfo(const QUrl& url);
+    Q_INVOKABLE QVariant questInfo(const QUrl &url);
 
-    static QVariant convertQuestInfoToJS(const QM::QuestInfo& info);
-    static void registerQMLTypes(const char* uri);
+    static QVariant convertQuestInfoToJS(const QM::QuestInfo &info);
+    static void registerQMLTypes(const char *uri);
 };
-}
-}
+} // namespace QML
+} // namespace OpenSR
 
 #endif // OPENSR_QMLHELPER_H

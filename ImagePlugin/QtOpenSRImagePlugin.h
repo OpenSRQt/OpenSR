@@ -33,10 +33,10 @@ class QtOpenSRImagePlugin : public QImageIOPlugin
 public:
     QtOpenSRImagePlugin(QObject *parent = 0);
 
-    virtual Capabilities capabilities(QIODevice * device, const QByteArray & format) const;
-    virtual QImageIOHandler* create(QIODevice * device, const QByteArray & format = QByteArray()) const;
-    virtual QStringList keys() const;
+    Capabilities capabilities(QIODevice *device, const QByteArray &format) const override;
+    QImageIOHandler *create(QIODevice *device, const QByteArray &format = QByteArray()) const override;
+    QStringList keys() const;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_QT_OPENSR_IMAGE_PLUGIN_H

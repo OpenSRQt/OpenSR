@@ -24,33 +24,28 @@ namespace OpenSR
 {
 namespace World
 {
-const quint32 Micromodulus::m_staticTypeId = typeIdFromClassName(Micromodulus::staticMetaObject.className());
-
-template<>
-void WorldObject::registerType<Micromodulus>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Micromodulus>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<Micromodulus>("OpenSR.World", 1, 0, "Micromodulus");
 }
 
-template<>
-Micromodulus* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> Micromodulus *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new Micromodulus(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<Micromodulus>()
+template <> quint32 WorldObject::staticTypeId<Micromodulus>()
 {
-    return Micromodulus::m_staticTypeId;
+    static const quint32 id = typeIdFromClassName(Micromodulus::staticMetaObject.className());
+    return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<Micromodulus>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<Micromodulus>()
 {
     return &Micromodulus::staticMetaObject;
 }
 
-Micromodulus::Micromodulus(WorldObject *parent, quint32 id): Item(parent, id)
+Micromodulus::Micromodulus(WorldObject *parent, quint32 id) : Item(parent, id)
 {
 }
 
@@ -60,12 +55,12 @@ Micromodulus::~Micromodulus()
 
 quint32 Micromodulus::typeId() const
 {
-    return Micromodulus::m_staticTypeId;
+    return staticTypeId<Micromodulus>();
 }
 
 QString Micromodulus::namePrefix() const
 {
     return tr("Micromodulus");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR
