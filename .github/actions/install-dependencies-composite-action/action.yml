@@ -21,4 +21,4 @@ runs:
     
     - name: Install OpenAL
       shell: bash
-      run: sudo apt-get install -y openal
+      run: sudo apt-get install -y libopenal-dev
