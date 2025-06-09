@@ -29,10 +29,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           database: ./build
+          ignore: 'QML|data|.github|build'
           style: 'file'
           tidy-checks: ''
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
 
-      - name: Fail fast?!
+      - name: Check failed
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
