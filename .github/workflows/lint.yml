@@ -1,11 +1,10 @@
 name: Code formatting and linting
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ ci-rework ]
   pull_request:
-    branches: [ master ]
+    branches: [ ci-rework ]
 
 env:
   BUILD_TYPE: Debug
