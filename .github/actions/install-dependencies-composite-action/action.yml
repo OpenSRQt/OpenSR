@@ -9,9 +9,11 @@ runs:
   using: "composite"
   steps:
     - name: Install CMake
+      shell: bash
       run: sudo apt-get update -y && sudo apt-get install -y cmake
 
     - name: Install Qt
+      shell: bash
       uses: jurplel/install-qt-action@v4
       with:
         version: ${{ inputs.qt-version }} 
@@ -19,9 +21,5 @@ runs:
         arch: 'linux_gcc_64'
     
     - name: Install OpenAL
+      shell: bash
       run: sudo apt-get install -y openal
-
-      
-
-
-
