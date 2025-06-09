@@ -1,6 +1,7 @@
 name: Code formatting and linting
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
   pull_request:
