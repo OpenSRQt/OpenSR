@@ -18,6 +18,7 @@ runs:
         version: ${{ inputs.qt-version }} 
         target: 'desktop'
         arch: 'linux_gcc_64'
+        modules: 'qtshadertools'
     
     - name: Install OpenAL
       shell: bash
