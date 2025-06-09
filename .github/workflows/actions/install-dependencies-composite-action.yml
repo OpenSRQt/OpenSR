@@ -1,0 +1,27 @@
+name: Install dependencies
+
+inputs:
+  qt-version:
+    required: true
+    default: '6.8.3'
+
+runs: 
+  using: "composite"
+  steps:
+    - name: Install CMake
+      run: sudo apt-get update -y && sudo apt-get install -y cmake
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ inputs.qt-version }} 
+        target: 'desktop'
+        arch: 'linux_gcc_64'
+    
+    - name: Install OpenAL
+      run: sudo apt-get install -y openal
+
+      
+
+
+
