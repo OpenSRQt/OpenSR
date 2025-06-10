@@ -19,14 +19,14 @@
 #ifndef OPENSR_WORLD_ARTEFACT_H
 #define OPENSR_WORLD_ARTEFACT_H
 
-#include "World.h"
 #include "Equipment.h"
+#include "World.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Artefact: public Equipment
+class OPENSR_WORLD_API Artefact : public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
@@ -38,7 +38,7 @@ public:
     quint32 typeId() const override;
     QString namePrefix() const override;
 };
-}
-}
+} // namespace World
+} // namespace OpenSR
 
 #endif // OPENSR_WORLD_ARTEFACT_H

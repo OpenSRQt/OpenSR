@@ -25,32 +25,28 @@ namespace OpenSR
 namespace World
 {
 
-template<>
-void WorldObject::registerType<CargoHook>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<CargoHook>(QQmlEngine *qml, QJSEngine *script)
 {
     qmlRegisterType<CargoHook>("OpenSR.World", 1, 0, "CargoHook");
 }
 
-template<>
-CargoHook* WorldObject::createObject(WorldObject *parent, quint32 id)
+template <> CargoHook *WorldObject::createObject(WorldObject *parent, quint32 id)
 {
     return new CargoHook(parent, id);
 }
 
-template<>
-quint32 WorldObject::staticTypeId<CargoHook>()
+template <> quint32 WorldObject::staticTypeId<CargoHook>()
 {
     static const quint32 id = typeIdFromClassName(CargoHook::staticMetaObject.className());
     return id;
 }
 
-template<>
-const QMetaObject* WorldObject::staticTypeMeta<CargoHook>()
+template <> const QMetaObject *WorldObject::staticTypeMeta<CargoHook>()
 {
     return &CargoHook::staticMetaObject;
 }
 
-CargoHook::CargoHook(WorldObject *parent, quint32 id): Equipment(parent, id)
+CargoHook::CargoHook(WorldObject *parent, quint32 id) : Equipment(parent, id)
 {
 }
 
@@ -67,5 +63,5 @@ QString CargoHook::namePrefix() const
 {
     return tr("Cargo hook");
 }
-}
-}
+} // namespace World
+} // namespace OpenSR

@@ -23,19 +23,23 @@ void TurnAnimation::setPrevTime(int prevTime)
 void TurnAnimation::updateCurrentTime(int currentTime)
 {
     if (state() != TurnAnimation::Running)
+    {
         return;
+    }
 
     const float dt = std::max(static_cast<float>(currentTime - m_prevTime), 0.0f);
     m_prevTime = currentTime;
 
     WorldContext *ctx = WorldManager::instance()->context();
-    if (ctx){
-        class Ship* playerShip = qobject_cast<class Ship*>(ctx->playerShip());
-        if(playerShip) 
+    if (ctx)
+    {
+        class Ship *playerShip = qobject_cast<class Ship *>(ctx->playerShip());
+        if (playerShip)
+        {
             playerShip->checkPlanetProximity(ctx->planetToEnter());
+        }
         ctx->processTurn(dt);
     }
-        
 }
 
 void TurnAnimation::setTurnDurationLock(bool turnDurationLock)

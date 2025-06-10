@@ -20,8 +20,8 @@
 #define OPENSR_GAI_ANIMATION_IO_H
 
 #include <OpenSR/libRangerQt.h>
-#include <QImageIOHandler>
 #include <QImage>
+#include <QImageIOHandler>
 #include <QVector>
 
 namespace OpenSR
@@ -43,7 +43,7 @@ public:
     int imageCount() const override;
     int loopCount() const override;
     int nextImageDelay() const override;
-    int currentImageNumber() const override; 
+    int currentImageNumber() const override;
 
 private:
     GAIHeader m_header{};
@@ -51,6 +51,6 @@ private:
     QVector<int> m_times;
     QImage m_prev;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_GAI_ANIMATION_IO_H
