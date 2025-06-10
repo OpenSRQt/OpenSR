@@ -15,6 +15,7 @@ jobs:
     
     permissions:
       contents: read
+      pull-requests: write
     
     steps:
       - name: Checkout repository
@@ -36,6 +37,8 @@ jobs:
           style: 'file'
           tidy-checks: ''
           files-changed-only: false
+          tidy-review: true
+          format-review: true
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
           
       - name: Check failed
