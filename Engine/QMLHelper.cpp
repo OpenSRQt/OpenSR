@@ -19,19 +19,19 @@
 #include "OpenSR/QMLHelper.h"
 
 #include <OpenSR/Engine.h>
+#include <OpenSR/GAIAnimatedImage.h>
+#include <OpenSR/Music.h>
+#include <OpenSR/PlanetDrawer.h>
 #include <OpenSR/QMLHelper.h>
+#include <OpenSR/QMLQuestPlayer.h>
 #include <OpenSR/ResourceManager.h>
 #include <OpenSR/Sound.h>
-#include <OpenSR/GAIAnimatedImage.h>
-#include <OpenSR/QMLQuestPlayer.h>
-#include <OpenSR/TexturedPolyline.h>
-#include <OpenSR/TexturedBezierCurve.h>
-#include <OpenSR/Music.h>
 #include <OpenSR/SpaceMouseArea.h>
-#include <OpenSR/PlanetDrawer.h>
+#include <OpenSR/TexturedBezierCurve.h>
+#include <OpenSR/TexturedPolyline.h>
 
-#include <QtQml>
 #include <QVariant>
+#include <QtQml>
 
 #include <QIODevice>
 
@@ -39,16 +39,17 @@ namespace OpenSR
 {
 namespace QML
 {
-QMLHelper::QMLHelper(QObject* parent): QObject(parent)
+QMLHelper::QMLHelper(QObject *parent) : QObject(parent)
 {
-
 }
 
-QVariant QMLHelper::questInfo(const QUrl& url)
+QVariant QMLHelper::questInfo(const QUrl &url)
 {
-    QIODevice *d = qobject_cast<Engine*>(qApp)->resources()->getIODevice(url);
+    QIODevice *d = qobject_cast<Engine *>(qApp)->resources()->getIODevice(url);
     if (!d || !d->isOpen())
+    {
         return QVariant();
+    }
 
     QVariant result = convertQuestInfoToJS(QM::readQuestInfo(d));
 
@@ -57,7 +58,7 @@ QVariant QMLHelper::questInfo(const QUrl& url)
     return result;
 }
 
-QVariant QMLHelper::convertQuestInfoToJS(const QM::QuestInfo& info)
+QVariant QMLHelper::convertQuestInfoToJS(const QM::QuestInfo &info)
 {
     QVariantMap map;
 
@@ -74,22 +75,22 @@ QVariant QMLHelper::convertQuestInfoToJS(const QM::QuestInfo& info)
     return map;
 }
 
-static QObject* engineSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+static QObject *engineSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    OpenSR::Engine *e = qobject_cast<OpenSR::Engine*>(qApp);
+    OpenSR::Engine *e = qobject_cast<OpenSR::Engine *>(qApp);
     QQmlEngine::setObjectOwnership(e, QQmlEngine::CppOwnership);
     return e;
 }
 
-static QObject* osrSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+static QObject *osrSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
     return new OpenSR::QML::QMLHelper(engine);
 }
 
-void QMLHelper::registerQMLTypes(const char* uri)
+void QMLHelper::registerQMLTypes(const char *uri)
 {
     using namespace OpenSR;
-    //qmlRegisterSingletonType<Engine>(uri, 1, 0, "Engine", engineSingletonProvider);
+    // qmlRegisterSingletonType<Engine>(uri, 1, 0, "Engine", engineSingletonProvider);
     qmlRegisterSingletonType<OpenSR::QML::QMLHelper>(uri, 1, 0, "OSR", osrSingletonProvider);
     qmlRegisterUncreatableType<ResourceManager>(uri, 1, 0, "ResourceManager", "ResourceManager is not instantiable");
     qmlRegisterType<Sound>(uri, 1, 0, "Sound");
@@ -101,6 +102,5 @@ void QMLHelper::registerQMLTypes(const char* uri)
     qmlRegisterType<SpaceMouseArea>(uri, 1, 0, "SpaceMouseArea");
     qmlRegisterType<PlanetDrawer>(uri, 1, 0, "PlanetDrawer");
 }
-}
-}
-
+} // namespace QML
+} // namespace OpenSR

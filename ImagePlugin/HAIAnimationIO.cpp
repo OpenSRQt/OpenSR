@@ -22,10 +22,9 @@
 
 namespace OpenSR
 {
-HAIAnimationIO::HAIAnimationIO(): QImageIOHandler(), m_currentFrame(-1)
+HAIAnimationIO::HAIAnimationIO() : QImageIOHandler(), m_currentFrame(-1)
 {
 }
-
 
 HAIAnimationIO::~HAIAnimationIO()
 {
@@ -34,22 +33,30 @@ HAIAnimationIO::~HAIAnimationIO()
 bool HAIAnimationIO::supportsOption(ImageOption option) const
 {
     if (option == QImageIOHandler::Size || option == QImageIOHandler::Animation)
+    {
         return true;
+    }
     return false;
 }
 
 QVariant HAIAnimationIO::option(ImageOption option) const
 {
     if (!checkHAIHeader(device()))
+    {
         return QVariant();
+    }
 
     HAIHeader header = peekHAIHeader(device());
 
     if (option == QImageIOHandler::Animation)
+    {
         return true;
+    }
 
     if (option == QImageIOHandler::Size)
+    {
         return QSize(static_cast<int>(header.width), static_cast<int>(header.height));
+    }
 
     return QVariant();
 }
@@ -59,7 +66,9 @@ bool HAIAnimationIO::canRead() const
     QIODevice *d = device();
 
     if (!d)
+    {
         return false;
+    }
 
     if (m_currentFrame < 0)
     {
@@ -68,7 +77,9 @@ bool HAIAnimationIO::canRead() const
     else
     {
         if (m_currentFrame >= m_header.count)
+        {
             return false;
+        }
     }
 
     return true;
@@ -79,7 +90,9 @@ bool HAIAnimationIO::read(QImage *image)
     QIODevice *d = device();
 
     if (!d)
+    {
         return false;
+    }
 
     if (m_currentFrame < 0)
     {
@@ -88,12 +101,16 @@ bool HAIAnimationIO::read(QImage *image)
     }
 
     if (m_currentFrame >= m_header.count)
+    {
         return false;
+    }
 
     *image = loadHAIFrame(device(), m_header, m_currentFrame);
 
     if (!image->isNull())
+    {
         m_currentFrame++;
+    }
 
     return true;
 }
@@ -116,7 +133,9 @@ int HAIAnimationIO::imageCount() const
 int HAIAnimationIO::nextImageDelay() const
 {
     if (m_currentFrame < 0)
+    {
         return 0;
+    }
 
     return HAI_FRAME_TIME;
 }
@@ -125,4 +144,4 @@ int HAIAnimationIO::loopCount() const
 {
     return -1;
 }
-}
+} // namespace OpenSR

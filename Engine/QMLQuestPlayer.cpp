@@ -24,7 +24,7 @@
 
 namespace OpenSR
 {
-QMLQuestPlayer::QMLQuestPlayer(QObject *parent): QObject(parent)
+QMLQuestPlayer::QMLQuestPlayer(QObject *parent) : QObject(parent)
 {
     connect(&m_player, SIGNAL(locationChanged()), this, SLOT(updateLocation()));
     connect(&m_player, SIGNAL(transitionText(QString)), this, SLOT(showTransitionText(QString)));
@@ -51,7 +51,7 @@ QVariantList QMLQuestPlayer::transitions() const
 {
     QVariantList result;
     QList<QM::QuestPlayer::TransitionItem> trans = m_player.visibleTransitions();
-    for (const QM::QuestPlayer::TransitionItem& t : trans)
+    for (const QM::QuestPlayer::TransitionItem &t : trans)
     {
         QVariantMap tres;
         tres["id"] = t.id;
@@ -67,7 +67,7 @@ QUrl QMLQuestPlayer::image() const
     return m_image;
 }
 
-void QMLQuestPlayer::setQuestID(const QString& id)
+void QMLQuestPlayer::setQuestID(const QString &id)
 {
     m_questID = id;
     emit(questIDChanged());
@@ -80,15 +80,17 @@ void QMLQuestPlayer::resetQuest()
     m_locationsImages.clear();
     m_transitionsImages.clear();
 
-    Engine *engine = ((Engine*)qApp);
+    Engine *engine = ((Engine *)qApp);
 
-    //m_currentText = QString();
-    //emit(currentTextChanged());
+    // m_currentText = QString();
+    // emit(currentTextChanged());
     QString path = engine->datValue(QString("PlanetQuest.PlanetQuest.%1").arg(m_questID)).toString().replace("\\", "/");
     QIODevice *dev = engine->resources()->getIODevice(path);
 
     if (!dev)
+    {
         return;
+    }
 
     if (!dev->isOpen())
     {
@@ -103,18 +105,24 @@ void QMLQuestPlayer::resetQuest()
         QStringList img = i.key().split(',');
         QString id = img.takeAt(0);
         if (id != m_questID)
+        {
             continue;
+        }
         QString type = img.takeAt(0);
         QString path = i.value().toString();
         if (type == "L")
         {
-            for (const QString& lid : img)
+            for (const QString &lid : img)
+            {
                 m_locationsImages[lid.toUInt()] = path;
+            }
         }
         else if (type == "P")
         {
-            for (const QString& pid : img)
+            for (const QString &pid : img)
+            {
                 m_transitionsImages[pid.toUInt()] = path;
+            }
         }
     }
 
@@ -168,7 +176,6 @@ void QMLQuestPlayer::showTransitionText(const QString &text)
     emit(questTransition());
 }
 
-
 void QMLQuestPlayer::showQuestCompleted(const QString &text)
 {
     m_currentText = text;
@@ -184,5 +191,4 @@ void QMLQuestPlayer::showQuestFailed(const QString &text, bool death)
     emit(parametersChanged());
     emit(questFailed(death));
 }
-}
-
+} // namespace OpenSR
