@@ -26,7 +26,9 @@ namespace OpenSR
 class PluginInterface
 {
 public:
-    virtual ~PluginInterface() {};
+    virtual ~PluginInterface()
+    {
+    }
 
     virtual bool initPlugin(Engine *engine) = 0;
 };

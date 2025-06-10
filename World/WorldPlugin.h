@@ -32,7 +32,9 @@ class WorldPlugin : public QObject, public PluginInterface
     Q_INTERFACES(OpenSR::PluginInterface)
 
 public:
-    ~WorldPlugin() override {};
+    ~WorldPlugin() override
+    {
+    }
 
     bool initPlugin(OpenSR::Engine *engine) override;
 };

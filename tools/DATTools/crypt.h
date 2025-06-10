@@ -19,18 +19,18 @@
 #ifndef OPENSR_DAT_CRYPT_H
 #define OPENSR_DAT_CRYPT_H
 
-#include <cstdint>
 #include <QByteArray>
+#include <cstdint>
 
 namespace OpenSR
 {
 namespace DAT
 {
 int32_t genKey();
-void decrypt(QByteArray& data, int32_t key, bool isCache = false);
-void encrypt(QByteArray& data, int32_t key, bool isCache = false);
+void decrypt(QByteArray &data, int32_t key, bool isCache = false);
+void encrypt(QByteArray &data, int32_t key, bool isCache = false);
 quint32 crc32(const QByteArray &data);
-}
-}
+} // namespace DAT
+} // namespace OpenSR
 
 #endif

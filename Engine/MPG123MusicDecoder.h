@@ -19,8 +19,8 @@
 #ifndef OPENSR_MPG123MUSICDECODER_H
 #define OPENSR_MPG123MUSICDECODER_H
 
-#include <OpenSR/OpenSR.h>
 #include <OpenSR/MusicDecoder.h>
+#include <OpenSR/OpenSR.h>
 
 #include "3rdparty/mpg123.h"
 
@@ -30,7 +30,7 @@ class QIODevice;
 
 namespace OpenSR
 {
-class MPG123MusicDecoder: public MusicDecoder
+class MPG123MusicDecoder : public MusicDecoder
 {
     Q_OBJECT
 public:
@@ -58,6 +58,6 @@ private:
     static bool m_mpgInited;
     static bool m_mpgInitFailed;
 };
-}
+} // namespace OpenSR
 
 #endif // OPENSR_MPG123MUSICDECODER_H
