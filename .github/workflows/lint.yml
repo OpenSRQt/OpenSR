@@ -2,9 +2,9 @@ name: Code formatting and linting
 
 on:
   push:
-    branches: [ ci-rework ]
+    branches: [ master ]
   pull_request:
-    branches: [ ci-rework ]
+    branches: [ master ]
 
 env:
   BUILD_TYPE: Debug
