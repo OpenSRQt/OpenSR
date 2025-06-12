@@ -32,10 +32,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          version: '19'
           database: 'build'
           ignore: 'QML|data|.github|build|Engine/3rdparty|Engine/shaders|tools'
           style: 'file'
           tidy-checks: ''
+          step-summary: true
           files-changed-only: false
           tidy-review: true
           format-review: true

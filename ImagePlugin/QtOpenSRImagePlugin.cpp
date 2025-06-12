@@ -110,7 +110,9 @@ QImageIOHandler *QtOpenSRImagePlugin::create(QIODevice *device, const QByteArray
 
 QStringList QtOpenSRImagePlugin::keys() const
 {
-    return QStringList() << "gi" << "gai" << "hai" << "psd";
+    QStringList keys;
+    keys << "gi" << "gai" << "hai" << "psd";
+    return keys;
 }
 } // namespace OpenSR
 

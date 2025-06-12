@@ -44,7 +44,7 @@ public:
     struct Data
     {
         QString surface, cloud0, cloud1, background;
-        int radius;
+        int radius{};
         QColor atmosphere;
     };
 
