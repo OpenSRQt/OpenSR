@@ -100,7 +100,7 @@ void drawR5G6B5(QImage &result, int x, int y, QIODevice *dev)
                 quint16 color{};
                 dev->read((char *)&color, 2);
                 *((uint32_t *)row) = (0xff000000) | (((color >> 11) & 0x1f) << 19) | (((color >> 5) & 0x3f) << 10) |
-                                     (((color) & 0x1f) << 3);
+                                     ((color & 0x1f) << 3);
                 row += 4;
                 cnt--;
 
@@ -108,7 +108,7 @@ void drawR5G6B5(QImage &result, int x, int y, QIODevice *dev)
                 {
                     dev->read((char *)&color, 2);
                     *((uint32_t *)row) = (0xff000000) | (((color >> 11) & 0x1f) << 19) | (((color >> 5) & 0x3f) << 10) |
-                                         (((color) & 0x1f) << 3);
+                                         ((color & 0x1f) << 3);
                     row += 4;
                     cnt--;
                 }

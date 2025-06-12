@@ -39,7 +39,7 @@ public:
     struct Data
     {
         QString texture;
-        int width;
+        int width{};
     };
 
     int width() const;
