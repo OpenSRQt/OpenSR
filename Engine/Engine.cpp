@@ -178,7 +178,7 @@ void Engine::showQMLComponent(const QString &url)
 
     for (auto root : d->qmlEngine->rootObjects())
     {
-        QMetaObject::invokeMethod(root, "changeScreen", Q_ARG(QVariant, QUrl(url)), Q_ARG(QVariant, QVariantMap()));
+        QMetaObject::invokeMethod(root, "destroyAndChangeScreen", Q_ARG(QVariant, QUrl(url)), Q_ARG(QVariant, QVariantMap()));
     }
 }
 

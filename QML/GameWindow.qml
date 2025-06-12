@@ -14,6 +14,11 @@ Window {
     }
 
     function changeScreen(url, properties) {
+        properties = (typeof properties === 'undefined') ? {} : properties;
+        createObjectFromURL(url, gameScreen, "screenRequest", properties);
+    }
+
+    function destroyAndChangeScreen(url, properties) {
         var childItems = gameScreen.data || [];
         for (var i = childItems.length - 1; i >= 0; i--) {
             var child = childItems[i];
@@ -22,8 +27,7 @@ Window {
             }
         }
 
-        properties = (typeof properties === 'undefined') ? {} : properties;
-        createObjectFromURL(url, gameScreen, "screenRequest", properties);
+        changeScreen(url, properties);
     }
 
     function componentObjectCreated() {
