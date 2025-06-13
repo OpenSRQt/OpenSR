@@ -49,25 +49,25 @@ int WeaponStyle::hitPoints() const
     return getData<Data>().hitPoints;
 }
 
-void WeaponStyle::setSoundPath(const QString & c)
+void WeaponStyle::setSoundPath(const QString &c)
 {
     auto d = getData<Data>();
     d.SoundPath = c;
     setData(d);
 }
-void WeaponStyle::setPreview(const QString & c)
+void WeaponStyle::setPreview(const QString &c)
 {
     auto d = getData<Data>();
     d.preview = c;
     setData(d);
 }
-void WeaponStyle::setWeaponAnim(const QString & c)
+void WeaponStyle::setWeaponAnim(const QString &c)
 {
     auto d = getData<Data>();
     d.weaponAnim = c;
     setData(d);
 }
-void WeaponStyle::setTypeWeapon(const QString & c)
+void WeaponStyle::setTypeWeapon(const QString &c)
 {
     auto d = getData<Data>();
     d.typeWeapon = c;
@@ -88,12 +88,9 @@ void WeaponStyle::setHitPoints(int c)
 
 bool operator==(const WeaponStyle &one, const WeaponStyle &another)
 {
-    return (one.SoundPath() == another.SoundPath()) &&
-            (one.preview() == another.preview()) &&
-            (one.weaponAnim() == another.weaponAnim()) &&
-            (one.typeWeapon() == another.typeWeapon()) &&
-            (one.radius() == another.radius()) &&
-            (one.hitPoints() == another.hitPoints());
+    return (one.SoundPath() == another.SoundPath()) && (one.preview() == another.preview()) &&
+           (one.weaponAnim() == another.weaponAnim()) && (one.typeWeapon() == another.typeWeapon()) &&
+           (one.radius() == another.radius()) && (one.hitPoints() == another.hitPoints());
 }
 
 QDataStream &operator<<(QDataStream &stream, const WeaponStyle &style)
@@ -113,19 +110,19 @@ QDataStream &operator>>(QDataStream &stream, WeaponStyle &style)
 
 QDataStream &operator<<(QDataStream &stream, const WeaponStyle::Data &data)
 {
-    return stream << data.SoundPath << data.preview << data.weaponAnim << data.typeWeapon << data.radius << data.hitPoints;
+    return stream << data.SoundPath << data.preview << data.weaponAnim << data.typeWeapon << data.radius
+                  << data.hitPoints;
 }
 
 QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data)
 {
-    return stream >> data.SoundPath >> data.preview >> data.weaponAnim >> data.typeWeapon >> data.radius >> data.hitPoints;
+    return stream >> data.SoundPath >> data.preview >> data.weaponAnim >> data.typeWeapon >> data.radius >>
+           data.hitPoints;
 }
-
 
 const quint32 Weapon::m_staticTypeId = typeIdFromClassName(Weapon::staticMetaObject.className());
 
-template<>
-void WorldObject::registerType<Weapon>(QQmlEngine *qml, QJSEngine *script)
+template <> void WorldObject::registerType<Weapon>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<WeaponStyle>();
     qRegisterMetaTypeStreamOperators<WeaponStyle>();
@@ -172,10 +169,12 @@ WeaponStyle Weapon::style() const
 {
     return m_style;
 }
-void Weapon::setStyle(const WeaponStyle& style)
+void Weapon::setStyle(const WeaponStyle &style)
 {
-    if(m_style == style)
+    if (m_style == style)
+    {
         return;
+    }
     m_style = style;
     emit styleChanged(style);
 }
@@ -185,5 +184,5 @@ int Weapon::hitPoints() const
     return style().hitPoints();
 }
 
-}
-}
+} // namespace World
+} // namespace OpenSR

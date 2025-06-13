@@ -430,19 +430,25 @@ int Ship::structure() const
 
 void Ship::setStructure(int structure)
 {
-    if(structure == m_structure) return;
+    if (structure == m_structure)
+    {
+        return;
+    }
     m_structure = structure;
     emit structureChanged(structure);
 }
 
-Weapon* Ship::activeWeapon() const
+Weapon *Ship::activeWeapon() const
 {
     return m_activeWeapon;
 }
 
-void Ship::setActiveWeapon(Weapon* weapon)
+void Ship::setActiveWeapon(Weapon *weapon)
 {
-    if(weapon == m_activeWeapon) return;
+    if (weapon == m_activeWeapon)
+    {
+        return;
+    }
     m_activeWeapon = weapon;
     emit activeWeaponChanged(weapon);
 }
@@ -450,7 +456,10 @@ void Ship::setActiveWeapon(Weapon* weapon)
 void Ship::damageObject(int damage)
 {
     m_structure -= damage;
-    if(m_structure <= 0) destroyObject();
+    if (m_structure <= 0)
+    {
+        destroyObject();
+    }
     emit shipDamaged(damage);
 }
 
@@ -458,7 +467,6 @@ void Ship::destroyObject()
 {
     emit shipDestroyed();
 }
-
 
 } // namespace World
 } // namespace OpenSR

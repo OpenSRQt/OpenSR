@@ -63,30 +63,31 @@ QString Container::namePrefix() const
     return tr("Container");
 }
 
-void Container::addWeapon(Weapon* weapon, int pos)
+void Container::addWeapon(Weapon *weapon, int pos)
 {
     weapons[pos] = weapon;
 }
 
-void Container::addResources(Item* item)
+void Container::addResources(Item *item)
 {
     resources[item]++;
 }
 
-Weapon* Container::getWeaponByPos(int pos) const
+Weapon *Container::getWeaponByPos(int pos) const
 {
-    if (pos < 0 || pos >= weapons.size()) {
+    if (pos < 0 || pos >= weapons.size())
+    {
         return nullptr;
     }
     return weapons.value(pos);
 }
 
-QMap<Item*,int> Container::getResources() const
+QMap<Item *, int> Container::getResources() const
 {
     return resources;
 }
 
-int Container::getResources(Item* item) const
+int Container::getResources(Item *item) const
 {
     return resources[item];
 }
@@ -96,9 +97,10 @@ void Container::removeWeapon(int pos)
     weapons.remove(pos);
 }
 
-void Container::removeResources(Item* item) {
+void Container::removeResources(Item *item)
+{
     resources[item]--;
 }
 
-}
-}
+} // namespace World
+} // namespace OpenSR

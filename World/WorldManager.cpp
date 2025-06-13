@@ -214,7 +214,7 @@ WorldManager::WorldManager(QObject *parent) : QObject(parent), m_context(0)
 
     m_animation = new TurnAnimation(this);
 
-    //QGuiApplication::setOverrideCursor(m_cursorManager.getCursor(CursorManager::Main));
+    // QGuiApplication::setOverrideCursor(m_cursorManager.getCursor(CursorManager::Main));
 }
 
 QString WorldManager::typeName(quint32 type) const
@@ -293,7 +293,8 @@ void WorldManager::finishTurn()
         disconnect(m_animation, &TurnAnimation::finished, this, &WorldManager::finishTurn);
     }
 
-    m_animation->setPrevTime(0);    m_context->finishTurn();
+    m_animation->setPrevTime(0);
+    m_context->finishTurn();
     m_turnFinished = true;
     m_context->resetActiveWeapon();
 }
