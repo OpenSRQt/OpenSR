@@ -15,9 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <QtQml>
 #include <OpenSR/Engine.h>
-
+#include "OpenSR/AnimatedCursor.h"
 namespace
 {
 static const QString SETTINGS_ORGANIZATION = "OpenSR";
@@ -34,6 +34,12 @@ int main(int argc, char **argv)
     QApplication::setOrganizationName(SETTINGS_ORGANIZATION);
     QApplication::setApplicationName(SETTINGS_APPLICATION);
 
+    QApplication::setOverrideCursor(Qt::BlankCursor);
+    AnimatedCursor cursorOverlay;
+    // qmlRegisterType<AnimatedCursor>("OpenSR", 1, 0, "AnimatedCursor");
+    cursorOverlay.setCursor("data/DATA/Cursor/Main.GAI");
+
+    
     engine.setStartupScript(STARTUP_SCRIPT);
     engine.setMainQML(MAIN_QML);
 

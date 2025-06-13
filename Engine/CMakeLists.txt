@@ -19,6 +19,7 @@ add_library(engine SHARED
     DATTranslator.cpp
     SpaceMouseArea.cpp
     PlanetDrawer.cpp
+    AnimatedCursor.cpp
     GAIMaterial.cpp
     GAIShader.cpp
 
@@ -39,6 +40,7 @@ add_library(engine SHARED
     ${CMAKE_SOURCE_DIR}/include/OpenSR/DATTranslator.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/SpaceMouseArea.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/PlanetDrawer.h
+    ${CMAKE_SOURCE_DIR}/include/OpenSR/AnimatedCursor.h
 
     GAIMaterial.h
     GAIShader.h

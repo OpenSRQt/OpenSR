@@ -213,6 +213,8 @@ WorldManager::WorldManager(QObject *parent) : QObject(parent), m_context(0)
                    WorldObject::staticTypeMeta<World::ResourceManager>());
 
     m_animation = new TurnAnimation(this);
+
+    //QGuiApplication::setOverrideCursor(m_cursorManager.getCursor(CursorManager::Main));
 }
 
 QString WorldManager::typeName(quint32 type) const

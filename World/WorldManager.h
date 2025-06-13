@@ -38,6 +38,7 @@
 #include "SpaceStation.h"
 #include "TurnAnimation.h"
 #include "Weapon.h"
+#include "CursorManager.h"
 
 namespace OpenSR
 {
@@ -141,6 +142,8 @@ private:
     WorldContext *m_context;
     TurnAnimation *m_animation;
     bool m_turnFinished = true;
+
+    CursorManager m_cursorManager;
 
     static WorldManager *m_staticInstance;
     static quint32 m_idPool;
