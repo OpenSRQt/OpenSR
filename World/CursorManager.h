@@ -1,12 +1,9 @@
 #ifndef OPENSR_WORLD_CURSOR_H
 #define OPENSR_WORLD_CURSOR_H
 
-#include <QCursor>
-#include <QPixmap>
-#include <QDebug>
+#include "OpenSR/AnimatedCursor.h"
 
 namespace OpenSR {
-
 namespace World {
 
 class CursorManager {
@@ -29,13 +26,15 @@ public:
   };
   Q_ENUM(CursorType)
 
-  Q_INVOKABLE const QCursor& getCursor(CursorType type) const;
-  // Q_INVOKABLE void setCursors(CursorType type);
+  Q_INVOKABLE QMovie * &getCursor(CursorManager::CursorType type);
+  void changeCursor(CursorManager::CursorType type);
 
 private:
-  QMap<CursorType, QCursor> cursors;
-  QCursor loadCursor(const QString &path, int hotspotX, int hotspotY);
+  QMap<CursorType, QMovie*> cursors;
+  QMovie* loadCursor(const QString &path);
 
+  AnimatedCursor *m_animatedCursor{};
+  CursorType current;
 
 };
 

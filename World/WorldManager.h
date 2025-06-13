@@ -87,6 +87,8 @@ public:
     WorldContext *context() const;
     bool turnFinished() const;
 
+    Q_INVOKABLE void setCursor(CursorManager::CursorType cursor);
+
     Q_INVOKABLE QString typeName(quint32 type) const;
 
     Q_INVOKABLE void generateWorld(const QString &genScriptUrl);

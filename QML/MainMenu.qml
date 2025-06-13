@@ -1,4 +1,4 @@
-import QtQuick
+import QtQuick 2.3
 import OpenSR 1.0
 
 Item {
@@ -40,6 +40,7 @@ Item {
     }
     GAIAnimatedImage {
         id: grid
+        
         sources: ["res:/DATA/FormMain2/2AnimMain.gai"]
         speed: 0.75
         anchors.fill: parent
@@ -122,7 +123,10 @@ Item {
             downImage: "res:/DATA/FormMain2/2ButExitD.gi"
             anchors.top: aboutButton.bottom
             anchors.topMargin: 10
-            onClicked: Qt.quit()
+            onClicked: {
+                menu.destroy()
+                Engine.quit()
+            }
         }
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: 100
@@ -169,17 +173,17 @@ Item {
     }
     
     function startQuest(id) {
-        destroyAndChangeScreen("qrc:/OpenSR/QuestPlayer.qml", {"questID": id});
+        changeScreen("qrc:/OpenSR/QuestPlayer.qml", {"questID": id});
     }
 
     function newGame() {
         World.generateWorld("res:/World/DefaultWorldGen.js");
-        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function loadGame() {
         World.loadWorld("/tmp/test.osr");
-        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function componentObjectCreated(object, id)

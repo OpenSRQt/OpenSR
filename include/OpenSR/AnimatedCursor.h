@@ -1,31 +1,33 @@
-#pragma once
+#ifndef OPENSR_ANIMATEDCURSOR_H
+#define OPENSR_ANIMATEDCURSOR_H
 
-#include <QWidget>
+#include <QLabel>
 #include <QMovie>
 #include <QTimer>
-#include <QLabel>
-#include <QQmlEngine>
+#include <QWidget>
 
-class AnimatedCursor : public QWidget {
+class AnimatedCursor : public QWidget
+{
     Q_OBJECT
-    QML_ELEMENT
     Q_PROPERTY(QString cursorSource READ cursorSource WRITE setCursor NOTIFY cursorChanged)
-    
+
 public:
-    Q_INVOKABLE explicit AnimatedCursor(QWidget* parent = nullptr);
-    
+    Q_INVOKABLE explicit AnimatedCursor(QWidget *parent = nullptr);
+
     QString cursorSource() const;
-    Q_INVOKABLE void setCursor(const QString& source);
-    
+    Q_INVOKABLE QMovie *setCursor(QMovie *source);
+    Q_INVOKABLE void setCursor(const QString &source);
     void moveToCursor();
-    void showEvent(QShowEvent* event);
-    ~AnimatedCursor();
+    ~AnimatedCursor() override;
 
 signals:
     void cursorChanged();
 
 private:
-    QLabel* cursorLabel = nullptr;
-    QMovie* cursorMovie = nullptr;
+    QTimer *m_moveTimer;
+    QLabel *cursorLabel = nullptr;
+    QMovie *cursorMovie = nullptr;
     QString m_cursorSource = nullptr;
 };
+
+#endif // OPENSR_ANIMATEDCURSOR_H

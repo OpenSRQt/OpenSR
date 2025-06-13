@@ -213,8 +213,13 @@ WorldManager::WorldManager(QObject *parent) : QObject(parent), m_context(0)
                    WorldObject::staticTypeMeta<World::ResourceManager>());
 
     m_animation = new TurnAnimation(this);
+    qmlRegisterUncreatableMetaObject(CursorManager::staticMetaObject, "OpenSR", 1, 0, "CursorType",
+                                     "Error: Cannot create instance");
+}
 
-    // QGuiApplication::setOverrideCursor(m_cursorManager.getCursor(CursorManager::Main));
+void WorldManager::setCursor(CursorManager::CursorType cursor)
+{
+    m_cursorManager.changeCursor(cursor);
 }
 
 QString WorldManager::typeName(quint32 type) const

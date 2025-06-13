@@ -82,8 +82,8 @@ public:
     Q_INVOKABLE Weapon(WorldObject *parent = 0, quint32 id = 0);
     ~Weapon() override;
 
-    virtual quint32 typeId() const override;
-    virtual QString namePrefix() const override;
+    quint32 typeId() const override;
+    QString namePrefix() const override;
 
     int hitPoints() const;
 

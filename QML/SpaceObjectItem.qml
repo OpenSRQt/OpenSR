@@ -19,6 +19,24 @@ Item {
 
     property int weaponRadius: 0
     property var activeExplosions: []
+    property bool canEnter: false;
+    property bool isDestructible: false;
+
+    function behaviorOnEnter() {
+        if(canEnter) {
+            WorldManager.setCursor(CursorType.Enter)
+        } else if (isDestructible && context.isChoosingToShoot) {
+            WorldManager.setCursor(CursorType.FireFull)
+        }
+    }
+
+    function behaviorOnExit() {
+        if(context.isChoosingToShoot) {
+            WorldManager.setCursor(CursorType.FireSmall)
+        } else {
+            WorldManager.setCursor(CursorType.Main)
+        }
+    }
 
     Loader {
         id: objectLoader
@@ -30,15 +48,19 @@ Item {
                 item.source = object.style.star;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
                 item.source = object.style.texture;
+                isDestructible = true;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet") {
                 item.planet = object;
+                canEnter = true;
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
                 item.source = object.style.texture;
                 item.height = item.width = object.style.width;
                 item.ship = object;
+                isDestructible = true;
                 weaponRadius = object.activeWeapon ? object.activeWeapon.style.radius : 100
             } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::SpaceStation") {
                 item.source = object.style.texture;
+                canEnter = true;
             }
         }
         SpaceMouseArea {
@@ -65,6 +87,7 @@ Item {
             context.objectToShoot = null;
             return;
         }
+        WorldManager.setCursor(CursorType.Main)
         context.isChoosingToShoot = false;
         context.prepareToShoot(object);
     }
@@ -74,7 +97,7 @@ Item {
         AnimatedImage {
             cache: false
             MouseArea {
-                id: item // ?
+                id: item
                 anchors.fill: parent
                 propagateComposedEvents: true
             }
@@ -93,6 +116,7 @@ Item {
                 onDoubleClicked: (mouse) => {
                     mouse.accepted = false;
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
+                        WorldManager.setCursor(CursorType.Main)
                         context.planetToEnter = planetItem.planet;
                         isWaitingForShipArrival = true;
                     }
@@ -240,15 +264,6 @@ Item {
             id: asteroidImage;
             property bool isHighlighted: false
             cache: false
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border {
-                    width: 2
-                    color: "blue"
-                }
-                visible: parent.isHighlighted
-            }
             MouseArea {
                 propagateComposedEvents: true
                 anchors.fill: parent
@@ -303,11 +318,13 @@ Item {
 
     function mouseEntered() {
         if (object) {
+            behaviorOnEnter()
             entered(object);
         }
     }
 
     function mouseExited() {
+        behaviorOnExit()
         exited(object);
     }
 

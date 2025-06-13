@@ -100,7 +100,7 @@ QDataStream &operator<<(QDataStream &stream, const WeaponStyle &style)
 
 QDataStream &operator>>(QDataStream &stream, WeaponStyle &style)
 {
-    quint32 id;
+    quint32 id = 0;
     stream >> id;
     ResourceManager *m = ResourceManager::instance();
     Q_ASSERT(m != 0);

@@ -1,47 +1,60 @@
 #include "CursorManager.h"
-#include "Engine.h"
+#include "OpenSR/AnimatedCursor.h"
+#include <QApplication>
 
 namespace OpenSR
 {
-
 namespace World
 {
 
-CursorManager::CursorManager()
+CursorManager::CursorManager() : m_animatedCursor(new AnimatedCursor()), current(CursorType::Main)
 {
-    cursors[Enter] = loadCursor("Bm.Cursor.Enter", 0, 0);
-    cursors[FireFull] = loadCursor("dat:/Bm.Cursor.FireFull", 0, 0);
-    cursors[FireSmall] = loadCursor("dat:/Bm.Cursor.FireSmall", 0, 0);
-    cursors[Main] = loadCursor("data/DATA/Cursor/Main.GAI", 0, 0);
-    cursors[ScanFull] = loadCursor("dat:/Bm.Cursor.ScanFull", 0, 0);
-    cursors[ScanSmall] = loadCursor("dat:/Bm.Cursor.ScanSmall", 0, 0);
-    cursors[Scroll] = loadCursor("dat:/Bm.Cursor.Scroll", 0, 0);
-    cursors[Take] = loadCursor("dat:/Bm.Cursor.Take", 0, 0);
-    cursors[TalkFull] = loadCursor("dat:/Bm.Cursor.TalkFull", 0, 0);
-    cursors[TalkSmall] = loadCursor("dat:/Bm.Cursor.TalkSmall", 0, 0);
+    cursors[Enter] = loadCursor("data/cursors/Enter.GAI");
+    cursors[FireFull] = loadCursor("data/cursors/FireFull.GAI");
+    cursors[FireSmall] = loadCursor("data/cursors/FireSmall.GAI");
+    cursors[Main] = loadCursor("data/cursors/Main.GAI");
+    cursors[ScanFull] = loadCursor("data/cursors/ScanFull.GAI");
+    cursors[ScanSmall] = loadCursor("data/cursors/ScanSmall.GAI");
+    cursors[Scroll] = loadCursor("data/cursors/Scroll.GAI");
+    cursors[Take] = loadCursor("data/cursors/Take.GAI");
+    cursors[TalkFull] = loadCursor("data/cursors/TalkFull.GAI");
+    cursors[TalkSmall] = loadCursor("data/cursors/TalkSmall.GAI");
+
+    QApplication::setOverrideCursor(Qt::BlankCursor);
+    changeCursor(Main);
 }
 
-const QCursor &CursorManager::getCursor(CursorManager::CursorType type) const
+QMovie *&CursorManager::getCursor(CursorManager::CursorType type)
 {
     auto it = cursors.find(type);
-    if (it != cursors.end())
+    if (it != cursors.end() && it.value())
     {
         return it.value();
     }
-    static QCursor fallback(Qt::ArrowCursor);
     qWarning() << "Cursor not found for type:" << type;
-    return fallback;
+    return cursors.find(Main).value();
 }
 
-QCursor CursorManager::loadCursor(const QString &path, int hotspotX, int hotspotY)
+void CursorManager::changeCursor(CursorManager::CursorType type)
 {
-    QPixmap pixmap(path);
-    if (pixmap.isNull())
+    QMovie *previous = m_animatedCursor->setCursor(getCursor(type));
+    if (!previous)
     {
-        qWarning() << "Failed to load cursor from" << path;
-        return QCursor(Qt::ArrowCursor);
+        return;
     }
-    return QCursor(pixmap, hotspotX, hotspotY);
+    cursors[current] = previous;
+    current = type;
+}
+
+QMovie *CursorManager::loadCursor(const QString &source)
+{
+    QMovie *cursorMovie = new QMovie(source);
+    if (!cursorMovie->isValid())
+    {
+        qWarning() << "Failed to load cursor from" << source;
+        return nullptr;
+    }
+    return cursorMovie;
 }
 
 } // namespace World

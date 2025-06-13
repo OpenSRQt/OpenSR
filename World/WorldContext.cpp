@@ -17,9 +17,9 @@
 */
 
 #include "WorldContext.h"
+#include "Asteroid.h"
 #include "Ship.h"
 #include "WorldObject.h"
-#include "Asteroid.h"
 #include <QDataStream>
 #include <QMap>
 #include <QtQml>
@@ -208,7 +208,7 @@ void WorldContext::setMovementPosition(const QPointF &pos)
 void WorldContext::setObjectToShoot(WorldObject *obj)
 {
     qDebug() << "setObjectToShoot(WorldObject *obj)";
-    if(m_objectToShoot == obj)
+    if (m_objectToShoot == obj)
     {
         return;
     }
@@ -315,7 +315,7 @@ void WorldContext::setContainer(Container *i)
     m_container = i;
 }
 
-WorldObject* WorldContext::objectToShoot() const
+WorldObject *WorldContext::objectToShoot() const
 {
     return m_objectToShoot;
 }

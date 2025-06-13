@@ -32,12 +32,6 @@ int main(int argc, char **argv)
     QApplication::setOrganizationName(SETTINGS_ORGANIZATION);
     QApplication::setApplicationName(SETTINGS_APPLICATION);
 
-    // QApplication::setOverrideCursor(Qt::BlankCursor);
-    // AnimatedCursor cursorOverlay;
-    // // qmlRegisterType<AnimatedCursor>("OpenSR", 1, 0, "AnimatedCursor");
-    // cursorOverlay.setCursor("data/DATA/Cursor/Main.GAI");
-
-    
     engine.setStartupScript(STARTUP_SCRIPT);
     engine.setMainQML(MAIN_QML);
 

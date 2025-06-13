@@ -118,7 +118,8 @@ public:
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(WorldObject *planetToEnter);
+    Q_INVOKABLE bool checkProximity(QPointF center, WorldObject *obj, int radius);
+    void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
     void setStructure(int structure);
     void setActiveWeapon(Weapon* weapon);
@@ -175,7 +176,7 @@ private:
     QPointF m_destination{};
     QPointF m_start_position{};
 
-    int m_structure = 0;
+    int m_structure;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;

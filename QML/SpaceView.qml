@@ -416,16 +416,6 @@ Item {
 
     // Get Gun, Get Gun 0 and Get Gun 1?
     // Ideally, this buttons should be on the bottom panel
-    Button {
-        id: getGunTemporary
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        text: "Get Gun"
-        onClicked: {
-            context.isChoosingToShoot = !context.isChoosingToShoot;
-        }
-    }
-
     Column {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -439,6 +429,11 @@ Item {
                     return;
                 }
                 context.isChoosingToShoot = context.setActiveWeapon(0);
+                if(context.isChoosingToShoot) {
+                    WorldManager.setCursor(CursorType.FireSmall)
+                } else {
+                    WorldManager.setCursor(CursorType.Main)
+                }
             }
         }
 
@@ -450,6 +445,11 @@ Item {
                     return;
                 }
                 context.isChoosingToShoot = context.setActiveWeapon(1);
+                if(context.isChoosingToShoot) {
+                    WorldManager.setCursor(CursorType.FireSmall)
+                } else {
+                    WorldManager.setCursor(CursorType.Main)
+                }
             }
         }
     }
@@ -473,9 +473,9 @@ Item {
         text: "Turn"
         sounded: false
         // TODO: Adding animations leads to crashes. WTF?
-        //normalImage: "res:/DATA/PanelMain2/2TurnN.gi"
-        //hoveredImage: "res:/DATA/FormMain2/2TurnA.gi"
-        //downImage: "res:/DATA/FormMain2/2TurnD.gi"
+        normalImage: "res:/DATA/PanelMain2/2TurnN.gi"
+        hoveredImage: "res:/DATA/FormMain2/2TurnA.gi"
+        downImage: "res:/DATA/FormMain2/2TurnD.gi"
         onClicked: {
             if (!WorldManager.turnFinished) {
                 return;
