@@ -20,11 +20,11 @@
 
 #include "WorldBindings.h"
 
-#include "Planet.h"
 #include <QLine>
 #include <QtMath>
 #include <QtQml/QQmlEngine>
 #include <cmath>
+#include "InhabitedPlanet.h"
 
 namespace OpenSR
 {

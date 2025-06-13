@@ -19,6 +19,7 @@
 #include "WorldContext.h"
 #include "Ship.h"
 #include "WorldObject.h"
+#include "Asteroid.h"
 #include <QDataStream>
 #include <QMap>
 #include <QtQml>

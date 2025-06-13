@@ -97,9 +97,6 @@ public:
     void processTurn(float time) override;
     void finishTurn() override;
 
-    Q_INVOKABLE void damageObject();
-    void destroyObject();
-
     Q_INVOKABLE void damageObject(int damage);
     void destroyObject();
 

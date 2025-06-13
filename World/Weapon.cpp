@@ -120,14 +120,10 @@ QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data)
            data.hitPoints;
 }
 
-const quint32 Weapon::m_staticTypeId = typeIdFromClassName(Weapon::staticMetaObject.className());
-
 template <> void WorldObject::registerType<Weapon>(QQmlEngine *qml, QJSEngine *script)
 {
     qRegisterMetaType<WeaponStyle>();
-    qRegisterMetaTypeStreamOperators<WeaponStyle>();
     qRegisterMetaType<WeaponStyle::Data>();
-    qRegisterMetaTypeStreamOperators<WeaponStyle::Data>();
     qmlRegisterType<Weapon>("OpenSR.World", 1, 0, "Weapon");
 }
 

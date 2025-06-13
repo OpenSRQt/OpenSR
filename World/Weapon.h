@@ -21,8 +21,8 @@
 
 #include "Equipment.h"
 #include "World.h"
-#include "Planet.h"
 #include <QGraphicsItem>
+#include "ResourceManager.h"
 
 namespace OpenSR
 {

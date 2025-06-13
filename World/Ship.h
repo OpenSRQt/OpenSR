@@ -19,14 +19,11 @@
 #ifndef OPENSR_WORLD_SHIP_H
 #define OPENSR_WORLD_SHIP_H
 
-#include <Container.h>
-
 #include "MannedObject.h"
 #include "WorldObject.h"
-#include "ResourceManager.h"
 #include "World.h"
 #include <QPoint>
-
+#include "Weapon.h"
 namespace OpenSR
 {
 namespace World
