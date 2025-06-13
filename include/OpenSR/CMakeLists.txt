@@ -1,2 +1,0 @@
-SET(HEADERS DATTranslator.h Engine.h GAIAnimatedImage.h GAITexture.h libRangerQt.h Music.h MusicDecoder.h OpenSR.h PlanetDrawer.h PluginInterface.h QMLHelper.h QMLQuestPlayer.h ResourceManager.h Sound.h SoundManager.h SpaceMouseArea.h TexturedBezierCurve.h TexturedPolyline.h Types.h)
-ADD_SUBDIRECTORY(QM)

@@ -176,7 +176,7 @@ private:
     QPointF m_destination{};
     QPointF m_start_position{};
 
-    int m_structure;
+    int m_structure = 0;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;

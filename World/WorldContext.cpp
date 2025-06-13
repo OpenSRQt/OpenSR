@@ -207,7 +207,6 @@ void WorldContext::setMovementPosition(const QPointF &pos)
 
 void WorldContext::setObjectToShoot(WorldObject *obj)
 {
-    qDebug() << "setObjectToShoot(WorldObject *obj)";
     if (m_objectToShoot == obj)
     {
         return;
@@ -277,11 +276,6 @@ bool WorldContext::setActiveWeapon(int pos) const
     auto ship = qobject_cast<Ship *>(playerShip());
     if (m_container && ship && weapon)
     {
-        if (ship->activeWeapon() && weapon == ship->activeWeapon())
-        {
-            ship->setActiveWeapon(nullptr);
-            return false;
-        }
         ship->setActiveWeapon(weapon);
         return true;
     }

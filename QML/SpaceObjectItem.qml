@@ -146,22 +146,9 @@ Item {
             cache: false
             property Ship ship
             property int weaponRadius: object.activeWeapon ? object.activeWeapon.style.radius : 100
-            property bool isHighlighted: false
-
-            Rectangle {
-                anchors.fill: parent
-                color: "transparent"
-                border {
-                    width: 2
-                    color: "blue"
-                }
-                visible: parent.isHighlighted
-            }
             MouseArea {
                 propagateComposedEvents: true
                 anchors.fill: parent
-                onEntered: npcShipImage.isHighlighted = true
-                onExited: npcShipImage.isHighlighted = false
                 onClicked: {
                     if(context.isChoosingToShoot) destroyComponent();
                 }
@@ -262,13 +249,10 @@ Item {
         id: asteroidComponent
         AnimatedImage {
             id: asteroidImage;
-            property bool isHighlighted: false
             cache: false
             MouseArea {
                 propagateComposedEvents: true
                 anchors.fill: parent
-                onEntered: asteroidImage.isHighlighted = true
-                onExited: asteroidImage.isHighlighted = false
                 onClicked: {
                     if(context.isChoosingToShoot) destroyComponent();
                 }
@@ -276,6 +260,7 @@ Item {
             Connections {
                 target: object
                 function onAsteroidDestroyed() {
+                    console.log("onAsteroidDestroyed()")
                     self.opacity = 0
                     var boomObj = boom.createObject(spaceNode, {
                         x: object.position.x,
@@ -351,7 +336,6 @@ Item {
                 running: true
                 repeat: false
                 onTriggered: {
-                    console.log("Timer triggered after " + interval + " ms")
                     explosionContainer.destroy()
                     if (creator) creator.destroy();
                 }

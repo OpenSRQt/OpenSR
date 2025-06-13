@@ -173,17 +173,17 @@ Item {
     }
     
     function startQuest(id) {
-        changeScreen("qrc:/OpenSR/QuestPlayer.qml", {"questID": id});
+        destroyAndChangeScreen("qrc:/OpenSR/QuestPlayer.qml", {"questID": id});
     }
 
     function newGame() {
         World.generateWorld("res:/World/DefaultWorldGen.js");
-        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function loadGame() {
         World.loadWorld("/tmp/test.osr");
-        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function componentObjectCreated(object, id)

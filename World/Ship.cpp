@@ -18,9 +18,9 @@
 
 #include "Ship.h"
 
+#include "Planet.h"
 #include "WorldBindings.h"
 
-#include "InhabitedPlanet.h"
 #include <QLine>
 #include <QtMath>
 #include <QtQml/QQmlEngine>
@@ -377,9 +377,13 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
         return;
     }
     Planet *planet = qobject_cast<Planet *>(planetToEnter);
-    int planetRadius = planet->style().radius();
+    int planetRadius = planet->radius();
+    QPointF planetCenter = planet->position();
+    QPointF shipPosition = position();
 
-    if (checkProximity(planet->position(), planetToEnter, planetRadius) && !m_isNearPlanet)
+    const qreal distance = QLineF(shipPosition, planetCenter).length();
+
+    if (distance <= planetRadius && !m_isNearPlanet)
     {
         m_isNearPlanet = true;
         emit enterPlace();
