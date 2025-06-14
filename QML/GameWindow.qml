@@ -10,12 +10,16 @@ Window {
 
     function createObjectFromURL(url, parent, id, properties) {
         properties = (typeof properties === 'undefined') ? {} : properties;
-        ScreenLoader.createObjectFromURL(url, parent, id, properties);
+        return ScreenLoader.createObjectFromURL(url, parent, id, properties);
     }
 
     function changeScreen(url, properties) {
         properties = (typeof properties === 'undefined') ? {} : properties;
-        createObjectFromURL(url, gameScreen, "screenRequest", properties);
+        var obj = createObjectFromURL(url, gameScreen, "screenRequest", properties);
+        if(obj) {
+            CursorManager.setWindow(obj);
+            CursorManager.changeCursor(CursorType.Main);
+        }
     }
 
     function destroyAndChangeScreen(url, properties) {
@@ -31,5 +35,13 @@ Window {
     }
 
     function componentObjectCreated() {
+    }
+
+    function quitComponent(obj) {
+        if(obj) {
+            CursorManager.setWindow(obj.parent);
+            CursorManager.changeCursor(CursorType.Main);
+            obj.destroy()
+        }
     }
 }

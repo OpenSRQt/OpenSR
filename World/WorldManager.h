@@ -38,7 +38,6 @@
 #include "SpaceStation.h"
 #include "TurnAnimation.h"
 #include "Weapon.h"
-#include "CursorManager.h"
 
 namespace OpenSR
 {
@@ -86,8 +85,6 @@ public:
 
     WorldContext *context() const;
     bool turnFinished() const;
-
-    Q_INVOKABLE void setCursor(CursorManager::CursorType cursor);
 
     Q_INVOKABLE QString typeName(quint32 type) const;
 
@@ -145,7 +142,7 @@ private:
     TurnAnimation *m_animation;
     bool m_turnFinished = true;
 
-    CursorManager m_cursorManager;
+    // CursorManager* m_cursorManager{};
 
     static WorldManager *m_staticInstance;
     static quint32 m_idPool;

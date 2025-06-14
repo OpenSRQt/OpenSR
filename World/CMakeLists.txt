@@ -35,7 +35,6 @@ add_library(world SHARED
     WorldBindings.cpp
     ResourceManager.cpp
     Resource.cpp
-    CursorManager.cpp
 
     Artefact.h
     Asteroid.h
@@ -71,7 +70,6 @@ add_library(world SHARED
     WorldBindings.h
     ResourceManager.h
     Resource.h
-    CursorManager.h
 )
 
 target_include_directories(world PUBLIC

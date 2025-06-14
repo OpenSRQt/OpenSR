@@ -29,7 +29,7 @@
 #include <OpenSR/SpaceMouseArea.h>
 #include <OpenSR/TexturedBezierCurve.h>
 #include <OpenSR/TexturedPolyline.h>
-
+#include "OpenSR/CursorManager.h"
 #include <QVariant>
 #include <QtQml>
 
@@ -91,6 +91,9 @@ void QMLHelper::registerQMLTypes(const char *uri)
 {
     using namespace OpenSR;
     // qmlRegisterSingletonType<Engine>(uri, 1, 0, "Engine", engineSingletonProvider);
+    qmlRegisterSingletonType<CursorManager>("OpenSR", 1, 0, "CursorManager", [](QQmlEngine *, QJSEngine *) -> QObject* {
+        return new CursorManager();
+    });
     qmlRegisterSingletonType<OpenSR::QML::QMLHelper>(uri, 1, 0, "OSR", osrSingletonProvider);
     qmlRegisterUncreatableType<ResourceManager>(uri, 1, 0, "ResourceManager", "ResourceManager is not instantiable");
     qmlRegisterType<Sound>(uri, 1, 0, "Sound");
@@ -101,6 +104,8 @@ void QMLHelper::registerQMLTypes(const char *uri)
     qmlRegisterType<TexturedBezierCurve>(uri, 1, 0, "TexturedBezierCurve");
     qmlRegisterType<SpaceMouseArea>(uri, 1, 0, "SpaceMouseArea");
     qmlRegisterType<PlanetDrawer>(uri, 1, 0, "PlanetDrawer");
+    qmlRegisterUncreatableMetaObject(CursorManager::staticMetaObject, "OpenSR", 1, 0, "CursorType",
+        "Error: Cannot create instance");
 }
 } // namespace QML
 } // namespace OpenSR

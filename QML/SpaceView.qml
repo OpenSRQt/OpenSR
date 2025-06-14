@@ -114,7 +114,8 @@ Item {
         for (var i in spaceNode.children) {
             spaceNode.children[i].destroy();
         }
-
+        CursorManager.setWindow(view);
+        CursorManager.changeCursor(CursorType.Main);
         if (!system)
             return;
 
@@ -430,9 +431,9 @@ Item {
                 }
                 context.isChoosingToShoot = context.setActiveWeapon(0);
                 if(context.isChoosingToShoot) {
-                    WorldManager.setCursor(CursorType.FireSmall)
+                    CursorManager.changeCursor(CursorType.FireSmall)
                 } else {
-                    WorldManager.setCursor(CursorType.Main)
+                    CursorManager.changeCursor(CursorType.Main)
                 }
             }
         }
@@ -446,9 +447,9 @@ Item {
                 }
                 context.isChoosingToShoot = context.setActiveWeapon(1);
                 if(context.isChoosingToShoot) {
-                    WorldManager.setCursor(CursorType.FireSmall)
+                    CursorManager.changeCursor(CursorType.FireSmall)
                 } else {
-                    WorldManager.setCursor(CursorType.Main)
+                    CursorManager.changeCursor(CursorType.Main)
                 }
             }
         }

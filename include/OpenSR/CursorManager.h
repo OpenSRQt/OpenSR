@@ -4,13 +4,12 @@
 #include "OpenSR/AnimatedCursor.h"
 
 namespace OpenSR {
-namespace World {
 
-class CursorManager {
-  Q_GADGET
+class CursorManager : public QObject {
+  Q_OBJECT
 public:
 
-  CursorManager();
+  CursorManager(QQuickItem* window = nullptr);
 
   enum CursorType {
     Enter,
@@ -27,7 +26,10 @@ public:
   Q_ENUM(CursorType)
 
   Q_INVOKABLE QMovie * &getCursor(CursorManager::CursorType type);
-  void changeCursor(CursorManager::CursorType type);
+  Q_INVOKABLE void changeCursor(CursorManager::CursorType type);
+  Q_INVOKABLE void showCursor();
+  Q_INVOKABLE void hideCursor();
+  Q_INVOKABLE void setWindow(QQuickItem* window);
 
 private:
   QMap<CursorType, QMovie*> cursors;
@@ -37,8 +39,6 @@ private:
   CursorType current;
 
 };
-
-} // namespace World
 
 } // namespace OpenSR
 

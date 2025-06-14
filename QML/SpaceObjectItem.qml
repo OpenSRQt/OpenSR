@@ -24,17 +24,17 @@ Item {
 
     function behaviorOnEnter() {
         if(canEnter) {
-            WorldManager.setCursor(CursorType.Enter)
+            CursorManager.changeCursor(CursorType.Enter)
         } else if (isDestructible && context.isChoosingToShoot) {
-            WorldManager.setCursor(CursorType.FireFull)
+            CursorManager.changeCursor(CursorType.FireFull)
         }
     }
 
     function behaviorOnExit() {
         if(context.isChoosingToShoot) {
-            WorldManager.setCursor(CursorType.FireSmall)
+            CursorManager.changeCursor(CursorType.FireSmall)
         } else {
-            WorldManager.setCursor(CursorType.Main)
+            CursorManager.changeCursor(CursorType.Main)
         }
     }
 
@@ -87,7 +87,7 @@ Item {
             context.objectToShoot = null;
             return;
         }
-        WorldManager.setCursor(CursorType.Main)
+        CursorManager.changeCursor(CursorType.Main)
         context.isChoosingToShoot = false;
         context.prepareToShoot(object);
     }
@@ -116,7 +116,7 @@ Item {
                 onDoubleClicked: (mouse) => {
                     mouse.accepted = false;
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
-                        WorldManager.setCursor(CursorType.Main)
+                        CursorManager.changeCursor(CursorType.Main)
                         context.planetToEnter = planetItem.planet;
                         isWaitingForShipArrival = true;
                     }
@@ -260,7 +260,6 @@ Item {
             Connections {
                 target: object
                 function onAsteroidDestroyed() {
-                    console.log("onAsteroidDestroyed()")
                     self.opacity = 0
                     var boomObj = boom.createObject(spaceNode, {
                         x: object.position.x,
