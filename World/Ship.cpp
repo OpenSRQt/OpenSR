@@ -18,9 +18,9 @@
 
 #include "Ship.h"
 
+#include "Planet.h"
 #include "WorldBindings.h"
 
-#include "Planet.h"
 #include <QLine>
 #include <QtMath>
 #include <QtQml/QQmlEngine>
@@ -390,9 +390,66 @@ void Ship::checkPlanetProximity(WorldObject *planetToEnter)
     }
 }
 
+bool Ship::checkProximity(QPointF center, WorldObject *obj, int radius)
+{
+    if (!obj)
+    {
+        return false;
+    }
+    QPointF shipPosition = position();
+
+    const qreal distance = QLineF(shipPosition, center).length();
+    return distance <= radius;
+}
+
 bool Ship::checkPlannedActions() const
 {
     return m_actionsPlanned;
+}
+
+int Ship::structure() const
+{
+    return m_structure;
+}
+
+void Ship::setStructure(int structure)
+{
+    if (structure == m_structure)
+    {
+        return;
+    }
+    m_structure = structure;
+    emit structureChanged(structure);
+}
+
+Weapon *Ship::activeWeapon() const
+{
+    return m_activeWeapon;
+}
+
+void Ship::setActiveWeapon(Weapon *weapon)
+{
+    if (weapon == m_activeWeapon)
+    {
+        return;
+    }
+    m_activeWeapon = weapon;
+    emit activeWeaponChanged(weapon);
+}
+
+void Ship::damageObject(int damage)
+{
+    m_structure -= damage;
+    if (m_structure <= 0)
+    {
+        destroyObject();
+    }
+    emit shipDamaged(damage);
+}
+
+void Ship::destroyObject()
+{
+    emit shipDestroyed();
 }
 
 } // namespace World

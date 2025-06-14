@@ -82,10 +82,9 @@ public:
     Q_INVOKABLE InhabitedPlanet(WorldObject *parent = 0, quint32 id = 0);
     ~InhabitedPlanet() override;
 
-    quint32 typeId() const override;
-    QString namePrefix() const override;
-
-    void prepareSave() override;
+    virtual quint32 typeId() const override;
+    virtual QString namePrefix() const override;
+    virtual void prepareSave() override;
 
     InhabitedPlanetStyle style() const;
     int radius() override;

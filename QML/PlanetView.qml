@@ -44,7 +44,7 @@ Item {
         anchors.left: parent.left
         text: "Exit"
         onClicked: {
-            planetView.destroy()
+            quitComponent(planetView)
             context.playerShip.exitThePlace();
         }
     }

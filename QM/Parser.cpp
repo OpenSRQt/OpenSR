@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <QStack>
 #include <cmath>
-#include <qtypes.h>
+#include <QtGlobal>
 
 namespace OpenSR
 {

@@ -12,9 +12,6 @@ Item {
     property int maxScrollTime: 600
 
     property var trajectoryView
-
-    property SpaceObjectItem playerShipItem
-    property list<SpaceObjectItem> clickables
     property var object
 
     anchors.fill: parent
@@ -34,6 +31,7 @@ Item {
             context.playerShip.prepareToMove(positionInSpaceNode);
             showTrajectory(context.playerShip);
             WorldManager.startTurn();
+            if(context.objectToShoot) fireProjectile(context.objectToShoot);
             hideTrajectory(context.playerShip);
         }
 
@@ -96,11 +94,28 @@ Item {
         }
     }
 
+    Item {
+        id: bottomPanel
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 100
+        Image {
+            source: "res:/DATA/PanelMain2/2BG.gi"
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.fill: parent
+
+            cache: true
+        }
+    }
+
     onSystemChanged: {
         for (var i in spaceNode.children) {
             spaceNode.children[i].destroy();
         }
-
+        CursorManager.setWindow(view);
+        CursorManager.changeCursor(CursorType.Main);
         if (!system)
             return;
 
@@ -135,6 +150,24 @@ Item {
             object: null,
             visible: false
         });
+    }
+
+    Projectile {
+        id: factory
+        anchors.fill: parent
+    }
+
+    function fireProjectile(object) {
+        if(object) {
+            let startX = context.playerShip.position.x;
+            let startY = context.playerShip.position.y;
+
+            var projectile = factory.createProjectile(
+                startX,
+                startY,
+                object
+            )
+        }
     }
 
     DebugTooltip {
@@ -382,16 +415,74 @@ Item {
         }
     }
 
+    // Get Gun, Get Gun 0 and Get Gun 1?
+    // Ideally, this buttons should be on the bottom panel
+    Column {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        spacing: 5
+
+        Button {
+            id: getGun0
+            text: "Get Gun 0"
+            onClicked: {
+                if (!WorldManager.turnFinished) {
+                    return;
+                }
+                context.isChoosingToShoot = context.setActiveWeapon(0);
+                if(context.isChoosingToShoot) {
+                    CursorManager.changeCursor(CursorType.FireSmall)
+                } else {
+                    CursorManager.changeCursor(CursorType.Main)
+                }
+            }
+        }
+
+        Button {
+            id: getGun1
+            text: "Get Gun 1"
+            onClicked: {
+                if (!WorldManager.turnFinished) {
+                    return;
+                }
+                context.isChoosingToShoot = context.setActiveWeapon(1);
+                if(context.isChoosingToShoot) {
+                    CursorManager.changeCursor(CursorType.FireSmall)
+                } else {
+                    CursorManager.changeCursor(CursorType.Main)
+                }
+            }
+        }
+    }
+
+    // TODO: Put it into right place of bottom panel
+    Button {
+        id: showShipButton
+        anchors.bottom: parent.bottom
+        anchors.right: turnButton.left
+        anchors.bottomMargin: 13
+        anchors.rightMargin: 64
+        sounded: false
+        normalImage: "res:/DATA/FormAB2/2ShipN.gi"
+        hoveredImage: "res:/DATA/FormAB2/2ShipA.gi"
+        downImage: "res:/DATA/FormAB2/2ShipD.gi"
+    }
+
     Button {
         id: turnButton
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        text: "Turn"
+        sounded: false
+        normalImage: "res:/DATA/PanelMain2/2TurnN.gi"
+        hoveredImage: "res:/DATA/PanelMain2/2TurnA.gi"
+        downImage: "res:/DATA/PanelMain2/2TurnD.gi"
         onClicked: {
             if (!WorldManager.turnFinished) {
                 return;
             }
             WorldManager.startTurn();
+            if(context.objectToShoot) fireProjectile(context.objectToShoot);
+            context.isChoosingToShoot = false;
             hideTrajectory(context.playerShip);
         }
     }

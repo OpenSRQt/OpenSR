@@ -19,9 +19,10 @@ add_library(engine SHARED
     DATTranslator.cpp
     SpaceMouseArea.cpp
     PlanetDrawer.cpp
+    AnimatedCursor.cpp
     GAIMaterial.cpp
     GAIShader.cpp
-
+    CursorManager.cpp
     ${CMAKE_SOURCE_DIR}/include/OpenSR/Engine.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/SoundManager.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/Sound.h
@@ -39,6 +40,8 @@ add_library(engine SHARED
     ${CMAKE_SOURCE_DIR}/include/OpenSR/DATTranslator.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/SpaceMouseArea.h
     ${CMAKE_SOURCE_DIR}/include/OpenSR/PlanetDrawer.h
+    ${CMAKE_SOURCE_DIR}/include/OpenSR/AnimatedCursor.h
+    ${CMAKE_SOURCE_DIR}/include/OpenSR/CursorManager.h
 
     GAIMaterial.h
     GAIShader.h

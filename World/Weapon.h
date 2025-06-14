@@ -21,24 +21,85 @@
 
 #include "Equipment.h"
 #include "World.h"
+#include <QGraphicsItem>
+#include "ResourceManager.h"
 
 namespace OpenSR
 {
 namespace World
 {
-class OPENSR_WORLD_API Weapon : public Equipment
+
+class OPENSR_WORLD_API WeaponStyle : public Resource
+{
+    Q_GADGET
+
+    Q_PROPERTY(QString SoundPath READ SoundPath WRITE setSoundPath)
+    Q_PROPERTY(QString preview READ preview WRITE setPreview)
+    Q_PROPERTY(QString weaponAnim READ weaponAnim WRITE setWeaponAnim)
+    Q_PROPERTY(QString typeWeapon READ typeWeapon WRITE setTypeWeapon)
+    Q_PROPERTY(int radius READ radius WRITE setRadius)
+    Q_PROPERTY(int hitPoints READ hitPoints WRITE setHitPoints)
+
+public:
+    struct Data
+    {
+        QString SoundPath;
+        QString preview; // i.gi/s.gi/a.gi
+        QString weaponAnim;
+        QString typeWeapon;
+        int radius;
+        int hitPoints;
+    };
+
+    QString SoundPath() const;
+    QString preview() const;
+    QString weaponAnim() const;
+    QString typeWeapon() const;
+    int radius() const;
+    int hitPoints() const;
+
+    void setSoundPath(const QString &);
+    void setPreview(const QString &);
+    void setWeaponAnim(const QString &);
+    void setTypeWeapon(const QString &);
+    void setRadius(int);
+    void setHitPoints(int);
+};
+
+bool operator==(const WeaponStyle &one, const WeaponStyle &another);
+
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle &style);
+QDataStream &operator>>(QDataStream &stream, WeaponStyle &style);
+QDataStream &operator<<(QDataStream &stream, const WeaponStyle::Data &data);
+QDataStream &operator>>(QDataStream &stream, WeaponStyle::Data &data);
+
+class OPENSR_WORLD_API Weapon: public Equipment
 {
     Q_OBJECT
     OPENSR_WORLD_OBJECT
-
+    Q_PROPERTY(OpenSR::World::WeaponStyle style READ style WRITE setStyle NOTIFY styleChanged)
 public:
     Q_INVOKABLE Weapon(WorldObject *parent = 0, quint32 id = 0);
     ~Weapon() override;
 
     quint32 typeId() const override;
     QString namePrefix() const override;
+
+    int hitPoints() const;
+
+    WeaponStyle style() const;
+    void setStyle(const WeaponStyle& style);
+
+signals:
+    void styleChanged(const WeaponStyle& style);
+
+private:
+    WeaponStyle m_style;
 };
-} // namespace World
-} // namespace OpenSR
+}
+}
+
+Q_DECLARE_METATYPE(OpenSR::World::WeaponStyle::Data)
+Q_DECLARE_METATYPE(OpenSR::World::WeaponStyle)
 
 #endif // OPENSR_WORLD_WEAPON_H

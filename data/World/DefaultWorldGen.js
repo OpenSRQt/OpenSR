@@ -1,5 +1,19 @@
 var context = World.context;
 
+function weapon(SoundPath, preview, weaponAnim, typeWeapon, radius, hitPoints) {
+    var style = World.WeaponStyle();
+
+    style.SoundPath = SoundPath;
+    style.preview = preview;
+    style.weaponAnim = weaponAnim;
+    style.typeWeapon = typeWeapon;
+    style.radius = radius;
+    style.hitPoints = hitPoints;
+
+    var weapon = World.Weapon(context);
+    weapon.style = style;
+    return weapon
+}
 function genRace(idName, name, icon, color, sound) {
     var style = World.RaceStyle();
 
@@ -131,7 +145,6 @@ planet.period = 15;
 planet.angle = 3.1415 / 4;
 planet.position = Qt.point(355, 222);
 
-
 function initStation(obj, kind) {
     switch (kind) {
     case "ranger":
@@ -171,19 +184,38 @@ function shipStyleByAffiliation(ship) {
     var info = Engine.datValue("Data.SE.Ship." + raceStr + "." + rankStr);
     var style = World.ShipStyle();
     style.texture = "dat:/" + info.Image; // animated
-    return style;
+    return style
 }
 
-var ship1 = World.Ship(context);
+var container = World.Container(context);
+var weapon1 = weapon("DATA/PQI/Weapon/0/", "res:/DATA/Items/2W01", "res:/DATA/AB/2W01", "energy", 200, 12);
+var weapon2 = weapon("Data/PQI/Weapon/0/", "res:/DATA/Items/2W01", "res:/DATA/AB/2W02", "fragment", 300, 20);
+container.addWeapon(weapon1, 0);
+container.addWeapon(weapon2, 1);
 
+var ship1 = World.Ship(context);
 ship1.position    = Qt.point(-300, -300);
 ship1.affiliation = World.ShipAffiliation.People;
 ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
 ship1.angle       = 0;
-
+ship1.structure   = 400;
+ship1.activeWeapon = null;
 ship1.style.width = 64;
+
+var ship2 = World.Ship(system);
+ship2.affiliation = World.ShipAffiliation.Fei;
+ship2.rank        = World.ShipRank.Pirate;
+ship2.style       = shipStyleByAffiliation(ship2);
+ship2.angle       = 0;
+ship2.structure   = 30;
+ship2.activeWeapon = null;
+ship2.style.width = 64;
+ship2.position    = Qt.point(-300, 300);
+
+context.container = container;
 context.playerShip = ship1;
+context.objectToShoot = null;
 context.planetToEnter = null;
 context.currentSystem = system;
 

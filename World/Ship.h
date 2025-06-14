@@ -20,10 +20,10 @@
 #define OPENSR_WORLD_SHIP_H
 
 #include "MannedObject.h"
-#include "Resource.h"
+#include "WorldObject.h"
 #include "World.h"
 #include <QPoint>
-
+#include "Weapon.h"
 namespace OpenSR
 {
 namespace World
@@ -66,6 +66,8 @@ class OPENSR_WORLD_API Ship : public MannedObject
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged STORED false)
     Q_PROPERTY(QPointF destination READ destination WRITE setDestination NOTIFY destinationChanged)
     Q_PROPERTY(bool isMoving READ isMoving WRITE setIsMoving NOTIFY isMovingChanged)
+    Q_PROPERTY(int structure READ structure WRITE setStructure NOTIFY structureChanged)
+    Q_PROPERTY(Weapon* activeWeapon READ activeWeapon WRITE setActiveWeapon STORED false NOTIFY activeWeaponChanged)
 
 public:
     enum class ShipAffiliation
@@ -108,14 +110,19 @@ public:
     float speed() const;
     QPointF destination() const;
     bool isMoving() const;
+    int structure() const;
+    Weapon* activeWeapon() const;
 
     Q_INVOKABLE void exitThePlace();
     void setAffiliation(ShipAffiliation affiliation);
     void setRank(ShipRank rank);
     void setDestination(QPointF destination);
     void setAngle(float angle);
-    void checkPlanetProximity(WorldObject *planetToEnter);
+    Q_INVOKABLE bool checkProximity(QPointF center, WorldObject *obj, int radius);
+    void checkPlanetProximity(WorldObject* planetToEnter);
     void setIsMoving(bool isMoving);
+    void setStructure(int structure);
+    void setActiveWeapon(Weapon* weapon);
 
     static const float normalLinearSpeed;
     static const float normalAngularSpeed;
@@ -127,9 +134,13 @@ public:
     void calcTrajectory(const QPointF &destination);
     bool checkPlannedActions() const;
 
-signals:
+    Q_INVOKABLE void damageObject(int);
+    void destroyObject();
+
+   signals:
     void affiliationChanged(ShipAffiliation affiliation);
     void rankChanged(ShipRank rank);
+    void structureChanged(int);
     void timeChanged();
     void speedChanged();
     void destinationChanged();
@@ -139,6 +150,10 @@ signals:
 
     void enterPlace();
     void exitPlace();
+    void activeWeaponChanged(Weapon*);
+
+    void shipDamaged(int);
+    void shipDestroyed();
 
 private:
     QPointF calcPosition(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
@@ -152,6 +167,7 @@ private:
 
     ShipAffiliation m_affiliation{};
     ShipRank m_rank{};
+    Weapon* m_activeWeapon{};
 
     float m_angle{};
     float m_speed{};
@@ -159,6 +175,8 @@ private:
     float m_targetAngle{};
     QPointF m_destination{};
     QPointF m_start_position{};
+
+    int m_structure = 0;
 
     bool m_isNearPlanet = false;
     bool m_isMoving = false;

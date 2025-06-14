@@ -339,8 +339,8 @@ void Asteroid::startTurn()
 
 void Asteroid::processTurn(float time)
 {
-    updateOrbitalTime(time);
-    calcPosition();
+    // updateOrbitalTime(time);
+    // calcPosition();
     SpaceObject::processTurn(time);
 }
 
@@ -348,5 +348,17 @@ void Asteroid::finishTurn()
 {
     SpaceObject::finishTurn();
 }
+
+void Asteroid::damageObject(int damage)
+{
+    destroyObject();
+    emit asteroidDamaged(damage);
+}
+
+void Asteroid::destroyObject()
+{
+    emit asteroidDestroyed();
+}
+
 } // namespace World
 } // namespace OpenSR

@@ -37,6 +37,7 @@
 #include "Ship.h"
 #include "SpaceStation.h"
 #include "TurnAnimation.h"
+#include "Weapon.h"
 
 namespace OpenSR
 {
@@ -98,6 +99,7 @@ public:
     Q_INVOKABLE OpenSR::World::PlanetStyle PlanetStyle();
     Q_INVOKABLE OpenSR::World::StationStyle StationStyle();
     Q_INVOKABLE OpenSR::World::InhabitedPlanetStyle InhabitedPlanetStyle();
+    Q_INVOKABLE OpenSR::World::WeaponStyle WeaponStyle();
     Q_INVOKABLE OpenSR::World::DesertPlanetStyle DesertPlanetStyle();
 
     Q_INVOKABLE OpenSR::World::Race *Race(OpenSR::World::WorldObject *parent = 0);
@@ -139,6 +141,8 @@ private:
     WorldContext *m_context;
     TurnAnimation *m_animation;
     bool m_turnFinished = true;
+
+    // CursorManager* m_cursorManager{};
 
     static WorldManager *m_staticInstance;
     static quint32 m_idPool;

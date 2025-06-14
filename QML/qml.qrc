@@ -13,5 +13,6 @@
         <file>TrajectoryItem.qml</file>
         <file>PlanetItem.qml</file>
         <file>PlanetView.qml</file>
+        <file>Projectile.qml</file>
     </qresource>
 </RCC>
