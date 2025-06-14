@@ -454,12 +454,13 @@ Item {
         }
     }
 
-
     // TODO: Put it into right place of bottom panel
     Button {
         id: showShipButton
         anchors.bottom: parent.bottom
         anchors.right: turnButton.left
+        anchors.bottomMargin: 13
+        anchors.rightMargin: 64
         sounded: false
         normalImage: "res:/DATA/FormAB2/2ShipN.gi"
         hoveredImage: "res:/DATA/FormAB2/2ShipA.gi"
@@ -470,12 +471,10 @@ Item {
         id: turnButton
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        text: "Turn"
         sounded: false
-        // TODO: Adding animations leads to crashes. WTF?
         normalImage: "res:/DATA/PanelMain2/2TurnN.gi"
-        hoveredImage: "res:/DATA/FormMain2/2TurnA.gi"
-        downImage: "res:/DATA/FormMain2/2TurnD.gi"
+        hoveredImage: "res:/DATA/PanelMain2/2TurnA.gi"
+        downImage: "res:/DATA/PanelMain2/2TurnD.gi"
         onClicked: {
             if (!WorldManager.turnFinished) {
                 return;
