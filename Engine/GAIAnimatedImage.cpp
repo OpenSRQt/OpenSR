@@ -58,7 +58,7 @@ class GAIAnimatedImage::GAIAnimatedImagePrivate
     QList<QVector<QPoint>> m_gaiOffsets;
     QTimer m_timer;
 
-    std::vector<std::unique_ptr<GAITexture>> m_textures;
+    std::vector<std::shared_ptr<GAITexture>> m_textures;
     long long m_currentFile = 0;
     bool m_fileChanged = false;
     bool m_playing = true;
@@ -168,7 +168,7 @@ QSGNode *GAIAnimatedImage::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
 
     if (d->m_fileChanged)
     {
-        material->setTexture(d->m_textures[d->m_currentFile].get());
+        material->setTexture(d->m_textures[d->m_currentFile]);
         node->markDirty(QSGNode::DirtyMaterial);
         d->m_fileChanged = false;
     }
