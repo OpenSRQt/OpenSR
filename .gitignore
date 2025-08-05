@@ -5,6 +5,8 @@ Makefile
 CMakeFiles
 *.user
 CMakeCache.txt
+/.vscode
+/.qt
 # Root build dir
 /build
 /libworld.so

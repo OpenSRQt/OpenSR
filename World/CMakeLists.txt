@@ -81,6 +81,9 @@ target_compile_definitions(world PRIVATE OPENSR_WORLD_BUILD)
 
 target_link_libraries(world PRIVATE 
     engine 
+)
+
+target_link_libraries(world PUBLIC 
     Qt6::Core 
     Qt6::Gui 
     Qt6::Widgets 

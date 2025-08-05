@@ -39,6 +39,7 @@ add_subdirectory(ImagePlugin)
 add_subdirectory(QM)
 add_subdirectory(Engine)
 add_subdirectory(World)
+add_subdirectory(tests)
 
 if(BUILD_RESOURCE_VIEWER OR BUILD_PLANET_VIEWER OR BUILD_QUEST_PLAYER OR BUILD_DAT_TOOLS)
     add_subdirectory(tools)

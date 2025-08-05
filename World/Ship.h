@@ -145,7 +145,7 @@ private:
     float calcAngle(const float dt, const float angle, const QPointF &pos, const QPointF &dest);
     void updatePosition(const float dt = 0.0f);
     void updateAngle(const float dt = 0.0f);
-    void normalizeAnlge(float &deltaAngle);
+    static void normalizeAngle(float &deltaAngle);
     void initTargetAngle(const QPointF &pos, const QPointF &dest);
     void correctLinearSpeed(const QPointF &dest, const QPointF &pos);
     void resetSpeedParams();
@@ -163,6 +163,8 @@ private:
     bool m_isNearPlanet = false;
     bool m_isMoving = false;
     bool m_actionsPlanned = false;
+
+    friend class TestShip;
 };
 } // namespace World
 } // namespace OpenSR
