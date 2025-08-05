@@ -112,31 +112,6 @@ bool operator==(const ShipStyle &one, const ShipStyle &another)
     return one.texture() == another.texture();
 }
 
-QDataStream &operator<<(QDataStream &stream, const ShipStyle &style)
-{
-    return stream << style.id();
-}
-
-QDataStream &operator>>(QDataStream &stream, ShipStyle &style)
-{
-    quint32 id{};
-    stream >> id;
-    ResourceManager *m = ResourceManager::instance();
-    Q_ASSERT(m != 0);
-    Resource::replaceData(style, m->getResource(id));
-    return stream;
-}
-
-QDataStream &operator<<(QDataStream &stream, const ShipStyle::Data &data)
-{
-    return stream << data.width << data.texture;
-}
-
-QDataStream &operator>>(QDataStream &stream, ShipStyle::Data &data)
-{
-    return stream >> data.width >> data.texture;
-}
-
 /*  Ship */
 
 const float Ship::normalLinearSpeed = 0.3f;
