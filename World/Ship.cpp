@@ -18,6 +18,7 @@
 
 #include "Ship.h"
 
+#include "ResourceManager.h"
 #include "WorldBindings.h"
 
 #include "Planet.h"
@@ -83,6 +84,31 @@ void ShipStyle::setTexture(const QString &texture)
 bool operator==(const ShipStyle &one, const ShipStyle &another)
 {
     return one.texture() == another.texture();
+}
+
+QDataStream &operator<<(QDataStream &stream, const ShipStyle &style)
+{
+    return stream << style.id();
+}
+
+QDataStream &operator>>(QDataStream &stream, ShipStyle &style)
+{
+    quint32 id{};
+    stream >> id;
+    ResourceManager *m = ResourceManager::instance();
+    Q_ASSERT(m != 0);
+    Resource::replaceData(style, m->getResource(id));
+    return stream;
+}
+
+QDataStream &operator<<(QDataStream &stream, const ShipStyle::Data &data)
+{
+    return stream << data.width << data.texture;
+}
+
+QDataStream &operator>>(QDataStream &stream, ShipStyle::Data &data)
+{
+    return stream >> data.width >> data.texture;
 }
 
 /*  Ship */
@@ -194,16 +220,18 @@ void Ship::setIsMoving(bool isMoving)
     emit isMovingChanged();
 }
 
-void Ship::normalizeAnlge(float &deltaAngle)
+void Ship::normalizeAngle(float &deltaAngle)
 {
-    while (deltaAngle > M_PI)
+    const float pi = static_cast<float>(M_PI);
+    const float twoPi = static_cast<float>(2 * M_PI);
+    while (deltaAngle > pi)
     {
-        deltaAngle -= 2 * M_PI;
+        deltaAngle -= twoPi;
     }
 
-    while (deltaAngle < -M_PI)
+    while (deltaAngle < -pi)
     {
-        deltaAngle += 2 * M_PI;
+        deltaAngle += twoPi;
     }
 }
 
@@ -278,7 +306,7 @@ float Ship::calcAngle(const float dt, const float angle, const QPointF &pos, con
 {
     initTargetAngle(pos, dest);
     float deltaAngle = m_targetAngle - angle;
-    normalizeAnlge(deltaAngle);
+    normalizeAngle(deltaAngle);
 
     if (std::abs(deltaAngle) <= dt * m_angularSpeed || angle == m_targetAngle)
     {
