@@ -1,5 +1,6 @@
 #include "GAIMaterial.h"
 #include "GAIShader.h"
+#include <memory>
 
 namespace OpenSR
 {
@@ -21,10 +22,10 @@ QSGMaterialShader *GAIMaterial::createShader(QSGRendererInterface::RenderMode) c
 
 GAITexture *GAIMaterial::texture() const
 {
-    return m_texture;
+    return m_texture.get();
 }
 
-void GAIMaterial::setTexture(GAITexture *texture)
+void GAIMaterial::setTexture(std::shared_ptr<GAITexture> texture)
 {
     m_texture = texture;
 }

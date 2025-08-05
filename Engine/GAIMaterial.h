@@ -14,9 +14,9 @@ public:
     QSGMaterialType *type() const override;
     QSGMaterialShader *createShader(QSGRendererInterface::RenderMode) const override;
     GAITexture *texture() const;
-    void setTexture(GAITexture *texture);
+    void setTexture(std::shared_ptr<GAITexture> texture);
 
 private:
-    GAITexture *m_texture;
+    std::shared_ptr<GAITexture> m_texture;
 };
 } // namespace OpenSR
