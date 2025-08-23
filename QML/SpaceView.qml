@@ -1,4 +1,5 @@
-import QtQuick 2.3
+import QtQuick
+import QtQuick.Controls
 import OpenSR 1.0
 import OpenSR.World 1.0
 
@@ -18,6 +19,60 @@ Item {
     property var object
 
     anchors.fill: parent
+    focus: true
+
+    Popup {
+        id: escapeMenu
+        width: parent.width * 0.3
+        height: parent.height * 0.4
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: "#202020"
+            border.color: "#505050"
+            radius: 5
+        }
+
+        Column {
+            anchors.fill: parent
+            anchors.margins: 10
+            spacing: 10
+
+            Text {
+                text: "Menu"
+                color: "white"
+                font.bold: true
+                font.pixelSize: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Button {
+                id: continueButton
+                text: "Continue"
+                width: parent.width
+                onClicked: escapeMenu.close()
+            }
+
+            Button {
+                id: exitButton
+                text: "Exit to main menu"
+                width: parent.width
+                onClicked: exitToMenu()
+            }
+        }
+    }
+
+    Keys.onEscapePressed: event => {
+        if (escapeMenu.opened) {
+            escapeMenu.close();
+        } else {
+            escapeMenu.open();
+        }
+        event.accepted = true;
+    }
 
     MouseArea {
         id: spaceMouseOverlay
@@ -394,5 +449,10 @@ Item {
             WorldManager.startTurn();
             hideTrajectory(context.playerShip);
         }
+    }
+
+    function exitToMenu() {
+        view.destroy();
+        changeScreen("qrc:/OpenSR/MainMenu.qml");
     }
 }
