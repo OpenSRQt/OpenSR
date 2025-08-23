@@ -174,12 +174,14 @@ Item {
 
     function newGame() {
         World.generateWorld("res:/World/DefaultWorldGen.js");
-        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        menu.destroy();
+        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function loadGame() {
         World.loadWorld("/tmp/test.osr");
-        destroyAndChangeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
+        menu.destroy();
+        changeScreen("qrc:/OpenSR/SpaceView.qml", {"system": World.context.currentSystem});
     }
 
     function componentObjectCreated(object, id)
