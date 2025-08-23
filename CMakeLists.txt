@@ -26,6 +26,45 @@ option(BUILD_RESOURCE_VIEWER "Build Resource Viewer tool" OFF)
 option(BUILD_PLANET_VIEWER "Build Planet Viewer tool" OFF)
 option(BUILD_QUEST_PLAYER "Build Quest Player tool" OFF)
 option(BUILD_DAT_TOOLS "Build tools for DAT files" OFF)
+option(BUILD_TESTS "Build project unit tests and tests for UI components" OFF)
+option(ENABLE_COVERAGE "Enable code covereage (turns test building on)" OFF)
+
+if(ENABLE_COVERAGE)
+    set(BUILD_TESTS ON)
+
+    add_compile_options(--coverage -g -O0 -fprofile-arcs)
+    add_link_options(--coverage -fprofile-arcs)
+
+    find_program(GCOVR gcovr REQUIRED)
+    
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/coverage)
+
+    add_custom_target(run_all_tests
+        COMMAND find ${CMAKE_BINARY_DIR} -name "*.gcda" -delete
+        COMMAND ${CMAKE_CTEST_COMMAND} -VV
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Running all tests for coverage"
+    )
+
+    add_custom_target(global_coverage
+        COMMAND ${GCOVR} -r ${CMAKE_SOURCE_DIR} 
+                --exclude '.*/tests'
+                --exclude '.*/moc_.*'
+                --exclude '.*autogen.*'
+                --exclude '.*_autogen.*'
+                --exclude '.*/CMakeFiles/.*'
+                --exclude '.*/.qt'
+                --html-details -o ${CMAKE_BINARY_DIR}/coverage/coverage.html
+                --html-title "Combined Coverage Report"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating combined coverage report for all tests"
+        DEPENDS run_all_tests
+    )
+endif()
+
+if(BUILD_TESTS)
+    include(CTest)
+endif()
 
 if(BUILD_ALL_TOOLS)
     set(BUILD_RESOURCE_VIEWER ON)
