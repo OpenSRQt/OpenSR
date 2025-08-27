@@ -4,6 +4,7 @@ import OpenSR.World 1.0
 
 Item {
     id: self
+    property bool testConfig: isTestMode
     property WorldObject object
     property bool positioning: false
     property int mouseDelta: 0
@@ -17,24 +18,46 @@ Item {
     y: positioning && object ? object.position.y : 0
     rotation: positioning && object ? radToDeg(shipAngle) : 0
 
+    function getComponentForObject(obj) {
+        if (!obj)
+            return defaultComponent;
+
+        const typeName = WorldManager.typeName(obj.typeId);
+
+        const componentMap = {
+            "OpenSR::World::PlanetarySystem": defaultComponent,
+            "OpenSR::World::Asteroid": defaultComponent,
+            "OpenSR::World::DesertPlanet": planetComponent,
+            "OpenSR::World::InhabitedPlanet": planetComponent,
+            "OpenSR::World::SpaceStation": defaultComponent,
+            "OpenSR::World::Ship": shipComponent
+        };
+
+        return componentMap[typeName] || defaultComponent;
+    }
+
     Loader {
         id: objectLoader
         anchors.centerIn: parent
         asynchronous: false
 
         onLoaded: {
-            if (WorldManager.typeName(object.typeId) === "OpenSR::World::PlanetarySystem") {
-                item.source = object.style.star;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
-                item.source = object.style.texture;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
+            if (!object)
+                return;
+            
+            testBorder.border.color = ObjectConfig.getBorderColorForObject(object);
+
+            if (testConfig) {
+                item.height = item.width = ObjectConfig.getTestSizeForObject(object);
+            } else if (item.hasOwnProperty("source")) {
+                item.source = ObjectConfig.getSourceForObject(object);
+            }
+
+            if (item.hasOwnProperty("planet")) {
                 item.planet = object;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
-                item.source = object.style.texture;
-                item.height = item.width = object.style.width;
+            }
+            if (item.hasOwnProperty("ship")) {
                 item.ship = object;
-            } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::SpaceStation") {
-                item.source = object.style.texture;
             }
         }
         SpaceMouseArea {
@@ -46,12 +69,21 @@ Item {
         }
     }
 
+    Rectangle {
+        id: testBorder
+        visible: testConfig && objectLoader.status === Loader.Ready
+        anchors.fill: objectLoader
+        color: "transparent"
+        border.color: "green"
+        border.width: 2
+    }
+
     Component {
         id: defaultComponent
         AnimatedImage {
             cache: false
             MouseArea {
-                id: item // ?
+                id: item
                 anchors.fill: parent
                 propagateComposedEvents: true
             }
@@ -67,7 +99,7 @@ Item {
             MouseArea {
                 propagateComposedEvents: true
                 anchors.fill: parent
-                onDoubleClicked: (mouse) => {
+                onDoubleClicked: mouse => {
                     mouse.accepted = false;
                     if (!context.playerShip.isMoving && context.planetToEnter == null) {
                         context.planetToEnter = planetItem.planet;
@@ -96,7 +128,7 @@ Item {
         id: shipComponent
 
         AnimatedImage {
-            id: shipImage;
+            id: shipImage
             cache: false
             property Ship ship
             opacity: 1
@@ -108,7 +140,9 @@ Item {
                 }
             }
             Behavior on scale {
-                NumberAnimation { duration: 2000 }
+                NumberAnimation {
+                    duration: 2000
+                }
             }
             Connections {
                 target: ship
@@ -124,7 +158,6 @@ Item {
                 }
             }
         }
-
     }
 
     onObjectChanged: {
@@ -137,22 +170,8 @@ Item {
             return;
         }
 
-        if (WorldManager.typeName(object.typeId) === "OpenSR::World::PlanetarySystem") {
-            objectLoader.sourceComponent = defaultComponent;
-            positioning = false;
-        } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Asteroid") {
-            objectLoader.sourceComponent = defaultComponent;
-            positioning = true;
-        } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::DesertPlanet" || WorldManager.typeName(object.typeId) === "OpenSR::World::InhabitedPlanet") {
-            objectLoader.sourceComponent = planetComponent;
-            positioning = true;
-        } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::SpaceStation") {
-            objectLoader.sourceComponent = defaultComponent;
-            positioning = true;
-        } else if (WorldManager.typeName(object.typeId) === "OpenSR::World::Ship") {
-            objectLoader.sourceComponent = shipComponent;
-            positioning = true;
-        }
+        objectLoader.sourceComponent = getComponentForObject(object);
+        positioning = ObjectConfig.getPositioningForObject(object);
     }
 
     function mouseEntered() {

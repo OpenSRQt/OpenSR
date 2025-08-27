@@ -12,4 +12,8 @@ target_link_libraries(opensr_ui_test PRIVATE
 
 target_link_libraries(opensr_ui_test PRIVATE Qt6::Core Qt6::Quick GTest::GTest Spix)
 
-gtest_discover_tests(opensr_ui_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} DISCOVERY_TIMEOUT 60 TEST_TIMEOUT 30)
+add_test(NAME opensr_ui_test COMMAND opensr_ui_test --test-mode WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+if (ENABLE_COVERAGE)
+    add_dependencies(run_all_tests opensr_ui_test)
+endif()

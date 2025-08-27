@@ -18,6 +18,8 @@ Item {
     property list<SpaceObjectItem> clickables
     property var object
 
+    property bool testConfig: isTestMode
+
     anchors.fill: parent
     focus: true
 
@@ -114,8 +116,9 @@ Item {
         y: parent.height / 2
 
         Image {
+            visible: !testConfig
             id: bg
-            source: system ? system.style.background : ""
+            source: testConfig ? "" : system.style.background
             x: -width / 2
             y: -height / 2
             cache: false
@@ -128,6 +131,7 @@ Item {
     }
 
     Item {
+        visible: !testConfig 
         id: radarView
         anchors.right: parent.right
         anchors.top: parent.top
@@ -136,7 +140,7 @@ Item {
         height: width
 
         Image {
-            source: "res:/DATA/PanelSpace2/1RadarA.gi"
+            source: testConfig ? "" : "res:/DATA/PanelSpace2/1RadarA.gi"
             anchors.fill: parent
             cache: true
         }
@@ -144,9 +148,9 @@ Item {
             id: radarCenterButton
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            normalImage: "res:/DATA/PanelSpace2/1CenterN.gi"
-            hoveredImage: "res:/DATA/PanelSpace2/1CenterA.gi"
-            downImage: "res:/DATA/PanelSpace2/1CenterD.gi"
+            normalImage: testConfig ? "" : "res:/DATA/PanelSpace2/1CenterN.gi"
+            hoveredImage: testConfig ? "" : "res:/DATA/PanelSpace2/1CenterA.gi"
+            downImage: testConfig ? "" : "res:/DATA/PanelSpace2/1CenterD.gi"
             onClicked: console.log("Centering not implemented")
         }
     }
@@ -155,9 +159,6 @@ Item {
         for (var i in spaceNode.children) {
             spaceNode.children[i].destroy();
         }
-
-        if (!system)
-            return;
 
         var component = Qt.createComponent("SpaceObjectItem.qml");
 
