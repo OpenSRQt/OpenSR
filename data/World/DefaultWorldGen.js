@@ -182,7 +182,6 @@ ship1.rank        = World.ShipRank.Diplomat;
 ship1.style       = shipStyleByAffiliation(ship1);
 ship1.angle       = 0;
 
-ship1.style.width = 64;
 context.playerShip = ship1;
 context.planetToEnter = null;
 context.currentSystem = system;

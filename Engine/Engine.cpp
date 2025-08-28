@@ -39,7 +39,6 @@
 #include <QResource>
 #include <QSettings>
 #include <QString>
-#include <qdebug.h>
 
 namespace OpenSR
 {
