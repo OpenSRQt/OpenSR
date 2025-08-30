@@ -36,6 +36,10 @@ runs:
       shell: bash
       run: sudo apt-get install -y gcovr
 
+    - name: Install xvbf
+      shell: bash
+      run: sudo apt-get install -y xvfb libxcb-cursor0
+
     - name: Install AnyRPC
       shell: bash
       run: |
