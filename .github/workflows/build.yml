@@ -1,4 +1,4 @@
-name: Build master
+name: Build and test
 
 on:
   push:
@@ -21,7 +21,18 @@ jobs:
         uses: ./.github/actions/install-dependencies-composite-action
 
       - name: Configure CMake
-        run: cmake -S . -B build -DBUILD_ALL_TOOLS=Yes -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        run: cmake -G Ninja -S . -B build -DBUILD_ALL_TOOLS=Yes -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DENABLE_COVERAGE=Yes
 
       - name: Build
-        run: cmake --build build -j
+        run: cmake --build build --parallel
+
+      - name: Run tests
+        run: cd build && ctest -VV
+
+      - name: Make coverage report
+        run: cmake --build . --target global_coverage && cd ..
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with: 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
