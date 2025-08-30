@@ -5,8 +5,6 @@ project(OpenSR
     LANGUAGES CXX
 )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -62,10 +60,6 @@ if(ENABLE_COVERAGE)
     )
 endif()
 
-if(BUILD_TESTS)
-    include(CTest)
-endif()
-
 if(BUILD_ALL_TOOLS)
     set(BUILD_RESOURCE_VIEWER ON)
     set(BUILD_PLANET_VIEWER ON)
@@ -78,7 +72,11 @@ add_subdirectory(ImagePlugin)
 add_subdirectory(QM)
 add_subdirectory(Engine)
 add_subdirectory(World)
-add_subdirectory(tests)
+
+if (BUILD_TESTS)
+    include(CTest)
+    add_subdirectory(tests)
+endif()
 
 if(BUILD_RESOURCE_VIEWER OR BUILD_PLANET_VIEWER OR BUILD_QUEST_PLAYER OR BUILD_DAT_TOOLS)
     add_subdirectory(tools)

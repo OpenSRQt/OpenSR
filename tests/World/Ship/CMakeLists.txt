@@ -15,8 +15,6 @@ target_link_libraries(ship_test PRIVATE
     world
 )
 
-add_test(NAME ship_test
-             COMMAND ship_test -silent -datatags
-             WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME ship_test COMMAND ship_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_dependencies(world_tests ship_test)
