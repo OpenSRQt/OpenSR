@@ -20,7 +20,6 @@
 
 #include "ResourceManager.h"
 #include "WorldBindings.h"
-#include "ResourceManager.h"
 
 #include "Planet.h"
 #include <QLine>

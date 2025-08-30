@@ -158,7 +158,9 @@ int Engine::run()
         if (!d->startupScript.isEmpty() && !d->testMode)
         {
             execScript(d->startupScript);
-        } else {
+        }
+        else
+        {
             execScript(QUrl("res:/opensrTestMode.js"));
         }
     };
