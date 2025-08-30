@@ -28,6 +28,10 @@ runs:
       shell: bash
       run: sudo apt-get install -y libopenal-dev
 
+    - name: Install GTest
+      shell: bash
+      run: sudo apt-get install -y libgtest-dev
+
     - name: Install AnyRPC
       shell: bash
       run: |
