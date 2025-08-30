@@ -27,9 +27,7 @@ jobs:
         run: cmake --build build --parallel
 
       - name: Run tests
-        uses: GabrielBB/xvfb-action@v1
-        with: 
-          run: cd build && ctest -VV
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" cd build && ctest -VV
 
       - name: Make coverage report
         run: cmake --build . --target global_coverage && cd ..
