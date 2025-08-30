@@ -52,8 +52,7 @@ if(ENABLE_COVERAGE)
                 --exclude '.*_autogen.*'
                 --exclude '.*/CMakeFiles/.*'
                 --exclude '.*/.qt'
-                --html-details -o ${CMAKE_BINARY_DIR}/coverage/coverage.html
-                --html-title "Combined Coverage Report"
+                --coveralls -o ${CMAKE_BINARY_DIR}/coverage/coverage.json
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating combined coverage report for all tests"
         DEPENDS run_all_tests
