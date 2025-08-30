@@ -32,6 +32,10 @@ runs:
       shell: bash
       run: sudo apt-get install -y libgtest-dev
 
+    - name: Install gcovr
+      shell: bash
+      run: sudo apt-get install -y gcovr
+
     - name: Install AnyRPC
       shell: bash
       run: |

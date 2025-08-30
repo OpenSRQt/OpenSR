@@ -2,9 +2,9 @@ name: Build and test
 
 on:
   push:
-    branches: [ master, qt-tests ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, qt-tests ]
+    branches: [ master ]
 
 env:
   BUILD_TYPE: Debug
