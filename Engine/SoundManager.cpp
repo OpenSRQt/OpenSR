@@ -249,7 +249,14 @@ MusicDecoder *SoundManager::getMusicDecoder(const QUrl &url, QObject *parent)
         }
         return new VorbisMusicDecoder(dev, parent);
     }
-    qWarning() << "Unsupported music format: " << QFileInfo(path).suffix();
+    if (url != QUrl(""))
+    {
+        qWarning() << "Unsupported music format: " << QFileInfo(path).suffix();
+    }
+    else
+    {
+        qDebug() << "Path url is empty: " << QFileInfo(path).suffix();
+    }
     return 0;
 }
 
