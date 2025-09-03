@@ -21,6 +21,8 @@ datfiles: $(DATCONVERT) $(DATJSON)
 other:
 	# To start game from command line
 	ln -sf build/World/libworld.so
+	# To allow game demo work correctly
+	(mkdir -p imageformats && cd imageformats && ln -sf ../build/ImagePlugin/libQtOpenSRImagePlugin.so && cd ../)
 	# To allow resource viewer open GAI images
 	(mkdir -p build/tools/ResourceViewer/imageformats && cd build/tools/ResourceViewer/imageformats && ln -sf ../../../ImagePlugin/libQtOpenSRImagePlugin.so)
 

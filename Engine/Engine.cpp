@@ -155,13 +155,15 @@ int Engine::run()
 
     auto scriptExec = [this] {
         Q_D(Engine);
+
+        if (d->testMode)
+        {
+            execScript(QUrl("res:/opensrTestMode.js"));
+            return;
+        }
         if (!d->startupScript.isEmpty() && !d->testMode)
         {
             execScript(d->startupScript);
-        }
-        else
-        {
-            execScript(QUrl("res:/opensrTestMode.js"));
         }
     };
 
