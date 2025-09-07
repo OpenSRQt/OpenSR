@@ -1,9 +1,5 @@
 # OpenSR
 
-[![Qt](https://img.shields.io/badge/Qt-6.0%2B-green.svg)](https://www.qt.io/)
-[![Build and test](https://github.com/InfernalKn1ght/OpenSR-Fork/actions/workflows/build.yml/badge.svg)](https://github.com/InfernalKn1ght/OpenSR-Fork/actions/workflows/build.yml)
-[![Code formatting and linting](https://github.com/InfernalKn1ght/OpenSR-Fork/actions/workflows/lint.yml/badge.svg)](https://github.com/InfernalKn1ght/OpenSR-Fork/actions/workflows/lint.yml)
-
 OpenSR is an open-source project featuring a modern remake of the classic 2004 game *Space Rangers 2: Dominators*, along with a comprehensive toolkit for managing the original game's resources. Built on the Qt framework, the project leverages QML for creating a fluid and modern game interface.
 
 **Current Status**: The engine core is now functional, and a small technical demo is available for testing. This early version showcases the foundational systems while development continues toward full gameplay implementation.
@@ -13,7 +9,6 @@ OpenSR is an open-source project featuring a modern remake of the classic 2004 g
 - **Engine Foundation**: Core systems implemented and operational
 - **Game Demo**: Early showcase of engine capabilities
 - **Resource Management Tools**: Comprehensive utilities for handling original game assets
-- **Extensible Architecture**: Modular design for easy expansion and customization
 - **Comprehensive Testing**: GUI testing with Spix and unit tests with Qt Test
 - **Code Coverage**: Integrated gcovr support for test coverage analysis
 
@@ -75,7 +70,7 @@ cmake --build .
 
 ### Game Demo
 
-The demo executable is located at: `OpenSR/build/Engine/opensr`
+The demo executable is located at: `OpenSR/build/Engine/opensr`. You have to run either without resources in test mode or prepare original game resource first. See next sections.
 
 **Important**: Currently, the executable must be launched from the OpenSR source directory:
 ```bash
@@ -83,14 +78,16 @@ The demo executable is located at: `OpenSR/build/Engine/opensr`
 ```
 
 #### Running with Test Mode
-OpenSR supports running without original game resources using test mode:
-```bash
-./build/Engine/opensr --test-mode
-```
+OpenSR supports running without original game resources using test mode.
 
 Before running in test mode, set up required library symlinks:
 ```bash
-make -f Makefile.root other
+./opensr_setup.sh -t demo
+```
+
+Run the game demo:
+```bash
+./build/Engine/opensr --test-mode
 ```
 
 #### Preparing Original Game Resources
@@ -102,12 +99,20 @@ To use original Space Rangers 2 resources:
 
 1. Build with tools enabled: `cmake -DBUILD_ALL_TOOLS=ON ...`
 2. Unpack your game image
+3. Choose the appropriate setup method
 
 ##### Quick Setup (Linux only)
-Run the preparation script:
 
+###### Step 1: Run the Setup Script
+
+Run setup script: 
 ```bash
-make -f Makefile.root all ASSETS=/path/to/your/game/SR2/DATA
+./opensr_setup.sh -a /path/to/your/iso/SR2/
+```
+
+For more information on setup script features run:
+```bash
+./opensr_setup.sh -h
 ```
 
 To correctly run the demo following PKG files are expected in your DATA directory:
@@ -126,10 +131,14 @@ Star.pkg
 
 **Default assets location**: `OpenSR/../OpenSRData`
 
-##### Detailed Manual Setup
+###### Step 2: Launch OpenSR
+Run the game demo executable:
 
-###### Required Game Version
-OpenSR currently requires resources from "Space Rangers 2: Reboot" (Космические Рейнджеры 2: Доминаторы. Перезагрузка).
+```bash
+./build/Engine/opensr
+```
+
+##### Detailed Manual Setup
 
 ###### Step 1: Copy Resource Files
 Copy the following .pkg files from your game installation to the `data/` folder:
@@ -186,7 +195,7 @@ Run the game executable:
 ./build/Engine/opensr
 ```
 
-###### File Structure After Setup
+##### File Structure After Setup
 Your project directory should contain:
 
 ```
@@ -207,14 +216,17 @@ OpenSR/
 #### ResourceViewer
 GUI application for viewing and extracting resources from .pkg files. Supports game-specific formats (.gai, .gi, .hai, etc.).
 
-**Note**: If built separately, in project directory run: `make -f Makefile.root other`
+**Note**: If built separately, in project directory run: 
+```bash
+./opensr_setup.sh -t tools
+```
 
 #### DATTools
 Command-line utilities for managing DAT game files:
 
 **opensr-dat-convert** - Encrypt/decrypt and compress/decompress DAT files:
 ```bash
-./build/tools/DATTools/opensr-dat-convert hd $ ../OpenSRData/CacheData.dat data/CacheData.dat
+./build/tools/DATTools/opensr-dat-convert hd ../OpenSRData/CacheData.dat data/CacheData.dat
 ```
 
 **opensr-dat-json** - Convert between DAT and JSON formats:
@@ -238,10 +250,32 @@ OpenSR employs a comprehensive testing strategy to ensure code quality and relia
 - **Unit Testing**: Core functionality testing with Qt Test framework
 
 ### Building Tests
-**Important**: GUI tests require Spix source code to be available in the `spix/` directory within the project. If Spix sources are not found, GUI test compilation will be automatically disabled.
+
+#### GUI Tests Setup
+
+To enable GUI testing functionality, you need to install the Spix framework:
+
+**Important**: Before installing Spix, ensure you have installed its required dependency - AnyRPC. Please refer to the [Spix documentation](https://github.com/faaxm/spix) for detailed AnyRPC installation instructions.
+
+1. **Clone Spix repository** in your project directory:
+```bash
+git clone https://github.com/faaxm/spix
+```
+
+2. **Build and install Spix**:
+```bash
+cd spix
+mkdir build && cd build
+cmake -DSPIX_QT_MAJOR=6 -DSPIX_BUILD_EXAMPLES=OFF ..
+cmake --build .
+sudo cmake --install .
+```
+
+**Note**: GUI tests require Spix source code to be available in the `spix/` directory within the project. If Spix sources are not found, GUI test compilation will be automatically disabled.
 
 To enable testing capabilities, build with the `BUILD_TESTS` option:
 ```bash
+# In build directory
 cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug ../
 cmake --build .
 ```
@@ -263,12 +297,14 @@ OpenSR integrates gcovr for detailed code coverage reporting:
 
 1. Build with coverage support enabled:
 ```bash
+# In build directory
 cmake -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug ../
 cmake --build .
 ```
 
 2. Generate comprehensive coverage report:
 ```bash
+# In project directory
 cmake --build ./build --target global_coverage
 ```
 
