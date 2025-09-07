@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/install-dependencies-composite-action
 
       - name: Configure CMake
-        run: cmake -G Ninja -S . -B build -DBUILD_ALL_TOOLS=Yes -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        run: cmake -G Ninja -S . -B build -DCMAKE_CXX_COMPILER=clang++ -DBUILD_ALL_TOOLS=Yes -DBUILD_TESTS=Yes -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
       
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
