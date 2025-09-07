@@ -67,13 +67,11 @@ check_dependencies() {
     if [ ! -f "$DATJSON" ]; then
         print_error "DATJSON not found: $DATJSON"
     fi
-    
-    if [ ! -d "$ASSETS" ]; then
-        print_error "Assets directory not found: $ASSETS"
-    fi
 }
 
 create_data_links() {
+    verify_assets
+
     print_info "Creating symlinks to .pkg files"
     cd data && find "$ASSETS/DATA" -iname '*.pkg' -exec ln -sfv {} \; && cd .. || print_error "Failed to create pkg symlinks"
     
@@ -135,12 +133,12 @@ setup_demo() {
 setup_tools() {
     # Image plugins for resource viewer
 
-    print_info "Setting up symlinks required for Resource Viewer"
+    print_info "Setting up symlinks required for resource viewer"
 
     mkdir -p "build/tools/ResourceViewer/imageformats" && \
     cd "build/tools/ResourceViewer/imageformats" && \
     ln -sf "../../../ImagePlugin/libQtOpenSRImagePlugin.so" . && \
-    cd ../../.. || print_warning "Failed to setup image formats for resource viewer"
+    cd ../../../../ || print_warning "Failed to setup image formats for resource viewer"
 }
 
 main() {
@@ -152,12 +150,11 @@ main() {
     setup_tools
     setup_demo
 
-    print_info "Build completed successfully!"
+    print_info "Setup completed successfully!"
 }
 
 case "$TARGET" in
     "data")
-        check_dependencies
         create_data_links
         ;;
     "datfiles")
