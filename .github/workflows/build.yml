@@ -27,7 +27,7 @@ jobs:
         run: cmake --build build --parallel
 
       - name: Create symlinks to plugins
-        run: make -f Makefile.root other
+        run: ./opensr_setup.sh -t demo
 
       - name: Run tests
         run: cd build/ && xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" ctest -VV
