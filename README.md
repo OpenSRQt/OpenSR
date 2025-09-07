@@ -1,6 +1,6 @@
 # OpenSR
 
-OpenSR is an open-source project featuring a modern remake of the classic 2004 game *Space Rangers 2: Dominators*, along with a comprehensive toolkit for managing the original game's resources. Built on the Qt framework, the project leverages QML for creating a fluid and modern game interface.
+OpenSR is an open-source project featuring a modern remake of the classic 2004 game *Space Rangers 2: Dominators*, along with a comprehensive toolkit for managing the original game's resources. The project is built on the Qt framework.
 
 **Current Status**: The engine core is now functional, and a small technical demo is available for testing. This early version showcases the foundational systems while development continues toward full gameplay implementation.
 
@@ -35,7 +35,7 @@ While Windows builds are possible through CMake and Qt6, please note:
 - **No Automatic Setup**: Currently there is no script for automatic resources preparation and symlink creation on Windows, so manual setup is required
 - **Build Limitations**: Build functionality has not been extensively tested on Windows
 - **Platform Issues**: Some platform-specific issues may occur
-- **GUI Testing**: GUI testing may require additional setup and configuration
+- **GUI Testing and Code Coverage**: GUI testing and gcovr may require additional setup and configuration
 
 For detailed instructions on manual resource setup, please refer to the [Detailed Manual Setup](#detailed-manual-setup) section. Windows users will need to use appropriate Windows utilities to perform the equivalent operations (such as using `mklink` for symlinks instead of `ln -s`).
 
@@ -105,7 +105,6 @@ To use original Space Rangers 2 resources:
 
 ###### Step 1: Run the Setup Script
 
-Run setup script: 
 ```bash
 ./opensr_setup.sh -a /path/to/your/iso/SR2/
 ```
@@ -130,6 +129,7 @@ Star.pkg
 ```
 
 **Default assets location**: `OpenSR/../OpenSRData`
+**Default language**: `Rus`
 
 ###### Step 2: Launch OpenSR
 Run the game demo executable:
