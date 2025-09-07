@@ -15,13 +15,11 @@ for(let i = 0; i < 20; i++)
 }
 
 var planet1 = World.DesertPlanet(system);
-planet1.name = "PlanetName.Solar.2"
 planet1.period = 15;
 planet1.angle = 3.1415 / 4;
 planet1.position = Qt.point(355, -222);
 
 var planet2 = World.InhabitedPlanet(system);
-planet2.name = "PlanetName.Solar.1"
 planet2.period = 15;
 planet2.angle = 3.1415 / 4;
 planet2.position = Qt.point(355, 222);
