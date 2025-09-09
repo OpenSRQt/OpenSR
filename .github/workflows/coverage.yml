@@ -24,7 +24,7 @@ jobs:
         run: cmake -G Ninja -S . -B build -DCMAKE_CXX_COMPILER=g++ -DBUILD_ALL_TOOLS=Yes -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DENABLE_COVERAGE=Yes
 
       - name: Build
-        run: cmake --build build --parallel
+        run: cmake --build build --parallel $(nproc)
 
       - name: Create symlinks to plugins
         run: ./opensr_setup.sh -t demo

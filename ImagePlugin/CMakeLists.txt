@@ -1,3 +1,5 @@
+find_package(Qt6 REQUIRED COMPONENTS Gui)
+
 add_library(QtOpenSRImagePlugin SHARED
     GAIAnimationIO.cpp
     GIImageIO.cpp

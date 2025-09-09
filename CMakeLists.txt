@@ -17,8 +17,6 @@ set(CMAKE_AUTOUIC ON)
 
 set(API_VERSION 1)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui)
-
 option(BUILD_ALL_TOOLS "Build all tools (overrides individual tool options)" OFF)
 option(BUILD_RESOURCE_VIEWER "Build Resource Viewer tool" OFF)
 option(BUILD_PLANET_VIEWER "Build Planet Viewer tool" OFF)
