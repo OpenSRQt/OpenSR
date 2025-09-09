@@ -1,8 +1,6 @@
 find_package(Qt6 REQUIRED COMPONENTS Widgets Quick ShaderTools Gui)
 find_package(OpenAL REQUIRED)
 
-message(WARNING "Используется Qt версии ${Qt6_VERSION}")
-
 add_library(engine SHARED
     Engine.cpp
     SoundManager.cpp
