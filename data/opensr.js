@@ -1,5 +1,5 @@
 Engine.addDATFile("res:/main.dat")
-Engine.addDATFile("res:/eng.dat")
+Engine.addDATFile("res:/rus.dat")
 Engine.addDATFile("res:/CacheData.dat", true)
 
 var dir = Engine.dataDir
