@@ -1,3 +1,5 @@
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
 add_library(QM SHARED
     QM.cpp
     Parser.cpp

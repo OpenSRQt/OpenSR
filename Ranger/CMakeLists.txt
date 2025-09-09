@@ -1,3 +1,5 @@
+find_package(Qt6 REQUIRED COMPONENTS Core Gui)
+
 add_library(RangerQt SHARED
     GAILoader.cpp
     GILoader.cpp

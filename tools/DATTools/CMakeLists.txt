@@ -1,3 +1,5 @@
+find_package(Qt6 REQUIRED COMPONENTS Core Gui)
+
 add_executable(opensr-dat-convert
     crypt.cpp
     convert.cpp
