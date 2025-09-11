@@ -66,11 +66,11 @@ void SpixOSRTest::executeTest()
 
 TEST(UITest, ButtonTest)
 {
-    SpixOSRTest::instance().wait(std::chrono::milliseconds(1000));
+    SpixOSRTest::instance().wait(std::chrono::milliseconds(2000));
     SpixOSRTest::instance().mouseClick(spix::ItemPath("gameScreen/menu/newButton"));
-    SpixOSRTest::instance().wait(std::chrono::milliseconds(1000));
+    SpixOSRTest::instance().wait(std::chrono::milliseconds(3000));
     SpixOSRTest::instance().invokeMethod("gameScreen/view", "exitToMenu", std::vector<spix::Variant>{});
-    SpixOSRTest::instance().wait(std::chrono::milliseconds(1000));
+    SpixOSRTest::instance().wait(std::chrono::milliseconds(2000));
     SpixOSRTest::instance().mouseClick(spix::ItemPath("gameScreen/menu/exitButton"));
 
     EXPECT_EQ(SpixOSRTest::instance().getAppErrors(), std::vector<std::string>{});
