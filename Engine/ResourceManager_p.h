@@ -23,6 +23,7 @@
 
 #include <OpenSR/libRangerQt.h>
 #include <QNetworkReply>
+#include <QDir>
 
 class QFile;
 class QBuffer;
