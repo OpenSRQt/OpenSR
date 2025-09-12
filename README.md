@@ -310,8 +310,11 @@ cmake --build ./build --target global_coverage
 
 The `global_coverage` target automatically verifies test availability and executes them via ctest before generating coverage data.
 
-Coverage results in JSON format are available at:
-`build/coverage/coverage.json`
+Coverage results in HTML format are available at:
+`build/coverage/coverage_local.html`
+
+For coveralls action in JSON format:
+`build/coverage/coverage_coveralls.json`
 
 ## License
 
