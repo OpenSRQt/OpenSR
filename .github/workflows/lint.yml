@@ -38,7 +38,7 @@ jobs:
           style: 'file'
           tidy-checks: ''
           step-summary: true
-          files-changed-only: false
+          files-changed-only: true
           tidy-review: true
           format-review: true
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
