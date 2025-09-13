@@ -77,6 +77,8 @@ create_data_links() {
     
     print_info "Creating symlink to Music directory"
     cd data && ln -sf "$ASSETS/Music/" . && cd .. || print_warning "Failed to create Music directory symlink"
+
+    print_info "Symlinks created successfully!"
 }
 
 process_dat_files() {
@@ -115,6 +117,8 @@ process_dat_files() {
     "$DATJSON" d2j "data/main.dat" "data/main.json" || print_error "Failed to convert main.dat to JSON"
     "$DATJSON" d2j "data/CacheData.dat" "data/CacheData.json" || print_error "Failed to convert CacheData.dat to JSON"
     "$DATJSON" d2j "data/$lang_file.dat" "data/$lang_file_lower.json" || print_error "Failed to convert $lang_file.dat to JSON"
+
+    print_info "DAT files processed successfully!"
 }
 
 setup_demo() {
@@ -123,22 +127,46 @@ setup_demo() {
     # World library
     ln -sf "build/World/libworld.so" || print_warning "Failed to create libworld.so symlink"
     
-    # Image plugins for demo
     mkdir -p "imageformats" && \
     cd "imageformats" && \
     ln -sf "../build/ImagePlugin/libQtOpenSRImagePlugin.so" . && \
     cd .. || print_warning "Failed to setup image formats for demo"
+
+    print_info "Demo setup completed successfully!"
 }
 
 setup_tools() {
-    # Image plugins for resource viewer
-
     print_info "Setting up symlinks required for resource viewer"
 
     mkdir -p "build/tools/ResourceViewer/imageformats" && \
     cd "build/tools/ResourceViewer/imageformats" && \
     ln -sf "../../../ImagePlugin/libQtOpenSRImagePlugin.so" . && \
     cd ../../../../ || print_warning "Failed to setup image formats for resource viewer"
+
+    print_info "Tools setup completed successfully!"
+}
+
+setup_spix() {
+    INSTALL_DIR="$(pwd)/deps-install"
+    print_info "Local install directory for Spix and its dependencies is set to: $INSTALL_DIR"
+
+    mkdir -p "deps" && cd ./deps
+    print_info "Cloning Spix repository"
+    git clone --recursive https://github.com/faaxm/spix.git && cd .. || print_error "Failed to clone Spix repository"
+    
+    print_info "Building and installing Spix dependencies"
+    chmod +x ./deps/spix/ci/install-deps.sh && \
+    ./deps/spix/ci/install-deps.sh local_build || print_error "Failed to build and install Spix dependencies"
+
+    print_info "Building and installing Spix"
+    cd ./deps/spix && mkdir -p "build" && cd ./build && \
+    cmake -DSPIX_QT_MAJOR=6 -DSPIX_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR .. && \
+    cmake --build . && cmake --install . && cd ../../../ || print_error "Failed to build and install"
+
+    print_info "Copying AnyRPC module to: './cmake/modules'"
+    mkdir -p ./cmake/modules && cp -r ./deps/spix/cmake/modules/FindAnyRPC.cmake ./cmake/modules/ || print_error "Failed to copy module file"
+
+    print_info "Spix setup completed successfully!"
 }
 
 main() {
@@ -166,6 +194,9 @@ case "$TARGET" in
         ;;
     "demo")
         setup_demo
+        ;;
+    "spix")
+        setup_spix
         ;;
     "all")
         main

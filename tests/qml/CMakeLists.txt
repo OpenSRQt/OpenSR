@@ -1,4 +1,4 @@
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/spix/cmake/modules)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 find_package(Qt6 COMPONENTS Core Quick Widgets REQUIRED)
 find_package(GTest REQUIRED)

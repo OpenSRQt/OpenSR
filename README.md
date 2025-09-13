@@ -246,16 +246,36 @@ GUI application for viewing and testing .qm files containing text adventure cont
 
 ### Testing Framework
 OpenSR employs a comprehensive testing strategy to ensure code quality and reliability:
-- **GUI Testing**: Automated interface testing using the Spix framework
+- **GUI Testing**: Automated interface testing using Spix framework
 - **Unit Testing**: Core functionality testing with Qt Test framework
 
 ### Building Tests
 
 #### GUI Tests Setup
 
-To enable GUI testing functionality, you need to install the Spix framework:
+To enable GUI testing functionality, you need to install Spix framework with its dependencies. 
 
-**Important**: Before installing Spix, ensure you have installed its required dependency - AnyRPC. Please refer to the [Spix documentation](https://github.com/faaxm/spix) for detailed AnyRPC installation instructions.
+##### Quick Setup (Linux only)
+
+**Important**: This setup option will automatically run a script that clones Spix, AnyRPC, and GTest repositories into the `./deps` directory, then builds and installs them locally to `./deps-install`. If you prefer to install these libraries to standard system directories, please refer to the Manual Setup section.
+
+Run setup script:
+
+```bash
+./opensr_setup.sh -t spix
+```
+
+Build OpenSR GUI tests:
+
+```bash
+# In build directory
+cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=../deps-install ../
+cmake --build .
+```
+
+##### Manual Setup
+
+**Important**: Before installing Spix, ensure you have installed its required dependencies - AnyRPC and GTest. Please refer to the [Spix documentation](https://github.com/faaxm/spix) for detailed AnyRPC installation instructions.
 
 1. **Clone Spix repository** in your project directory:
 ```bash
@@ -269,9 +289,9 @@ mkdir build && cd build
 cmake -DSPIX_QT_MAJOR=6 -DSPIX_BUILD_EXAMPLES=OFF ..
 cmake --build .
 sudo cmake --install .
+# To correctly build GUI tests later, copy AnyRPC cmake module file from Spix sources:
+cd ../../ && mkdir -p ./cmake/modules && cp -r ./deps/spix/cmake/modules/FindAnyRPC.cmake ./cmake/modules/
 ```
-
-**Note**: GUI tests require Spix source code to be available in the `spix/` directory within the project. If Spix sources are not found, GUI test compilation will be automatically disabled.
 
 To enable testing capabilities, build with the `BUILD_TESTS` option:
 ```bash

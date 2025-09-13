@@ -8,7 +8,7 @@ namespace
 {
 static const QString SETTINGS_ORGANIZATION = "OpenSR";
 static const QString SETTINGS_APPLICATION = "OpenSR";
-static const QString STARTUP_SCRIPT = "res:/opensrTestMode.js";
+static const QString STARTUP_SCRIPT = "res:/opensr.js";
 static const QString MAIN_QML = "res:/OpenSR/GameWindow.qml";
 } // namespace
 
