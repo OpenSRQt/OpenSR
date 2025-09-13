@@ -7,6 +7,8 @@ CMakeFiles
 CMakeCache.txt
 /.vscode
 /.qt
+/deps
+/deps-install
 # Root build dir
 /build
 /libworld.so
