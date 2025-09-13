@@ -268,9 +268,9 @@ Run setup script:
 Build OpenSR GUI tests:
 
 ```bash
-# In build directory
-cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=../deps-install ../
-cmake --build .
+# In the root directory
+cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=`pwd`/deps-install -S . -B build
+cmake --build build -j
 ```
 
 ##### Manual Setup
